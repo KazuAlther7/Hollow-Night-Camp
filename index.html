@@ -2125,7 +2125,8 @@
         : 'LET ME IN';
     }
 
-    // READER PROFILE
+// READER PROFILE
+let currentUserId = null;
 let profileEditor = null;
 let profileNickname = null;
 let profileBio = null;
@@ -2135,14 +2136,16 @@ let profileSaveButton = null;
 let currentAvatarUrl = null;
 
 async function showSignedIn(user) {
-  authPanel.hidden = true;
-  accountPanel.classList.add('visible');
+currentUserId = user.id;
 
-  accountEmail.textContent = user.email || 'Camp member';
+authPanel.hidden = true;
+accountPanel.classList.add('visible');
 
-  sessionMessage.textContent =
-    'Your account is signed in successfully.';
+accountEmail.textContent = user.email || 'Camp member';
 
+sessionMessage.textContent =
+'Your account is signed in successfully.';
+  
   try {
     const profile = await getReaderProfile(user.id);
 
@@ -2219,7 +2222,7 @@ async function showSignedIn(user) {
 
         try {
           const updatedProfile = await updateReaderProfile(
-            user.id,
+            currentuser.id,
             {
               nickname,
               bio,
@@ -2266,6 +2269,8 @@ async function showSignedIn(user) {
 }
 
     function showSignedOut() {
+      currentUserId = null;
+      
       authPanel.hidden = false;
       accountPanel.classList.remove('visible');
     }
