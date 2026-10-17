@@ -68,21 +68,26 @@ export async function getReaderProfile(userId) {
 
 // UPDATE PROFIL READER
 export async function updateReaderProfile(userId, profile) {
-  const { data, error } = await supabase
-    .from("profiles")
-    .update({
-      nickname: profile.nickname.trim(),
-      bio: profile.bio.trim(),
-      avatar_url: profile.avatar_url || null,
-      updated_at: new Date().toISOString()
-    })
-    .eq("id", userId)
-    .select("id, nickname, bio, avatar_url, role")
-    .single();
+const { data, error } = await supabase
+.from("profiles")
+.update({
+nickname: profile.nickname.trim(),
+bio: profile.bio.trim(),
+avatar_url: profile.avatar_url || null,
+updated_at: new Date().toISOString()
+})
+.eq("id", userId)
+.select("id, nickname, bio, avatar_url, role");
 
-  if (error) {
-    throw error;
-  }
+if (error) {
+throw error;
+}
 
-  return data;
+if (!data || data.length !== 1) {
+throw new Error(
+"Profil tidak berhasil diperbarui. Pastikan akun memiliki akses untuk mengedit profilnya."
+);
+}
+
+return data[0];
 }
