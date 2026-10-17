@@ -50,3 +50,39 @@ return supabase.auth.onAuthStateChange((event, session) => {
 callback(event, session);
 });
 }
+
+// AMBIL PROFIL READER
+export async function getReaderProfile(userId) {
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, nickname, bio, avatar_url, role")
+    .eq("id", userId)
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+// UPDATE PROFIL READER
+export async function updateReaderProfile(userId, profile) {
+  const { data, error } = await supabase
+    .from("profiles")
+    .update({
+      nickname: profile.nickname.trim(),
+      bio: profile.bio.trim(),
+      avatar_url: profile.avatar_url || null,
+      updated_at: new Date().toISOString()
+    })
+    .eq("id", userId)
+    .select("id, nickname, bio, avatar_url, role")
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
