@@ -1875,15 +1875,145 @@
         : 'LET ME IN';
     }
 
-    function showSignedIn(user) {
-      authPanel.hidden = true;
-      accountPanel.classList.add('visible');
+    // READER PROFILE
+let profileEditor = null;
+let profileNickname = null;
+let profileBio = null;
+let profileRole = null;
+let profileStatus = null;
+let profileSaveButton = null;
+let currentAvatarUrl = null;
 
-      accountEmail.textContent = user.email || 'Camp member';
+async function showSignedIn(user) {
+  authPanel.hidden = true;
+  accountPanel.classList.add('visible');
 
-      sessionMessage.textContent =
-        'Your account is signed in successfully.';
+  accountEmail.textContent = user.email || 'Camp member';
+
+  sessionMessage.textContent =
+    'Your account is signed in successfully.';
+
+  try {
+    const profile = await getReaderProfile(user.id);
+
+    // Buat editor profil satu kali saja
+    if (!profileEditor) {
+      profileEditor = document.createElement('form');
+      profileEditor.id = 'readerProfileEditor';
+
+      profileEditor.innerHTML = `
+        <div class="reader-profile">
+          <h2>Your Camp Profile</h2>
+
+          <p class="profile-label">CAMP NICKNAME</p>
+          <input
+            id="profileNickname"
+            type="text"
+            minlength="3"
+            maxlength="30"
+            required
+            placeholder="Your nickname"
+          >
+
+          <p class="profile-label">YOUR BIO</p>
+          <textarea
+            id="profileBio"
+            maxlength="300"
+            rows="4"
+            placeholder="Tell the camp a little about yourself..."
+          ></textarea>
+
+          <p class="profile-label">ACCOUNT ROLE</p>
+          <p id="profileRole"></p>
+
+          <button id="profileSaveButton" type="submit">
+            SAVE PROFILE
+          </button>
+
+          <p id="profileStatus" role="status"></p>
+        </div>
+      `;
+
+      accountPanel.appendChild(profileEditor);
+
+      profileNickname =
+        profileEditor.querySelector('#profileNickname');
+
+      profileBio =
+        profileEditor.querySelector('#profileBio');
+
+      profileRole =
+        profileEditor.querySelector('#profileRole');
+
+      profileStatus =
+        profileEditor.querySelector('#profileStatus');
+
+      profileSaveButton =
+        profileEditor.querySelector('#profileSaveButton');
+
+      profileEditor.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const nickname = profileNickname.value.trim();
+        const bio = profileBio.value.trim();
+
+        if (nickname.length < 3) {
+          profileStatus.textContent =
+            'Nickname must contain at least 3 characters.';
+          return;
+        }
+
+        profileSaveButton.disabled = true;
+        profileSaveButton.textContent = 'SAVING...';
+        profileStatus.textContent = '';
+
+        try {
+          const updatedProfile = await updateReaderProfile(
+            user.id,
+            {
+              nickname,
+              bio,
+              avatar_url: currentAvatarUrl
+            }
+          );
+
+          profileNickname.value = updatedProfile.nickname;
+          profileBio.value = updatedProfile.bio;
+          profileRole.textContent =
+            updatedProfile.role.toUpperCase();
+
+          profileStatus.textContent =
+            'Profile saved successfully!';
+
+        } catch (error) {
+          console.error('Profile update failed:', error);
+
+          profileStatus.textContent =
+            error.message || 'Could not save your profile.';
+        } finally {
+          profileSaveButton.disabled = false;
+          profileSaveButton.textContent = 'SAVE PROFILE';
+        }
+      });
     }
+
+    // Isi formulir dengan data dari Supabase
+    profileNickname.value = profile.nickname || '';
+    profileBio.value = profile.bio || '';
+    profileRole.textContent =
+      (profile.role || 'reader').toUpperCase();
+
+    currentAvatarUrl = profile.avatar_url || null;
+
+    profileStatus.textContent = '';
+
+  } catch (error) {
+    console.error('Unable to load reader profile:', error);
+
+    sessionMessage.textContent =
+      'You are signed in, but your profile could not be loaded. Please refresh the page.';
+  }
+}
 
     function showSignedOut() {
       authPanel.hidden = false;
