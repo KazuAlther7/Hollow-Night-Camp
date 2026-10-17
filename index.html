@@ -1940,9 +1940,9 @@
         if (mode === 'register') {
 
           const result = await registerReader(
+            username,
             email,
-            password,
-            username
+            password
           );
 
           if (result.user && !result.session) {
