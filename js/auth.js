@@ -7,7 +7,7 @@ email: email.trim(),
 password,
 options: {
 data: {
-username: username.trim()
+nickname: username.trim()
 },
 emailRedirectTo: window.location.origin +
 window.location.pathname
