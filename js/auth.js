@@ -1,50 +1,50 @@
-import { supabase } from '../config/supabase.js';
+import { supabase } from "../config/supabase.js";
 
-export async function registerReader(email, password, username) {
-const { data, error } = await supabase.auth.signUp({
-email,
-password,
-options: {
-data: {
-username
-},
-emailRedirectTo: window.location.origin +
-'/Hollow-Night-Camp/'
+// REGISTER READER
+export async function registerReader(username, email, password) {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        username: username.trim()
+      }
+    }
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
 }
-});
 
-if (error) throw error;
-
-return data;
-}
-
+// LOGIN READER
 export async function loginReader(email, password) {
-const { data, error } = await supabase.auth.signInWithPassword({
-email,
-password
-});
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  });
 
-if (error) throw error;
+  if (error) {
+    throw error;
+  }
 
-return data;
+  return data;
 }
 
+// LOGOUT READER
 export async function logoutReader() {
-const { error } = await supabase.auth.signOut();
+  const { error } = await supabase.auth.signOut();
 
-if (error) throw error;
+  if (error) {
+    throw error;
+  }
 }
 
-export async function getCurrentReader() {
-const { data, error } = await supabase.auth.getUser();
-
-if (error) throw error;
-
-return data.user;
-}
-
+// DETEKSI STATUS LOGIN
 export function observeAuthState(callback) {
-return supabase.auth.onAuthStateChange((event, session) => {
-callback(event, session);
-});
+  return supabase.auth.onAuthStateChange((_event, session) => {
+    callback(session?.user ?? null);
+  });
 }
