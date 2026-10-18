@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#17251d">
 
-  <title>Hollow Night Camp — Enter The Camp</title>
+  <title>Hollow Night Camp</title>
 
   <meta name="description"
     content="Welcome to Hollow Night Camp. Gather around the fire, discover forgotten stories, and investigate the mysteries hidden beyond the woods.">
@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Sans:wght@400;500;600;700&family=Special+Elite&family=Fredoka:wght@400;500;600;700&display=swap"
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Special+Elite&family=Fredoka:wght@400;500;600;700&display=swap"
     rel="stylesheet">
 
   <style>
@@ -1711,539 +1711,6 @@
   }
 }
 
-/* =====================================
-   CAMPFIRE HOME
-===================================== */
-
-.camp-app {
-  width: min(1180px, 92%);
-  margin: 0 auto;
-  padding: 32px 0 80px;
-  flex: 1;
-  animation: revealUp .5s var(--ease) both;
-}
-
-.camp-app[hidden] {
-  display: none !important;
-}
-
-.camp-navigation {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-
-  padding: 10px;
-  margin-bottom: 32px;
-
-  border: 1px solid rgba(243, 231, 201, .15);
-  border-radius: 15px;
-
-  background: rgba(16, 26, 22, .8);
-  box-shadow: 0 12px 35px rgba(0, 0, 0, .12);
-}
-
-.camp-nav-item,
-.notification-button {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-
-  min-height: 43px;
-  padding: 10px 15px;
-
-  border: 1px solid transparent;
-  border-radius: 10px;
-
-  background: transparent;
-  color: #d2d5c5;
-
-  font-size: 12px;
-  font-weight: 600;
-
-  cursor: pointer;
-  transition: background .2s ease, color .2s ease;
-}
-
-.camp-nav-item:hover,
-.notification-button:hover {
-  background: rgba(243, 231, 201, .07);
-  color: var(--paper);
-}
-
-.camp-nav-item.active {
-  border-color: rgba(242, 163, 75, .25);
-  background: rgba(242, 163, 75, .12);
-  color: var(--fire);
-}
-
-.notification-button {
-  margin-left: auto;
-  font-size: 18px;
-}
-
-.notification-dot {
-  position: absolute;
-  top: 7px;
-  right: 7px;
-
-  width: 7px;
-  height: 7px;
-
-  border-radius: 50%;
-  background: var(--orange);
-  box-shadow: 0 0 9px rgba(242, 163, 75, .6);
-}
-
-.camp-page {
-  min-width: 0;
-}
-
-.camp-welcome {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 25px;
-
-  padding: clamp(25px, 5vw, 48px);
-  margin-bottom: 34px;
-
-  overflow: hidden;
-
-  border: 1px solid rgba(243, 231, 201, .18);
-  border-radius: 22px;
-
-  background:
-    radial-gradient(
-      ellipse at 85% 20%,
-      rgba(242, 163, 75, .15),
-      transparent 40%
-    ),
-    linear-gradient(135deg, rgba(43, 65, 47, .96), rgba(19, 32, 25, .97));
-
-  box-shadow: 0 20px 55px rgba(0, 0, 0, .16);
-}
-
-.camp-welcome > div:first-child {
-  position: relative;
-  z-index: 1;
-}
-
-.camp-eyebrow {
-  display: block;
-  color: var(--orange);
-  font-family: var(--typewriter);
-  font-size: 10px;
-  letter-spacing: 1.5px;
-  line-height: 1.8;
-}
-
-.camp-welcome h1,
-.camp-placeholder-page h1 {
-  margin: 15px 0;
-  font-family: var(--heading);
-  font-size: clamp(32px, 5vw, 55px);
-  line-height: 1.1;
-}
-
-.camp-welcome h1 span {
-  color: var(--orange);
-}
-
-.camp-welcome p,
-.camp-placeholder-page p {
-  max-width: 560px;
-  margin: 0;
-  color: #c8d0bf;
-  font-size: 13px;
-  line-height: 1.9;
-}
-
-.camp-welcome-icon {
-  flex-shrink: 0;
-  display: grid;
-  place-items: center;
-
-  width: 100px;
-  height: 100px;
-
-  border: 1px solid rgba(242, 163, 75, .3);
-  border-radius: 50%;
-
-  background: rgba(242, 163, 75, .08);
-  font-size: 48px;
-
-  box-shadow: 0 0 60px rgba(242, 163, 75, .08);
-}
-
-.home-section {
-  margin-top: 42px;
-}
-
-.home-section-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  margin-bottom: 20px;
-}
-
-.home-section-heading h2 {
-  margin: 7px 0 0;
-  font-family: var(--heading);
-  font-size: clamp(23px, 3vw, 30px);
-}
-
-.home-section-heading p {
-  margin: 8px 0 0;
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.7;
-}
-
-.text-action {
-  flex-shrink: 0;
-  border: 0;
-  background: transparent;
-  color: var(--orange);
-  font-size: 12px;
-  cursor: pointer;
-}
-
-.text-action:hover {
-  text-decoration: underline;
-}
-
-.featured-story-card {
-  display: grid;
-  grid-template-columns: minmax(150px, .75fr) minmax(0, 1.25fr);
-  overflow: hidden;
-
-  border: 1px solid rgba(243, 231, 201, .16);
-  border-radius: 17px;
-
-  background: rgba(16, 26, 22, .82);
-}
-
-.featured-story-art {
-  display: grid;
-  place-items: center;
-  min-height: 225px;
-
-  background:
-    radial-gradient(circle at 50% 55%, rgba(242, 163, 75, .2), transparent 37%),
-    linear-gradient(145deg, #354a35, #17241d 75%);
-
-  border-right: 1px solid rgba(243, 231, 201, .12);
-}
-
-.featured-story-art span {
-  display: grid;
-  place-items: center;
-
-  width: 90px;
-  height: 90px;
-
-  border: 2px solid rgba(242, 163, 75, .6);
-  border-radius: 50% 45% 50% 40%;
-
-  color: var(--orange);
-  font-family: var(--typewriter);
-  font-size: 50px;
-
-  transform: rotate(-8deg);
-  box-shadow: 0 0 45px rgba(242, 163, 75, .12);
-}
-
-.featured-story-content {
-  align-self: center;
-  padding: clamp(20px, 4vw, 35px);
-}
-
-.story-tag {
-  color: var(--moss);
-  font-family: var(--typewriter);
-  font-size: 9px;
-  letter-spacing: 1.5px;
-}
-
-.featured-story-content h3 {
-  margin: 12px 0;
-  font-family: var(--heading);
-  font-size: clamp(22px, 3vw, 31px);
-}
-
-.featured-story-content p {
-  max-width: 480px;
-  color: #c3c8b1;
-  font-size: 12px;
-  line-height: 1.9;
-}
-
-.camp-action-button {
-  margin-top: 12px;
-  padding: 12px 16px;
-
-  border: 1px solid rgba(242, 163, 75, .4);
-  border-radius: 8px;
-
-  background: rgba(242, 163, 75, .1);
-  color: var(--fire);
-
-  font-size: 12px;
-  font-weight: 700;
-
-  cursor: pointer;
-}
-
-.camp-action-button:hover {
-  background: rgba(242, 163, 75, .18);
-}
-
-.community-home-grid,
-.author-home-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 15px;
-}
-
-.community-home-card {
-  padding: 24px;
-  text-align: left;
-
-  border: 1px solid rgba(243, 231, 201, .14);
-  border-radius: 15px;
-
-  background: rgba(16, 26, 22, .75);
-  color: var(--paper);
-
-  cursor: pointer;
-  transition: transform .2s ease, border-color .2s ease;
-}
-
-.community-home-card:hover,
-.author-home-card:hover {
-  transform: translateY(-3px);
-  border-color: rgba(242, 163, 75, .5);
-}
-
-.community-home-card > span:first-child {
-  font-size: 28px;
-}
-
-.community-home-card h3 {
-  margin: 15px 0 8px;
-  font-family: var(--heading);
-  font-size: 20px;
-}
-
-.community-home-card p {
-  color: #c3c8b1;
-  font-size: 12px;
-  line-height: 1.8;
-}
-
-.community-home-card .card-link {
-  display: inline-block;
-  margin-top: 8px;
-  color: var(--orange);
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.home-author-studio {
-  padding: clamp(20px, 4vw, 30px);
-  margin: 34px 0;
-
-  border: 1px solid rgba(242, 163, 75, .3);
-  border-radius: 18px;
-
-  background:
-    radial-gradient(circle at 100% 0%, rgba(242, 163, 75, .1), transparent 35%),
-    rgba(16, 26, 22, .9);
-}
-
-.home-author-studio[hidden] {
-  display: none !important;
-}
-
-.author-badge {
-  padding: 7px 10px;
-  border: 1px solid rgba(242, 163, 75, .35);
-  border-radius: 6px;
-
-  color: var(--fire);
-  background: rgba(242, 163, 75, .1);
-
-  font-family: var(--typewriter);
-  font-size: 9px;
-  letter-spacing: 1.5px;
-}
-
-.author-home-card {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 9px;
-
-  min-height: 155px;
-  padding: 19px;
-
-  border: 1px solid rgba(243, 231, 201, .14);
-  border-radius: 13px;
-
-  background: rgba(243, 231, 201, .035);
-  color: var(--paper);
-  text-align: left;
-
-  cursor: pointer;
-  transition: transform .2s ease, border-color .2s ease;
-}
-
-.author-home-icon {
-  color: var(--orange);
-  font-size: 24px;
-}
-
-.author-home-title {
-  font-family: var(--heading);
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.author-home-description {
-  color: #c3c8b1;
-  font-size: 11px;
-  line-height: 1.7;
-}
-
-.home-status {
-  margin: 16px 0 0;
-  color: var(--fire);
-  font-size: 12px;
-  line-height: 1.8;
-}
-
-.home-profile-section {
-  padding-top: 30px;
-  border-top: 1px solid rgba(243, 231, 201, .14);
-}
-
-.home-profile-description {
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.8;
-}
-
-.home-logout-button {
-  margin-top: 22px;
-  padding: 11px 15px;
-
-  border: 1px solid rgba(243, 231, 201, .22);
-  border-radius: 8px;
-
-  background: rgba(243, 231, 201, .04);
-  color: var(--paper);
-
-  font-size: 12px;
-  cursor: pointer;
-}
-
-.home-logout-button:hover {
-  border-color: var(--orange);
-}
-
-.camp-placeholder-page {
-  min-height: 350px;
-  padding: clamp(28px, 6vw, 60px);
-
-  border: 1px solid rgba(243, 231, 201, .16);
-  border-radius: 20px;
-
-  background: rgba(16, 26, 22, .85);
-}
-
-.camp-placeholder-page h1 {
-  margin-top: 18px;
-}
-
-@media (max-width: 700px) {
-  .camp-app {
-    padding-top: 20px;
-  }
-
-  .camp-navigation {
-    gap: 5px;
-    padding: 7px;
-  }
-
-  .camp-nav-item {
-    flex: 1 1 auto;
-    gap: 5px;
-    padding: 9px;
-    font-size: 10px;
-  }
-
-  .notification-button {
-    margin-left: 0;
-    padding: 9px;
-  }
-
-  .camp-welcome {
-    align-items: flex-start;
-  }
-
-  .camp-welcome-icon {
-    width: 58px;
-    height: 58px;
-    font-size: 28px;
-  }
-
-  .featured-story-card {
-    grid-template-columns: 1fr;
-  }
-
-  .featured-story-art {
-    min-height: 150px;
-    border-right: 0;
-    border-bottom: 1px solid rgba(243, 231, 201, .12);
-  }
-}
-
-@media (max-width: 480px) {
-  .camp-navigation {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .camp-nav-item {
-    flex-direction: column;
-    gap: 4px;
-    font-size: 10px;
-  }
-
-  .notification-button {
-    margin: 0 auto;
-  }
-
-  .community-home-grid,
-  .author-home-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .home-section-heading {
-    align-items: flex-start;
-  }
-
-  .home-section-heading .text-action {
-    padding-top: 6px;
-    font-size: 10px;
-  }
-}
-
 .reader-profile .profile-hint {
   margin: 7px 0 16px;
   color: #b8b5a7;
@@ -2373,567 +1840,451 @@
         padding: 16px;
       }
     }
+  
+/* =====================================
+   STAGES (login -> welcome -> home)
+===================================== */
+body.stage-welcome .page,
+body.stage-welcome .scene,
+body.stage-home .scene,
+body.stage-home .topbar,
+body.stage-home .footer { display: none; }
+
+body.stage-home {
+  background:
+    radial-gradient(ellipse 70% 38% at 50% -6%, rgba(242,163,75,.22), transparent 70%),
+    linear-gradient(180deg, #0e1424 0%, #17203a 46%, #1f2a3c 100%);
+  background-attachment: fixed;
+}
+
+/* =====================================
+   WELCOME TO HOLLOW NIGHT CAMP
+===================================== */
+.welcome-screen {
+  --s: max(calc(100vw / 1600), calc(100vh / 900));
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  overflow: hidden;
+  background: #0b1a1e;
+  animation: welcomeIn 1.2s ease both;
+}
+.welcome-screen[hidden] { display: none !important; }
+
+.welcome-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  animation: welcomeDrift 26s ease-in-out infinite alternate;
+  transform-origin: 50% 80%;
+}
+@keyframes welcomeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes welcomeDrift { from { transform: scale(1); } to { transform: scale(1.045); } }
+
+.w-star { animation: starTwinkle 4s ease-in-out infinite; }
+.w-star:nth-child(3n) { animation-delay: -1.3s; }
+.w-star:nth-child(3n+1) { animation-delay: -2.6s; }
+
+.w-fog { animation: fogDrift 38s linear infinite alternate; }
+.w-fog.f2 { animation-duration: 52s; animation-direction: alternate-reverse; }
+.w-fog.f3 { animation-duration: 30s; }
+@keyframes fogDrift { from { transform: translateX(-90px); } to { transform: translateX(90px); } }
+
+.w-lantern { animation: lanternFlicker 3.2s ease-in-out infinite; }
+.w-lantern.r { animation-delay: -1.6s; }
+@keyframes lanternFlicker {
+  0%, 100% { opacity: .95; } 35% { opacity: .7; } 55% { opacity: 1; } 80% { opacity: .78; }
+}
+
+.w-fly { animation: flyFloat 9s ease-in-out infinite; }
+.w-fly:nth-of-type(2n) { animation-duration: 12s; animation-delay: -4s; }
+.w-fly:nth-of-type(3n) { animation-duration: 7s; animation-delay: -2s; }
+@keyframes flyFloat {
+  0%, 100% { transform: translate(0,0); opacity: .25; }
+  50% { transform: translate(26px,-34px); opacity: 1; }
+}
+
+.w-sign { transform-origin: 800px 520px; animation: signSway 6s ease-in-out infinite alternate; }
+@keyframes signSway { from { transform: rotate(-.7deg); } to { transform: rotate(.7deg); } }
+
+.welcome-copy {
+  position: absolute;
+  top: clamp(40px, 9vh, 110px);
+  left: 0; right: 0;
+  padding: 0 20px;
+  text-align: center;
+  z-index: 2;
+  text-shadow: 0 3px 24px rgba(0,0,0,.6);
+}
+.welcome-copy .kicker {
+  margin: 0 0 10px;
+  font-family: var(--typewriter);
+  font-size: clamp(14px, 2.2vw, 20px);
+  letter-spacing: .12em;
+  color: var(--fire);
+}
+.welcome-copy h1 {
+  margin: 0;
+  font-family: var(--heading);
+  font-weight: 700;
+  font-size: clamp(34px, 7.4vw, 86px);
+  line-height: .98;
+  color: var(--paper);
+}
+.welcome-copy .tagline {
+  margin: 18px 0 0;
+  font-family: var(--typewriter);
+  font-size: clamp(14px, 2vw, 21px);
+  color: var(--muted);
+}
+
+.enter-camp-button {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--s) * 92);
+  z-index: 3;
+  transform: translate(-50%, 18px);
+  opacity: 0;
+  pointer-events: none;
+
+  padding: 15px 34px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--fire), var(--orange));
+  color: var(--ink);
+  font-family: var(--heading);
+  font-weight: 700;
+  font-size: clamp(15px, 2vw, 19px);
+  letter-spacing: .06em;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 6px 0 #9a5f22, 0 0 40px rgba(242,163,75,.55);
+  transition: opacity .9s ease, transform .9s var(--ease), box-shadow .2s ease;
+}
+.enter-camp-button.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  pointer-events: auto;
+}
+.enter-camp-button:hover { box-shadow: 0 8px 0 #9a5f22, 0 0 56px rgba(255,206,114,.75); }
+.enter-camp-button:active { transform: translate(-50%, 4px); box-shadow: 0 2px 0 #9a5f22, 0 0 30px rgba(242,163,75,.5); }
+
+/* =====================================
+   CAMPFIRE HOME — top Main Bar
+===================================== */
+.camp-app {
+  width: min(1120px, 92%);
+  margin: 0 auto;
+  padding: 104px 0 70px;
+  flex: 1;
+}
+.camp-app[hidden] { display: none !important; }
+
+.main-bar {
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  z-index: 15;
+  transform: translateX(-50%);
+
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 96vw;
+  padding: 7px 8px 7px 10px;
+
+  border: 2px solid rgba(243,231,201,.28);
+  border-radius: 999px;
+  background: rgba(14,20,36,.9);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 36px rgba(0,0,0,.45), 0 0 0 5px rgba(242,163,75,.07);
+  animation: barDrop .7s var(--ease) both;
+}
+@keyframes barDrop { from { opacity: 0; transform: translate(-50%, -24px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+.bar-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding-right: 10px;
+  margin-right: 4px;
+  border-right: 1px solid rgba(243,231,201,.2);
+  font-family: var(--heading);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--paper);
+  white-space: nowrap;
+}
+.bar-brand-mark {
+  display: grid;
+  place-items: center;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--orange);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.camp-nav-item,
+.bar-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #c9cdd9;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background .2s ease, color .2s ease;
+}
+.camp-nav-item:hover, .bar-icon-button:hover { background: rgba(243,231,201,.09); color: var(--paper); }
+.camp-nav-item.active { background: rgba(242,163,75,.18); color: var(--fire); }
+
+.author-toggle {
+  margin-left: 4px;
+  border: 1.5px solid rgba(242,163,75,.55);
+  color: var(--fire);
+}
+.author-toggle[aria-expanded="true"] { background: var(--orange); color: var(--ink); }
+
+.bar-icon-button { position: relative; font-size: 17px; padding: 8px 11px; }
+.notification-dot {
+  position: absolute; top: 8px; right: 9px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--red);
+  box-shadow: 0 0 9px rgba(217,110,69,.8);
+}
+
+/* ⋮ round menu (chapter editor mode) */
+.editor-menu-button {
+  position: fixed;
+  top: 16px; left: 16px;
+  z-index: 16;
+  width: 48px; height: 48px;
+  border: 2px solid rgba(243,231,201,.3);
+  border-radius: 50%;
+  background: rgba(14,20,36,.92);
+  color: var(--paper);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 8px 26px rgba(0,0,0,.45);
+}
+.editor-menu-button:hover { border-color: var(--orange); color: var(--fire); }
+.editor-menu {
+  position: fixed;
+  top: 72px; left: 16px;
+  z-index: 16;
+  display: grid;
+  gap: 2px;
+  min-width: 210px;
+  padding: 8px;
+  border: 2px solid rgba(243,231,201,.25);
+  border-radius: 18px;
+  background: rgba(14,20,36,.96);
+  box-shadow: 0 16px 40px rgba(0,0,0,.5);
+}
+.editor-menu .camp-nav-item { justify-content: flex-start; border-radius: 12px; width: 100%; }
+.editor-menu[hidden], .editor-menu-button[hidden] { display: none !important; }
+body.editor-mode .main-bar { display: none; }
+body.editor-mode .camp-app { padding-top: 84px; }
+
+/* =====================================
+   CAMPFIRE HOME — content
+===================================== */
+.camp-page { min-width: 0; animation: revealUp .5s var(--ease) both; }
+
+.camp-hero { padding: 26px 0 30px; max-width: 760px; }
+.camp-hero h1 {
+  margin: 0;
+  font-family: var(--heading);
+  font-weight: 700;
+  font-size: clamp(38px, 6.4vw, 72px);
+  line-height: 1;
+  color: var(--paper);
+}
+.camp-hero h1 em { font-style: normal; color: var(--orange); }
+.camp-hero p {
+  margin: 16px 0 0;
+  max-width: 52ch;
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--muted);
+}
+
+/* navigation cards: paper patches */
+.nav-card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-areas: "novels novels theories arcade" "novels novels settings settings";
+  gap: 18px;
+  margin: 8px 0 44px;
+}
+.nav-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 6px;
+  min-height: 170px;
+  padding: 22px;
+  text-align: left;
+  color: var(--ink);
+  background: var(--paper);
+  border: 0;
+  border-radius: 14px;
+  cursor: pointer;
+  box-shadow: 0 14px 30px rgba(0,0,0,.35);
+  transition: transform .25s var(--ease), box-shadow .25s ease;
+}
+.nav-card::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 2px dashed rgba(39,53,42,.32);
+  border-radius: 9px;
+  pointer-events: none;
+}
+.nav-card:nth-child(1) { grid-area: novels; transform: rotate(-.8deg); }
+.nav-card:nth-child(2) { grid-area: theories; transform: rotate(.7deg); background: #e6d6ae; }
+.nav-card:nth-child(3) { grid-area: arcade; transform: rotate(-.5deg); background: #efc98f; }
+.nav-card:nth-child(4) { grid-area: settings; transform: rotate(.4deg); background: #c9d3b4; min-height: 120px; }
+.nav-card:hover { transform: rotate(0) translateY(-5px); box-shadow: 0 20px 38px rgba(0,0,0,.45); }
+.nav-card .nav-card-icon { font-size: 38px; line-height: 1; margin-bottom: auto; }
+.nav-card:nth-child(1) .nav-card-icon { font-size: 64px; }
+.nav-card h3 { margin: 0; font-family: var(--heading); font-size: 22px; font-weight: 600; }
+.nav-card:nth-child(1) h3 { font-size: 32px; }
+.nav-card p { margin: 0; font-size: 14px; line-height: 1.5; color: rgba(39,53,42,.82); }
+
+/* author studio (opened from Main Bar toggle) */
+.home-author-studio {
+  margin: 0 0 44px;
+  padding: clamp(20px, 4vw, 30px);
+  border: 2px solid rgba(242,163,75,.55);
+  border-radius: 22px;
+  background: radial-gradient(circle at 100% 0%, rgba(242,163,75,.16), transparent 45%), rgba(9,13,26,.82);
+  animation: revealUp .45s var(--ease) both;
+}
+.home-author-studio { scroll-margin-top: 100px; }
+.home-author-studio[hidden] { display: none !important; }
+.home-author-studio h2 { margin: 0; font-family: var(--heading); font-size: 28px; }
+.home-author-studio > .studio-head p { margin: 6px 0 0; color: var(--muted); }
+.studio-head { margin-bottom: 20px; }
+.author-home-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }
+.author-home-card {
+  display: grid;
+  gap: 6px;
+  padding: 18px;
+  text-align: left;
+  color: var(--paper);
+  background: rgba(243,231,201,.07);
+  border: 1.5px solid rgba(243,231,201,.2);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease, transform .2s ease;
+}
+.author-home-card:hover { background: rgba(242,163,75,.14); border-color: var(--orange); transform: translateY(-3px); }
+.author-home-icon { font-size: 26px; }
+.author-home-title { font-family: var(--heading); font-size: 18px; font-weight: 600; }
+.author-home-description { font-size: 13px; line-height: 1.5; color: var(--muted); }
+.home-status { margin: 16px 0 0; color: var(--fire); font-size: 14px; }
+
+/* sections */
+.home-section { margin: 0 0 44px; }
+.home-section-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+.home-section-heading h2 { margin: 0; font-family: var(--heading); font-size: clamp(24px, 3.4vw, 32px); }
+.text-action {
+  border: 0; background: none; padding: 6px 0;
+  color: var(--orange); font-weight: 700; font-size: 14px; cursor: pointer;
+}
+.text-action:hover { color: var(--fire); text-decoration: underline; }
+
+.featured-story-card {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: clamp(18px, 4vw, 36px);
+  align-items: center;
+  padding: clamp(18px, 3vw, 28px);
+  border-left: 5px solid var(--orange);
+  border-radius: 6px 20px 20px 6px;
+  background: rgba(243,231,201,.06);
+}
+.featured-story-art {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 3 / 4;
+  border-radius: 10px;
+  background: linear-gradient(160deg, #2c3b55, #121a2d);
+  border: 2px dashed rgba(243,231,201,.3);
+  font-family: var(--typewriter);
+  font-size: 84px;
+  color: var(--fire);
+}
+.story-tag { font-family: var(--typewriter); font-size: 13px; color: var(--orange); }
+.featured-story-content h3 { margin: 8px 0 10px; font-family: var(--heading); font-size: clamp(22px, 3vw, 30px); }
+.featured-story-content p { margin: 0 0 20px; line-height: 1.65; color: var(--muted); }
+.camp-action-button {
+  padding: 12px 22px;
+  border: 0; border-radius: 999px;
+  background: var(--orange); color: var(--ink);
+  font-weight: 700; cursor: pointer;
+  transition: background .2s ease, transform .2s ease;
+}
+.camp-action-button:hover { background: var(--fire); transform: translateY(-2px); }
+
+.home-profile-section { padding-top: 8px; border-top: 1px solid rgba(243,231,201,.15); padding-top: 32px; }
+.home-profile-description { margin: 0; color: var(--muted); }
+.home-logout-button {
+  display: block;
+  margin: 8px auto 0;
+  padding: 12px 26px;
+  border: 1.5px solid rgba(243,231,201,.3);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--paper);
+  font-weight: 600;
+  cursor: pointer;
+}
+.home-logout-button:hover { border-color: var(--red); color: #ffb69b; }
+
+.camp-placeholder-page { padding: 40px 0; max-width: 620px; }
+.camp-placeholder-page h1 { margin: 0 0 14px; font-family: var(--heading); font-size: clamp(34px, 5vw, 54px); }
+.camp-placeholder-page p { margin: 0; font-size: 17px; line-height: 1.65; color: var(--muted); }
+
+@media (max-width: 820px) {
+  .nav-card-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: "novels novels" "theories arcade" "settings settings";
+  }
+  .featured-story-card { grid-template-columns: 1fr; }
+  .featured-story-art { aspect-ratio: 16 / 7; font-size: 54px; }
+}
+@media (max-width: 700px) {
+  .bar-brand span:last-child { display: none; }
+  .camp-nav-item span:last-child, .author-toggle .toggle-label { display: none; }
+  .camp-nav-item { padding: 8px 11px; }
+  .camp-app { padding-top: 92px; }
+}
+@media (max-width: 480px) {
+  .main-bar { top: 10px; padding: 5px 6px; gap: 1px; }
+  .bar-brand { padding-right: 6px; }
+  .nav-card { min-height: 140px; padding: 18px; }
+  .home-section-heading { align-items: flex-start; }
+}
 
-    /* =========================================
-       WELCOME TRANSITION SCREEN
-    ========================================= */
-    .welcome-screen {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(10, 15, 12, 0.92);
-      backdrop-filter: blur(4px);
-      animation: fadeIn 1s ease both;
-    }
-
-    .welcome-screen[hidden] {
-      display: none !important;
-    }
-
-    .welcome-content {
-      text-align: center;
-      padding: 50px 40px;
-      background: rgba(10, 8, 6, 0.85);
-      border: 1px solid #8a6d3b;
-      border-radius: 12px;
-      box-shadow: 0 0 60px rgba(0, 0, 0, 0.9), inset 0 0 40px rgba(0, 0, 0, 0.6);
-      max-width: 650px;
-      width: 90%;
-      animation: revealUp 1s .2s var(--ease) both;
-    }
-
-    .welcome-content h1 {
-      font-family: 'Cinzel', serif;
-      font-size: clamp(30px, 5vw, 52px);
-      color: #d4af37;
-      margin: 0 0 20px;
-      line-height: 1.2;
-      text-shadow: 0 0 25px rgba(212, 175, 55, 0.5);
-      letter-spacing: 1px;
-    }
-
-    .welcome-content p {
-      font-family: 'Special Elite', monospace;
-      color: #c0b090;
-      font-size: clamp(13px, 2vw, 16px);
-      margin-bottom: 35px;
-      letter-spacing: 1px;
-      opacity: 0.9;
-    }
-
-    .enter-camp-button {
-      padding: 16px 45px;
-      background: linear-gradient(180deg, #2a1f14, #0a0806);
-      border: 2px solid #8a6d3b;
-      border-radius: 6px;
-      color: #d4af37;
-      font-family: 'Cinzel', serif;
-      font-size: clamp(16px, 2.5vw, 20px);
-      font-weight: 700;
-      letter-spacing: 2px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 0 25px rgba(212, 175, 55, 0.25);
-      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-    }
-
-    .enter-camp-button:hover {
-      background: linear-gradient(180deg, #3a2e1e, #1a1410);
-      box-shadow: 0 0 40px rgba(212, 175, 55, 0.5);
-      transform: scale(1.05);
-      color: #f0d4a0;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    /* =========================================
-       CAMP GATE BACKGROUND (Image 1 style)
-    ========================================= */
-    .camp-gate-bg {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      overflow: hidden;
-      pointer-events: none;
-      background: linear-gradient(180deg, #0a1114 0%, #141e22 40%, #1a2a24 100%);
-    }
-
-    body.in-camp .scene {
-      display: none;
-    }
-
-    .camp-gate-bg .gate-moon {
-      position: absolute;
-      top: 8%;
-      left: 15%;
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      background: #e8e0c8;
-      box-shadow: 0 0 40px rgba(232, 224, 200, 0.15);
-    }
-
-    .camp-gate-bg .gate-stars {
-      position: absolute;
-      inset: 0;
-      opacity: 0.6;
-      background-image:
-        radial-gradient(circle, #e8e0c8 1px, transparent 1.5px),
-        radial-gradient(circle, #e8e0c8 1px, transparent 1.5px);
-      background-size: 150px 150px, 200px 200px;
-      background-position: 20px 30px, 80px 10px;
-    }
-
-    .camp-gate-bg .gate-trees-left,
-    .camp-gate-bg .gate-trees-right {
-      position: absolute;
-      bottom: 0;
-      width: 200px;
-      height: 60%;
-      background: repeating-linear-gradient(90deg, transparent, transparent 30px, #0d1611 30px, #0d1611 60px);
-      opacity: 0.8;
-    }
-
-    .camp-gate-bg .gate-trees-left { left: 0; transform: skewY(5deg); }
-    .camp-gate-bg .gate-trees-right { right: 0; transform: skewY(-5deg); }
-
-    .camp-gate-bg .gate-fence {
-      position: absolute;
-      bottom: 15%;
-      width: 220px;
-      height: 70px;
-      border-top: 4px solid #4a2e1b;
-      border-bottom: 4px solid #4a2e1b;
-      background: repeating-linear-gradient(90deg, transparent, transparent 18px, #4a2e1b 18px, #4a2e1b 22px);
-    }
-
-    .camp-gate-bg .gate-fence.left { left: 5%; transform: skewY(6deg); }
-    .camp-gate-bg .gate-fence.right { right: 5%; transform: skewY(-6deg); }
-
-    .camp-gate-bg .gate-structure {
-      position: absolute;
-      bottom: 15%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 650px;
-      height: 420px;
-    }
-
-    .camp-gate-bg .gate-post {
-      position: absolute;
-      bottom: 0;
-      width: 45px;
-      height: 320px;
-      background: linear-gradient(90deg, #4a2e1b, #6b4226);
-      border: 2px solid #3a2210;
-      border-radius: 4px;
-      box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
-    }
-
-    .camp-gate-bg .gate-post.left { left: 0; }
-    .camp-gate-bg .gate-post.right { right: 0; }
-
-    .camp-gate-bg .gate-crossbeam {
-      position: absolute;
-      bottom: 300px;
-      left: 22px;
-      right: 22px;
-      height: 45px;
-      background: linear-gradient(0deg, #4a2e1b, #6b4226);
-      border: 2px solid #3a2210;
-      border-radius: 6px;
-      box-shadow: 0 6px 12px rgba(0,0,0,0.5);
-    }
-
-    .camp-gate-bg .gate-roof {
-      position: absolute;
-      bottom: 320px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0;
-      height: 0;
-      border-left: 325px solid transparent;
-      border-right: 325px solid transparent;
-      border-bottom: 130px solid #4a2e1b;
-      filter: drop-shadow(0 6px 8px rgba(0,0,0,0.6));
-    }
-
-    .camp-gate-bg .gate-roof::after {
-      content: "";
-      position: absolute;
-      bottom: -130px;
-      left: -305px;
-      width: 0;
-      height: 0;
-      border-left: 305px solid transparent;
-      border-right: 305px solid transparent;
-      border-bottom: 120px solid #2e1a0e;
-    }
-
-    .camp-gate-bg .gate-sign {
-      position: absolute;
-      bottom: 310px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 340px;
-      padding: 12px 0;
-      background: #2e1a0e;
-      border: 3px solid #8a6d3b;
-      border-radius: 6px;
-      color: #d4af37;
-      font-family: 'Cinzel', serif;
-      font-size: 28px;
-      font-weight: 700;
-      text-align: center;
-      letter-spacing: 3px;
-      text-shadow: 0 2px 6px #000;
-      box-shadow: 0 6px 12px rgba(0,0,0,0.7);
-    }
-
-    .camp-gate-bg .gate-banner {
-      position: absolute;
-      bottom: 230px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 220px;
-      padding: 18px 0;
-      background: #e8e0c8;
-      color: #4a2e1b;
-      font-family: 'Special Elite', monospace;
-      font-size: 15px;
-      text-align: center;
-      border-radius: 0 0 30px 30px;
-      box-shadow: 0 6px 12px rgba(0,0,0,0.6);
-      clip-path: polygon(0 0, 100% 0, 100% 85%, 95% 100%, 85% 85%, 15% 85%, 5% 100%, 0 85%);
-    }
-
-    .camp-gate-bg .gate-lamp {
-      position: absolute;
-      bottom: 275px;
-      width: 35px;
-      height: 35px;
-      background: #f2d58b;
-      border-radius: 50%;
-      box-shadow: 0 0 50px 20px rgba(242, 213, 139, 0.3);
-    }
-
-    .camp-gate-bg .gate-lamp.left { left: -18px; }
-    .camp-gate-bg .gate-lamp.right { right: -18px; }
-
-    .camp-gate-bg .gate-bear {
-      position: absolute;
-      bottom: 12%;
-      right: 16%;
-      font-size: 120px;
-      filter: brightness(0.25) drop-shadow(0 15px 15px rgba(0,0,0,0.9));
-      transform: scaleX(-1);
-      opacity: 0.9;
-    }
-
-    .camp-gate-bg .gate-truck {
-      position: absolute;
-      bottom: 18%;
-      left: 13%;
-      width: 200px;
-      height: 90px;
-      filter: brightness(0.6);
-    }
-
-    .camp-gate-bg .truck-cab {
-      position: absolute;
-      left: 0;
-      bottom: 20px;
-      width: 70px;
-      height: 55px;
-      background: #2a4a5a;
-      border-radius: 5px 0 0 0;
-      border: 2px solid #1a2a3a;
-    }
-
-    .camp-gate-bg .truck-bed {
-      position: absolute;
-      left: 70px;
-      bottom: 20px;
-      width: 130px;
-      height: 65px;
-      background: #1e3a4a;
-      border: 2px solid #1a2a3a;
-      border-radius: 0 5px 5px 0;
-    }
-
-    .camp-gate-bg .truck-wheel {
-      position: absolute;
-      bottom: 0;
-      width: 35px;
-      height: 35px;
-      background: #111;
-      border-radius: 50%;
-      border: 4px solid #333;
-    }
-
-    .camp-gate-bg .truck-wheel.front { left: 15px; }
-    .camp-gate-bg .truck-wheel.back { right: 25px; }
-
-    .camp-gate-bg .gate-path {
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 900px;
-      height: 30%;
-      background: radial-gradient(ellipse at center bottom, #3a2e1e 0%, transparent 70%);
-      border-radius: 50% 50% 0 0;
-      opacity: 0.8;
-    }
-
-    .camp-gate-bg .gate-fog {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse at 50% 80%, rgba(100, 120, 100, 0.12), transparent 60%);
-      pointer-events: none;
-      animation: fogMove 12s ease-in-out infinite alternate;
-    }
-
-    @keyframes fogMove {
-      from { transform: translateX(-3%); }
-      to { transform: translateX(3%); }
-    }
-
-    /* =========================================
-       DARK FANTASY UI OVERRIDES (Image 2 style)
-    ========================================= */
-    .camp-navigation {
-      background: rgba(15, 12, 10, 0.95);
-      border: 1px solid #5a4a2a;
-      border-radius: 4px;
-      padding: 0;
-      justify-content: center;
-      gap: 0;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8);
-      margin-bottom: 28px;
-    }
-
-    .camp-nav-item {
-      border-right: 1px solid #3a2e1e;
-      border-radius: 0;
-      padding: 16px 28px;
-      font-family: 'Cinzel', serif;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      font-size: 11px;
-      color: #8a7a5a;
-      background: transparent;
-    }
-
-    .camp-nav-item:last-child {
-      border-right: none;
-    }
-
-    .camp-nav-item.active {
-      color: #d4af37;
-      background: rgba(212, 175, 55, 0.06);
-      box-shadow: inset 0 -3px 0 #d4af37;
-    }
-
-    .camp-nav-item:hover {
-      color: #e8e0c8;
-      background: rgba(255, 255, 255, 0.03);
-    }
-
-    .notification-button {
-      border-left: 1px solid #3a2e1e;
-      border-radius: 0;
-      padding: 16px 20px;
-      color: #8a7a5a;
-      font-size: 18px;
-    }
-
-    .notification-button:hover {
-      color: #d4af37;
-      background: rgba(212, 175, 55, 0.06);
-    }
-
-    .notification-dot {
-      background: #d4af37;
-      box-shadow: 0 0 10px rgba(212, 175, 55, 0.8);
-    }
-
-    .camp-welcome {
-      background: rgba(10, 8, 6, 0.85);
-      border: 1px solid #8a6d3b;
-      border-radius: 4px;
-      box-shadow: 0 0 30px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,0,0,0.6);
-      backdrop-filter: blur(5px);
-      padding: 40px;
-      text-align: center;
-      flex-direction: column;
-    }
-
-    .camp-welcome h1 {
-      font-family: 'Cinzel', serif;
-      color: #d4af37;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.8);
-      font-size: clamp(32px, 5vw, 55px);
-    }
-
-    .camp-welcome p {
-      color: #c0b090;
-      font-family: 'Special Elite', monospace;
-    }
-
-    .camp-welcome-icon {
-      display: none; /* Hide the big fire icon to match the UI */
-    }
-
-    .camp-eyebrow {
-      color: #d4af37;
-      font-family: 'Cinzel', serif;
-      letter-spacing: 2px;
-    }
-
-    .featured-story-card {
-      background: rgba(15, 12, 10, 0.9);
-      border: 1px solid #5a4a2a;
-      border-radius: 4px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-    }
-
-    .featured-story-art {
-      background: radial-gradient(circle at 50% 50%, #2a1f14, #0a0806);
-      border-right: 1px solid #5a4a2a;
-    }
-
-    .featured-story-art span {
-      color: #d4af37;
-      border-color: #8a6d3b;
-      box-shadow: 0 0 40px rgba(212, 175, 55, 0.15);
-    }
-
-    .featured-story-content h3 {
-      font-family: 'Cinzel', serif;
-      color: #d4af37;
-      font-size: clamp(22px, 3vw, 30px);
-    }
-
-    .featured-story-content p {
-      color: #b0a080;
-    }
-
-    .camp-action-button {
-      background: linear-gradient(180deg, #2a1f14, #0a0806);
-      border: 1px solid #8a6d3b;
-      color: #d4af37;
-      font-family: 'Cinzel', serif;
-      letter-spacing: 1px;
-      padding: 14px 20px;
-      border-radius: 4px;
-      box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
-    }
-
-    .camp-action-button:hover {
-      background: linear-gradient(180deg, #3a2e1e, #1a1410);
-      box-shadow: 0 0 25px rgba(212, 175, 55, 0.3);
-    }
-
-    .community-home-card {
-      background: rgba(15, 12, 10, 0.9);
-      border: 1px solid #5a4a2a;
-      border-radius: 4px;
-      color: #b0a080;
-    }
-
-    .community-home-card h3 {
-      font-family: 'Cinzel', serif;
-      color: #d4af37;
-    }
-
-    .community-home-card .card-link {
-      color: #d4af37;
-    }
-
-    .home-author-studio {
-      background: rgba(15, 12, 10, 0.95);
-      border: 1px solid #8a6d3b;
-      border-radius: 4px;
-    }
-
-    .author-badge {
-      border-color: #8a6d3b;
-      color: #d4af37;
-      background: rgba(212, 175, 55, 0.08);
-      font-family: 'Cinzel', serif;
-    }
-
-    .author-home-card {
-      background: rgba(25, 20, 15, 0.9);
-      border: 1px solid #5a4a2a;
-      border-radius: 4px;
-      color: #b0a080;
-    }
-
-    .author-home-title {
-      font-family: 'Cinzel', serif;
-      color: #d4af37;
-    }
-
-    .author-home-description {
-      color: #a09070;
-    }
-
-    .author-home-icon {
-      color: #d4af37;
-    }
-
-    .home-section-heading h2 {
-      font-family: 'Cinzel', serif;
-      color: #d4af37;
-      text-shadow: 0 2px 6px rgba(0,0,0,0.6);
-    }
-
-    .text-action {
-      color: #d4af37;
-      font-family: 'Cinzel', serif;
-      letter-spacing: 1px;
-    }
-
-    .home-profile-section {
-      border-top: 1px solid #5a4a2a;
-    }
-
-    .home-logout-button {
-      border: 1px solid #8a6d3b;
-      color: #d4af37;
-      background: rgba(212, 175, 55, 0.05);
-      font-family: 'Cinzel', serif;
-      letter-spacing: 1px;
-    }
-
-    .home-logout-button:hover {
-      background: rgba(212, 175, 55, 0.12);
-    }
-
-    .camp-placeholder-page {
-      background: rgba(15, 12, 10, 0.9);
-      border: 1px solid #5a4a2a;
-      border-radius: 4px;
-    }
-
-    .camp-placeholder-page h1 {
-      font-family: 'Cinzel', serif;
-      color: #d4af37;
-    }
   </style>
 </head>
 
-<body>
+<body class="stage-login">
 
-  <!-- Illustrated night forest (Global Scene) -->
+  <!-- Illustrated night forest -->
   <div class="scene" aria-hidden="true">
     <div class="stars"></div>
     <div class="moon"></div>
@@ -2967,48 +2318,140 @@
     <div class="ground"></div>
 
     <!-- Campfire: part of the forest background -->
-    <div class="campfire" aria-label="Illustration of a glowing campfire">
-      <div class="fire-glow"></div>
-      <div class="ember"></div>
-      <div class="ember"></div>
-      <div class="ember"></div>
-      <div class="log one"></div>
-      <div class="log two"></div>
-      <div class="fire">
-        <div class="flame outer"></div>
-        <div class="flame middle"></div>
-        <div class="flame inner"></div>
-      </div>
-      <div class="campfire-caption">
-        Best stories are told<br>around the fire.
-      </div>
-    </div>
+        <div class="campfire" aria-label="Illustration of a glowing campfire">
+
+          <div class="fire-glow"></div>
+
+          <div class="ember"></div>
+          <div class="ember"></div>
+          <div class="ember"></div>
+
+          <div class="log one"></div>
+          <div class="log two"></div>
+
+          <div class="fire">
+            <div class="flame outer"></div>
+            <div class="flame middle"></div>
+            <div class="flame inner"></div>
+          </div>
+
+          <div class="campfire-caption">
+            Best stories are told<br>
+            around the fire.
+          </div>
+
+        </div>
+
   </div>
 
-  <!-- Welcome Transition Screen -->
-  <div id="welcomeScreen" class="welcome-screen" hidden>
-    <div class="welcome-content">
+
+  <!-- =====================================
+       WELCOME TO HOLLOW NIGHT CAMP (transition)
+  ====================================== -->
+  <section id="welcomeScreen" class="welcome-screen" aria-label="Welcome to Hollow Night Camp" hidden>
+    <svg class="welcome-svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+  <defs>
+    <linearGradient id="wSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#08121d"/><stop offset=".55" stop-color="#163239"/><stop offset="1" stop-color="#2b4a45"/>
+    </linearGradient>
+    <radialGradient id="wMoon"><stop offset="0" stop-color="#fff6dc"/><stop offset=".25" stop-color="#f3e7c9"/><stop offset="1" stop-color="#f3e7c9" stop-opacity="0"/></radialGradient>
+    <radialGradient id="wFog"><stop offset="0" stop-color="#cfe0d8" stop-opacity=".55"/><stop offset="1" stop-color="#cfe0d8" stop-opacity="0"/></radialGradient>
+    <radialGradient id="wLamp"><stop offset="0" stop-color="#ffe3a0"/><stop offset=".3" stop-color="#ffce72" stop-opacity=".7"/><stop offset="1" stop-color="#f2a34b" stop-opacity="0"/></radialGradient>
+    <linearGradient id="wPath" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffce72" stop-opacity=".55"/><stop offset="1" stop-color="#ffce72" stop-opacity=".05"/>
+    </linearGradient>
+    <linearGradient id="wWood" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#3a2a1c"/><stop offset=".5" stop-color="#5a4128"/><stop offset="1" stop-color="#2e2116"/>
+    </linearGradient>
+    <filter id="glowF" x="-300%" y="-300%" width="700%" height="700%"><feGaussianBlur stdDeviation="3"/></filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#wSky)"/>
+  <circle class="w-star" cx="683" cy="87" r="1.8" fill="#f3e7c9"/><circle class="w-star" cx="1353" cy="34" r="1" fill="#f3e7c9"/><circle class="w-star" cx="1117" cy="58" r="1.3" fill="#f3e7c9"/><circle class="w-star" cx="1213" cy="39" r="1" fill="#f3e7c9"/><circle class="w-star" cx="96" cy="54" r="1.8" fill="#f3e7c9"/><circle class="w-star" cx="876" cy="45" r="1" fill="#f3e7c9"/><circle class="w-star" cx="205" cy="292" r="1.8" fill="#f3e7c9"/><circle class="w-star" cx="141" cy="299" r="1" fill="#f3e7c9"/><circle class="w-star" cx="477" cy="308" r="1" fill="#f3e7c9"/><circle class="w-star" cx="1201" cy="309" r="1.8" fill="#f3e7c9"/><circle class="w-star" cx="121" cy="123" r="1" fill="#f3e7c9"/><circle class="w-star" cx="1160" cy="78" r="1.3" fill="#f3e7c9"/><circle class="w-star" cx="878" cy="83" r="1" fill="#f3e7c9"/><circle class="w-star" cx="1189" cy="167" r="1" fill="#f3e7c9"/><circle class="w-star" cx="231" cy="307" r="1" fill="#f3e7c9"/><circle class="w-star" cx="782" cy="59" r="1" fill="#f3e7c9"/><circle class="w-star" cx="1175" cy="40" r="1" fill="#f3e7c9"/><circle class="w-star" cx="1036" cy="282" r="1.8" fill="#f3e7c9"/><circle class="w-star" cx="663" cy="248" r="1.8" fill="#f3e7c9"/><circle class="w-star" cx="760" cy="163" r="1" fill="#f3e7c9"/><circle class="w-star" cx="388" cy="134" r="1" fill="#f3e7c9"/><circle class="w-star" cx="1196" cy="163" r="1.8" fill="#f3e7c9"/><circle class="w-star" cx="723" cy="239" r="1.3" fill="#f3e7c9"/><circle class="w-star" cx="1267" cy="47" r="1" fill="#f3e7c9"/><circle class="w-star" cx="1068" cy="224" r="1" fill="#f3e7c9"/><circle class="w-star" cx="1570" cy="185" r="1" fill="#f3e7c9"/><circle class="w-star" cx="1021" cy="225" r="1" fill="#f3e7c9"/><circle class="w-star" cx="1388" cy="49" r="1.3" fill="#f3e7c9"/><circle class="w-star" cx="716" cy="189" r="1.8" fill="#f3e7c9"/><circle class="w-star" cx="1207" cy="243" r="1" fill="#f3e7c9"/><circle class="w-star" cx="211" cy="148" r="1.8" fill="#f3e7c9"/><circle class="w-star" cx="1447" cy="43" r="1" fill="#f3e7c9"/><circle class="w-star" cx="1517" cy="168" r="1.8" fill="#f3e7c9"/><circle class="w-star" cx="602" cy="207" r="1.3" fill="#f3e7c9"/><circle class="w-star" cx="66" cy="246" r="1.3" fill="#f3e7c9"/><circle class="w-star" cx="364" cy="322" r="1" fill="#f3e7c9"/><circle class="w-star" cx="1031" cy="40" r="1" fill="#f3e7c9"/><circle class="w-star" cx="608" cy="76" r="1" fill="#f3e7c9"/><circle class="w-star" cx="834" cy="210" r="1.8" fill="#f3e7c9"/><circle class="w-star" cx="185" cy="95" r="1.8" fill="#f3e7c9"/><circle class="w-star" cx="842" cy="291" r="1.3" fill="#f3e7c9"/><circle class="w-star" cx="300" cy="230" r="1.3" fill="#f3e7c9"/><circle class="w-star" cx="1466" cy="222" r="1.3" fill="#f3e7c9"/><circle class="w-star" cx="1418" cy="204" r="1" fill="#f3e7c9"/><circle class="w-star" cx="329" cy="52" r="1" fill="#f3e7c9"/><circle class="w-star" cx="329" cy="128" r="1" fill="#f3e7c9"/><circle class="w-star" cx="44" cy="258" r="1" fill="#f3e7c9"/><circle class="w-star" cx="558" cy="154" r="1" fill="#f3e7c9"/><circle class="w-star" cx="318" cy="224" r="1.3" fill="#f3e7c9"/><circle class="w-star" cx="1268" cy="299" r="1.3" fill="#f3e7c9"/><circle class="w-star" cx="277" cy="273" r="1" fill="#f3e7c9"/><circle class="w-star" cx="955" cy="296" r="1.8" fill="#f3e7c9"/><circle class="w-star" cx="835" cy="214" r="1.8" fill="#f3e7c9"/><circle class="w-star" cx="232" cy="256" r="1.8" fill="#f3e7c9"/><circle class="w-star" cx="147" cy="107" r="1" fill="#f3e7c9"/><circle class="w-star" cx="447" cy="235" r="1" fill="#f3e7c9"/><circle class="w-star" cx="245" cy="184" r="1" fill="#f3e7c9"/><circle class="w-star" cx="229" cy="10" r="1" fill="#f3e7c9"/><circle class="w-star" cx="1118" cy="61" r="1.3" fill="#f3e7c9"/><circle class="w-star" cx="1276" cy="23" r="1" fill="#f3e7c9"/><circle class="w-star" cx="445" cy="324" r="1.8" fill="#f3e7c9"/><circle class="w-star" cx="324" cy="139" r="1.3" fill="#f3e7c9"/><circle class="w-star" cx="1253" cy="196" r="1.8" fill="#f3e7c9"/><circle class="w-star" cx="271" cy="69" r="1.8" fill="#f3e7c9"/><circle class="w-star" cx="974" cy="255" r="1.8" fill="#f3e7c9"/><circle class="w-star" cx="658" cy="53" r="1" fill="#f3e7c9"/><circle class="w-star" cx="229" cy="185" r="1.3" fill="#f3e7c9"/><circle class="w-star" cx="1000" cy="92" r="1" fill="#f3e7c9"/><circle class="w-star" cx="440" cy="280" r="1.3" fill="#f3e7c9"/><circle class="w-star" cx="320" cy="288" r="1" fill="#f3e7c9"/>
+  <circle cx="1210" cy="150" r="170" fill="url(#wMoon)" opacity=".55"/>
+  <circle cx="1210" cy="150" r="52" fill="#f3e7c9"/>
+  <circle cx="1192" cy="138" r="9" fill="#d9cba8"/><circle cx="1228" cy="164" r="6" fill="#d9cba8"/>
+
+  <!-- mountains -->
+  <polygon fill="#1c3b40" points="0,560 0,420 140,330 250,400 410,250 560,380 700,300 860,420 1010,290 1180,410 1320,330 1470,420 1600,350 1600,560"/>
+  <polygon fill="#e8eee6" opacity=".55" points="410,250 372,296 398,288 412,312 430,286 452,296"/>
+  <polygon fill="#e8eee6" opacity=".5" points="1010,290 975,334 998,326 1012,350 1030,324 1050,334"/>
+  <polygon fill="#142e33" points="0,600 0,500 180,430 330,510 520,400 700,520 900,450 1100,530 1300,430 1460,510 1600,450 1600,600"/>
+  <g class="w-fog"><ellipse cx="500" cy="500" rx="520" ry="46" fill="url(#wFog)"/><ellipse cx="1250" cy="520" rx="460" ry="40" fill="url(#wFog)"/></g>
+
+  <!-- distant & mid forest -->
+  <rect y="560" width="1600" height="340" fill="#13292b"/>
+  <g fill="#16302f"><rect x="-23" y="541" width="7" height="22"/><polygon points="-20,489 -53,568 13,568"/><polygon points="-20,449 -47,528 7,528"/><polygon points="-20,402 -39,481 -1,481"/></g><g fill="#16302f"><rect x="23" y="543" width="6" height="20"/><polygon points="26,496 -4,567 56,567"/><polygon points="26,460 2,531 50,531"/><polygon points="26,417 9,488 43,488"/></g><g fill="#16302f"><rect x="69" y="545" width="5" height="18"/><polygon points="72,502 45,566 99,566"/><polygon points="72,470 50,534 94,534"/><polygon points="72,431 56,496 88,496"/></g><g fill="#16302f"><rect x="115" y="542" width="6" height="21"/><polygon points="118,492 86,568 150,568"/><polygon points="118,454 93,530 143,530"/><polygon points="118,409 100,484 136,484"/></g><g fill="#16302f"><rect x="161" y="540" width="7" height="23"/><polygon points="164,486 129,568 199,568"/><polygon points="164,444 136,527 192,527"/><polygon points="164,395 144,478 184,478"/></g><g fill="#16302f"><rect x="208" y="546" width="5" height="16"/><polygon points="210,508 186,566 234,566"/><polygon points="210,480 191,537 229,537"/><polygon points="210,445 196,502 224,502"/></g><g fill="#16302f"><rect x="253" y="542" width="6" height="22"/><polygon points="256,491 224,568 288,568"/><polygon points="256,452 230,529 282,529"/><polygon points="256,406 237,483 275,483"/></g><g fill="#16302f"><rect x="299" y="540" width="7" height="23"/><polygon points="302,486 268,568 336,568"/><polygon points="302,445 274,527 330,527"/><polygon points="302,396 282,478 322,478"/></g><g fill="#16302f"><rect x="345" y="545" width="5" height="18"/><polygon points="348,503 322,566 374,566"/><polygon points="348,472 327,535 369,535"/><polygon points="348,434 333,497 363,497"/></g><g fill="#16302f"><rect x="391" y="543" width="6" height="20"/><polygon points="394,496 364,567 424,567"/><polygon points="394,460 370,531 418,531"/><polygon points="394,417 377,488 411,488"/></g><g fill="#16302f"><rect x="437" y="544" width="6" height="19"/><polygon points="440,500 412,567 468,567"/><polygon points="440,467 418,533 462,533"/><polygon points="440,427 424,494 456,494"/></g><g fill="#16302f"><rect x="482" y="540" width="7" height="24"/><polygon points="486,484 451,568 521,568"/><polygon points="486,442 458,526 514,526"/><polygon points="486,392 466,476 506,476"/></g><g fill="#16302f"><rect x="529" y="546" width="5" height="17"/><polygon points="532,506 507,566 557,566"/><polygon points="532,476 512,536 552,536"/><polygon points="532,440 517,500 547,500"/></g><g fill="#16302f"><rect x="575" y="544" width="6" height="18"/><polygon points="578,501 550,567 606,567"/><polygon points="578,468 556,534 600,534"/><polygon points="578,428 562,494 594,494"/></g><g fill="#16302f"><rect x="621" y="541" width="7" height="22"/><polygon points="624,488 591,568 657,568"/><polygon points="624,449 597,528 651,528"/><polygon points="624,401 605,480 643,480"/></g><g fill="#16302f"><rect x="667" y="545" width="5" height="17"/><polygon points="670,504 644,566 696,566"/><polygon points="670,473 649,535 691,535"/><polygon points="670,436 655,498 685,498"/></g><g fill="#16302f"><rect x="713" y="543" width="6" height="20"/><polygon points="716,495 686,567 746,567"/><polygon points="716,459 692,531 740,531"/><polygon points="716,416 698,488 734,488"/></g><g fill="#16302f"><rect x="759" y="543" width="6" height="20"/><polygon points="762,495 732,567 792,567"/><polygon points="762,459 738,531 786,531"/><polygon points="762,416 744,488 780,488"/></g><g fill="#16302f"><rect x="805" y="541" width="7" height="22"/><polygon points="808,488 775,568 841,568"/><polygon points="808,449 781,528 835,528"/><polygon points="808,401 789,480 827,480"/></g><g fill="#16302f"><rect x="851" y="543" width="6" height="20"/><polygon points="854,496 824,567 884,567"/><polygon points="854,461 830,532 878,532"/><polygon points="854,418 837,489 871,489"/></g><g fill="#16302f"><rect x="897" y="544" width="6" height="18"/><polygon points="900,501 872,567 928,567"/><polygon points="900,468 878,534 922,534"/><polygon points="900,429 884,494 916,494"/></g><g fill="#16302f"><rect x="943" y="542" width="6" height="21"/><polygon points="946,492 914,568 978,568"/><polygon points="946,455 921,530 971,530"/><polygon points="946,410 928,485 964,485"/></g><g fill="#16302f"><rect x="989" y="545" width="5" height="17"/><polygon points="992,504 966,566 1018,566"/><polygon points="992,473 971,535 1013,535"/><polygon points="992,436 977,498 1007,498"/></g><g fill="#16302f"><rect x="1035" y="542" width="6" height="21"/><polygon points="1038,493 1007,567 1069,567"/><polygon points="1038,456 1013,530 1063,530"/><polygon points="1038,411 1020,486 1056,486"/></g><g fill="#16302f"><rect x="1081" y="541" width="7" height="23"/><polygon points="1084,488 1050,568 1118,568"/><polygon points="1084,447 1057,528 1111,528"/><polygon points="1084,399 1064,480 1104,480"/></g><g fill="#16302f"><rect x="1127" y="541" width="7" height="22"/><polygon points="1130,488 1096,568 1164,568"/><polygon points="1130,448 1103,528 1157,528"/><polygon points="1130,400 1111,480 1149,480"/></g><g fill="#16302f"><rect x="1173" y="541" width="7" height="22"/><polygon points="1176,489 1143,568 1209,568"/><polygon points="1176,449 1149,528 1203,528"/><polygon points="1176,402 1157,481 1195,481"/></g><g fill="#16302f"><rect x="1219" y="540" width="7" height="23"/><polygon points="1222,486 1188,568 1256,568"/><polygon points="1222,445 1194,527 1250,527"/><polygon points="1222,396 1202,478 1242,478"/></g><g fill="#16302f"><rect x="1265" y="545" width="5" height="17"/><polygon points="1268,505 1242,566 1294,566"/><polygon points="1268,475 1248,536 1288,536"/><polygon points="1268,438 1253,499 1283,499"/></g><g fill="#16302f"><rect x="1311" y="541" width="7" height="23"/><polygon points="1314,488 1280,568 1348,568"/><polygon points="1314,447 1287,528 1341,528"/><polygon points="1314,399 1294,480 1334,480"/></g><g fill="#16302f"><rect x="1357" y="545" width="5" height="18"/><polygon points="1360,504 1334,566 1386,566"/><polygon points="1360,472 1339,535 1381,535"/><polygon points="1360,435 1345,498 1375,498"/></g><g fill="#16302f"><rect x="1403" y="541" width="7" height="23"/><polygon points="1406,487 1372,568 1440,568"/><polygon points="1406,447 1379,528 1433,528"/><polygon points="1406,398 1386,479 1426,479"/></g><g fill="#16302f"><rect x="1449" y="544" width="6" height="19"/><polygon points="1452,499 1424,567 1480,567"/><polygon points="1452,466 1429,533 1475,533"/><polygon points="1452,425 1436,492 1468,492"/></g><g fill="#16302f"><rect x="1495" y="541" width="7" height="22"/><polygon points="1498,489 1465,568 1531,568"/><polygon points="1498,450 1472,529 1524,529"/><polygon points="1498,403 1479,482 1517,482"/></g><g fill="#16302f"><rect x="1541" y="541" width="7" height="23"/><polygon points="1544,488 1510,568 1578,568"/><polygon points="1544,447 1517,528 1571,528"/><polygon points="1544,399 1524,480 1564,480"/></g><g fill="#16302f"><rect x="1587" y="545" width="5" height="17"/><polygon points="1590,504 1564,566 1616,566"/><polygon points="1590,473 1569,535 1611,535"/><polygon points="1590,436 1575,498 1605,498"/></g><g fill="#16302f"><rect x="1633" y="545" width="5" height="17"/><polygon points="1636,505 1610,566 1662,566"/><polygon points="1636,475 1616,536 1656,536"/><polygon points="1636,438 1621,499 1651,499"/></g>
+  <g class="w-fog f2"><ellipse cx="800" cy="610" rx="760" ry="50" fill="url(#wFog)"/></g>
+  <rect y="640" width="1600" height="260" fill="#0e2022"/>
+  <g fill="#102524"><rect x="-29" y="612" width="10" height="33"/><polygon points="-24,535 -73,652 25,652"/><polygon points="-24,477 -63,593 15,593"/><polygon points="-24,407 -52,524 4,524"/></g><g fill="#102524"><rect x="31" y="619" width="7" height="24"/><polygon points="35,562 -1,649 71,649"/><polygon points="35,519 6,605 64,605"/><polygon points="35,467 14,554 56,554"/></g><g fill="#102524"><rect x="84" y="615" width="9" height="29"/><polygon points="88,548 45,650 131,650"/><polygon points="88,496 54,599 122,599"/><polygon points="88,435 63,538 113,538"/></g><g fill="#102524"><rect x="163" y="616" width="9" height="28"/><polygon points="167,549 124,650 210,650"/><polygon points="167,498 133,599 201,599"/><polygon points="167,437 142,538 192,538"/></g><g fill="#102524"><rect x="217" y="610" width="10" height="35"/><polygon points="222,529 170,652 274,652"/><polygon points="222,467 181,591 263,591"/><polygon points="222,393 192,516 252,516"/></g><g fill="#102524"><rect x="286" y="613" width="10" height="32"/><polygon points="291,538 243,651 339,651"/><polygon points="291,481 253,595 329,595"/><polygon points="291,413 263,526 319,526"/></g><g fill="#102524"><rect x="350" y="614" width="9" height="30"/><polygon points="355,543 310,651 400,651"/><polygon points="355,489 319,597 391,597"/><polygon points="355,424 329,532 381,532"/></g><g fill="#102524"><rect x="406" y="616" width="8" height="28"/><polygon points="410,551 368,650 452,650"/><polygon points="410,501 377,600 443,600"/><polygon points="410,442 386,541 434,541"/></g><g fill="#102524"><rect x="471" y="616" width="8" height="28"/><polygon points="475,550 433,650 517,650"/><polygon points="475,501 442,600 508,600"/><polygon points="475,441 451,540 499,540"/></g><g fill="#102524"><rect x="547" y="617" width="8" height="27"/><polygon points="551,552 510,650 592,650"/><polygon points="551,504 518,601 584,601"/><polygon points="551,445 527,542 575,542"/></g><g fill="#102524"><rect x="606" y="616" width="8" height="27"/><polygon points="610,552 569,650 651,650"/><polygon points="610,503 577,601 643,601"/><polygon points="610,444 586,542 634,542"/></g><g fill="#102524"><rect x="994" y="610" width="10" height="35"/><polygon points="999,528 947,652 1051,652"/><polygon points="999,466 957,590 1041,590"/><polygon points="999,391 969,516 1029,516"/></g><g fill="#102524"><rect x="1063" y="620" width="7" height="24"/><polygon points="1067,564 1031,648 1103,648"/><polygon points="1067,521 1038,606 1096,606"/><polygon points="1067,470 1046,555 1088,555"/></g><g fill="#102524"><rect x="1123" y="614" width="9" height="30"/><polygon points="1127,544 1082,651 1172,651"/><polygon points="1127,490 1091,597 1163,597"/><polygon points="1127,426 1101,533 1153,533"/></g><g fill="#102524"><rect x="1192" y="618" width="8" height="25"/><polygon points="1196,559 1158,649 1234,649"/><polygon points="1196,514 1166,604 1226,604"/><polygon points="1196,460 1174,550 1218,550"/></g><g fill="#102524"><rect x="1238" y="614" width="9" height="31"/><polygon points="1243,541 1197,651 1289,651"/><polygon points="1243,487 1206,596 1280,596"/><polygon points="1243,421 1216,530 1270,530"/></g><g fill="#102524"><rect x="1305" y="612" width="10" height="32"/><polygon points="1310,536 1261,652 1359,652"/><polygon points="1310,478 1271,594 1349,594"/><polygon points="1310,409 1282,524 1338,524"/></g><g fill="#102524"><rect x="1368" y="613" width="9" height="32"/><polygon points="1373,539 1326,651 1420,651"/><polygon points="1373,482 1335,595 1411,595"/><polygon points="1373,415 1346,528 1400,528"/></g><g fill="#102524"><rect x="1448" y="615" width="9" height="30"/><polygon points="1452,545 1407,651 1497,651"/><polygon points="1452,492 1416,598 1488,598"/><polygon points="1452,428 1426,534 1478,534"/></g><g fill="#102524"><rect x="1493" y="614" width="9" height="31"/><polygon points="1498,541 1452,651 1544,651"/><polygon points="1498,486 1461,596 1535,596"/><polygon points="1498,420 1471,530 1525,530"/></g><g fill="#102524"><rect x="1569" y="613" width="9" height="31"/><polygon points="1574,541 1528,651 1620,651"/><polygon points="1574,485 1537,596 1611,596"/><polygon points="1574,419 1547,530 1601,530"/></g><g fill="#102524"><rect x="1622" y="617" width="8" height="27"/><polygon points="1626,554 1586,650 1666,650"/><polygon points="1626,507 1594,602 1658,602"/><polygon points="1626,450 1603,545 1649,545"/></g>
+
+  <!-- warm light beyond the gate -->
+  <ellipse cx="800" cy="600" rx="150" ry="140" fill="url(#wLamp)" opacity=".55"/>
+  <polygon points="742,720 858,720 1040,900 560,900" fill="url(#wPath)"/>
+
+  <!-- ground -->
+  <path d="M0,720 Q400,700 800,718 T1600,720 L1600,900 L0,900Z" fill="#0b1a1a"/>
+  <polygon points="748,720 852,720 1010,900 590,900" fill="url(#wPath)" opacity=".8"/>
+
+  <!-- the gate -->
+  <g>
+    <rect x="684" y="470" width="42" height="256" rx="6" fill="url(#wWood)"/>
+    <rect x="874" y="470" width="42" height="256" rx="6" fill="url(#wWood)"/>
+    <rect x="664" y="452" width="272" height="32" rx="8" fill="url(#wWood)"/>
+    <rect x="664" y="452" width="272" height="6" rx="3" fill="#7a5a36" opacity=".6"/>
+    <g stroke="#2b1f14" stroke-width="2" opacity=".6"><path d="M692,500 v220 M706,490 v230 M884,500 v220 M898,490 v230"/></g>
+    <polygon points="684,470 726,470 726,520 684,560" fill="#3a2a1c" opacity=".0"/>
+
+    <!-- sign -->
+    <g class="w-sign">
+      <path d="M740,484 L760,520 M860,484 L840,520" stroke="#2b1f14" stroke-width="3" fill="none"/>
+      <rect x="716" y="518" width="168" height="40" rx="6" fill="#4a3720" stroke="#2b1f14" stroke-width="3"/>
+      <text x="800" y="543" text-anchor="middle" font-family="Special Elite, monospace" font-size="15" fill="#f3e7c9" letter-spacing="1.5">HOLLOW NIGHT CAMP</text>
+    </g>
+
+    <!-- lanterns -->
+    <g class="w-lantern"><circle cx="705" cy="500" r="54" fill="url(#wLamp)"/><rect x="696" y="488" width="18" height="26" rx="4" fill="#ffe3a0"/></g>
+    <g class="w-lantern r"><circle cx="895" cy="500" r="54" fill="url(#wLamp)"/><rect x="886" y="488" width="18" height="26" rx="4" fill="#ffe3a0"/></g>
+  </g>
+
+  <!-- near trees framing the gate -->
+  <g fill="#0a1716"><rect x="-49" y="849" width="18" height="59"/><polygon points="-40,710 -129,921 49,921"/><polygon points="-40,604 -111,815 31,815"/><polygon points="-40,477 -92,688 12,688"/></g><g fill="#0a1716"><rect x="37" y="851" width="17" height="58"/><polygon points="46,715 -41,921 133,921"/><polygon points="46,612 -23,818 115,818"/><polygon points="46,488 -4,694 96,694"/></g><g fill="#0a1716"><rect x="124" y="854" width="16" height="54"/><polygon points="132,726 51,919 213,919"/><polygon points="132,629 67,823 197,823"/><polygon points="132,513 85,706 179,706"/></g><g fill="#0a1716"><rect x="209" y="850" width="18" height="59"/><polygon points="218,712 130,921 306,921"/><polygon points="218,607 148,816 288,816"/><polygon points="218,482 167,691 269,691"/></g><g fill="#0a1716"><rect x="294" y="840" width="21" height="70"/><polygon points="304,675 199,925 409,925"/><polygon points="304,551 220,800 388,800"/><polygon points="304,401 243,650 365,650"/></g><g fill="#0a1716"><rect x="381" y="850" width="18" height="58"/><polygon points="390,712 302,921 478,921"/><polygon points="390,608 320,817 460,817"/><polygon points="390,483 339,692 441,692"/></g><g fill="#0a1716"><rect x="465" y="840" width="21" height="70"/><polygon points="476,675 371,925 581,925"/><polygon points="476,549 392,800 560,800"/><polygon points="476,399 415,650 537,650"/></g>
+  <g fill="#0a1716"><rect x="1050" y="844" width="20" height="66"/><polygon points="1060,689 962,923 1158,923"/><polygon points="1060,572 981,806 1139,806"/><polygon points="1060,431 1003,666 1117,666"/></g><g fill="#0a1716"><rect x="1137" y="850" width="18" height="59"/><polygon points="1146,711 1058,921 1234,921"/><polygon points="1146,607 1076,816 1216,816"/><polygon points="1146,481 1095,690 1197,690"/></g><g fill="#0a1716"><rect x="1221" y="838" width="22" height="73"/><polygon points="1232,666 1123,926 1341,926"/><polygon points="1232,536 1145,796 1319,796"/><polygon points="1232,380 1169,640 1295,640"/></g><g fill="#0a1716"><rect x="1307" y="838" width="22" height="73"/><polygon points="1318,666 1209,926 1427,926"/><polygon points="1318,536 1231,796 1405,796"/><polygon points="1318,380 1255,640 1381,640"/></g><g fill="#0a1716"><rect x="1395" y="850" width="17" height="58"/><polygon points="1404,714 1317,921 1491,921"/><polygon points="1404,611 1335,817 1473,817"/><polygon points="1404,487 1354,694 1454,694"/></g><g fill="#0a1716"><rect x="1482" y="854" width="16" height="54"/><polygon points="1490,727 1409,919 1571,919"/><polygon points="1490,630 1425,823 1555,823"/><polygon points="1490,515 1443,708 1537,708"/></g><g fill="#0a1716"><rect x="1568" y="854" width="16" height="54"/><polygon points="1576,728 1496,919 1656,919"/><polygon points="1576,632 1512,823 1640,823"/><polygon points="1576,517 1529,708 1623,708"/></g>
+
+  <circle class="w-fly" cx="1450" cy="552" r="3" fill="#ffce72" filter="url(#glowF)"/><circle class="w-fly" cx="1198" cy="571" r="3" fill="#ffce72" filter="url(#glowF)"/><circle class="w-fly" cx="1008" cy="599" r="3" fill="#ffce72" filter="url(#glowF)"/><circle class="w-fly" cx="552" cy="514" r="3" fill="#ffce72" filter="url(#glowF)"/><circle class="w-fly" cx="635" cy="608" r="3" fill="#ffce72" filter="url(#glowF)"/><circle class="w-fly" cx="719" cy="756" r="3" fill="#ffce72" filter="url(#glowF)"/><circle class="w-fly" cx="612" cy="800" r="3" fill="#ffce72" filter="url(#glowF)"/><circle class="w-fly" cx="787" cy="632" r="3" fill="#ffce72" filter="url(#glowF)"/><circle class="w-fly" cx="1234" cy="714" r="3" fill="#ffce72" filter="url(#glowF)"/><circle class="w-fly" cx="388" cy="531" r="3" fill="#ffce72" filter="url(#glowF)"/><circle class="w-fly" cx="844" cy="734" r="3" fill="#ffce72" filter="url(#glowF)"/><circle class="w-fly" cx="1476" cy="798" r="3" fill="#ffce72" filter="url(#glowF)"/><circle class="w-fly" cx="1178" cy="715" r="3" fill="#ffce72" filter="url(#glowF)"/><circle class="w-fly" cx="1147" cy="566" r="3" fill="#ffce72" filter="url(#glowF)"/>
+
+  <!-- foreground fog -->
+  <g class="w-fog f3"><ellipse cx="700" cy="760" rx="620" ry="70" fill="url(#wFog)"/><ellipse cx="1000" cy="810" rx="560" ry="64" fill="url(#wFog)"/></g>
+  <g class="w-fog f2"><ellipse cx="400" cy="860" rx="600" ry="70" fill="url(#wFog)"/><ellipse cx="1250" cy="870" rx="520" ry="60" fill="url(#wFog)"/></g>
+</svg>
+    <div class="welcome-copy">
+      <p class="kicker">The gate is open.</p>
       <h1>WELCOME TO<br>HOLLOW NIGHT CAMP</h1>
-      <p>The fire is warm. The woods are watching.</p>
-      <button id="enterCampButton" class="enter-camp-button">🔥 ENTER THE CAMP</button>
+      <p class="tagline">The fire is warm. The woods are watching.</p>
     </div>
-  </div>
+    <button id="enterCampButton" class="enter-camp-button" type="button">ENTER THE CAMP</button>
+  </section>
 
   <div class="page">
 
     <!-- Header -->
     <header class="topbar">
+
       <a class="brand" href="./" aria-label="Hollow Night Camp home">
         <div class="brand-mark" aria-hidden="true">H</div>
+
         <div class="brand-copy">
           <div class="brand-title">Hollow Night</div>
           <div class="brand-subtitle">CAMP &middot; EST. 1997</div>
         </div>
       </a>
+
       <div class="top-note">
         <span class="status-dot"></span>
         <span>THE FIRE IS STILL BURNING</span>
       </div>
+
     </header>
 
     <!-- Main -->
@@ -3016,11 +2459,16 @@
 
       <!-- Welcome story -->
       <section class="story">
-        <div class="story-label">A little mystery awaits</div>
+
+        <div class="story-label">
+          A little mystery awaits
+        </div>
+
         <h1>
           Welcome to<br>
           The <span class="highlight">Camp.</span>
         </h1>
+
         <p class="story-description">
           Somewhere beyond the pine trees, past the old wooden
           sign, there's a place where <strong>strange stories come
@@ -3030,75 +2478,178 @@
           So grab your flashlight, pull up a chair, and stay a
           little while. The woods get weird after dark.
         </p>
+
+
       </section>
 
       <!-- Authentication card -->
       <section class="auth-wrap">
+
         <div class="card-pin" aria-hidden="true"></div>
+
         <div class="auth-card">
 
           <!-- Login/Register -->
           <div id="authPanel">
+
             <div class="card-header">
+
               <div>
-                <div class="card-eyebrow">Field Journal No. 001</div>
-                <h2 class="card-heading" id="formHeading">Hey, stranger!</h2>
+                <div class="card-eyebrow">
+                  Field Journal No. 001
+                </div>
+
+                <h2 class="card-heading" id="formHeading">
+                  Hey, stranger!
+                </h2>
+
                 <p class="card-description" id="formDescription">
                   Got an account? Come on in.
                 </p>
               </div>
-              <div class="stamp" aria-hidden="true">CAMP<br>ACCESS</div>
+
+              <div class="stamp" aria-hidden="true">
+                CAMP<br>ACCESS
+              </div>
+
             </div>
 
             <div class="tabs" role="tablist" aria-label="Account access">
-              <button class="tab active" id="loginTab" type="button" role="tab" aria-selected="true">
+
+              <button
+                class="tab active"
+                id="loginTab"
+                type="button"
+                role="tab"
+                aria-selected="true"
+              >
                 Login
               </button>
-              <button class="tab" id="registerTab" type="button" role="tab" aria-selected="false">
+
+              <button
+                class="tab"
+                id="registerTab"
+                type="button"
+                role="tab"
+                aria-selected="false"
+              >
                 Join Camp
               </button>
+
             </div>
 
             <form id="authForm">
+
               <div class="field" id="usernameField" hidden>
-                <label for="username">YOUR CAMP NICKNAME</label>
-                <input id="username" type="text" placeholder="What should we call you?" minlength="3" maxlength="30" autocomplete="nickname">
-                <p class="field-help">At least 3 characters.</p>
+
+                <label for="username">
+                  YOUR CAMP NICKNAME
+                </label>
+
+                <input
+                  id="username"
+                  type="text"
+                  placeholder="What should we call you?"
+                  minlength="3"
+                  maxlength="30"
+                  autocomplete="nickname"
+                >
+
+                <p class="field-help">
+                  At least 3 characters.
+                </p>
+
               </div>
 
               <div class="field">
-                <label for="email">EMAIL ADDRESS</label>
-                <input id="email" type="email" placeholder="you@example.com" autocomplete="email" required>
+
+                <label for="email">
+                  EMAIL ADDRESS
+                </label>
+
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  autocomplete="email"
+                  required
+                >
+
               </div>
 
               <div class="field">
-                <label for="password">PASSWORD</label>
-                <input id="password" type="password" placeholder="Your secret password" minlength="8" autocomplete="current-password" required>
-                <p class="field-help" id="passwordHelp" hidden>Use at least 8 characters.</p>
+
+                <label for="password">
+                  PASSWORD
+                </label>
+
+                <input
+                  id="password"
+                  type="password"
+                  placeholder="Your secret password"
+                  minlength="8"
+                  autocomplete="current-password"
+                  required
+                >
+
+                <p class="field-help" id="passwordHelp" hidden>
+                  Use at least 8 characters.
+                </p>
+
               </div>
 
-              <button class="primary-button" id="submitButton" type="submit">LET ME IN</button>
+              <button
+                class="primary-button"
+                id="submitButton"
+                type="submit"
+              >
+                LET ME IN
+              </button>
+
             </form>
 
-            <div class="message" id="message" role="status" aria-live="polite"></div>
+            <div
+              class="message"
+              id="message"
+              role="status"
+              aria-live="polite"
+            ></div>
 
             <div class="card-footer">
               <span class="tiny-star">&#10022;</span>
-              No monsters allowed after midnight.<br>Probably.
+              No monsters allowed after midnight.
+              <br>
+              Probably.
             </div>
+
           </div>
 
           <!-- Signed-in account -->
           <div class="account-panel" id="accountPanel">
+
             <div class="account-avatar" aria-hidden="true">H</div>
-            <div class="account-eyebrow">CLASSIFIED: CAMP MEMBER</div>
-            <h2 class="account-heading">You're back!</h2>
+
+            <div class="account-eyebrow">
+              CLASSIFIED: CAMP MEMBER
+            </div>
+
+            <h2 class="account-heading">
+              You're back!
+            </h2>
+
             <p class="account-description">
               The fire is warm, the coffee is questionable,
               and the mysteries aren't going to solve themselves.
             </p>
+
             <div class="account-email" id="accountEmail"></div>
-            <div class="message visible" id="sessionMessage" role="status" aria-live="polite">
+
+            <div
+              class="message visible"
+              id="sessionMessage"
+              role="status"
+              aria-live="polite"
+            >
               You're signed in.
             </div>
 
@@ -3106,12 +2657,17 @@
             <div id="authorModeBox" class="author-mode-box" hidden>
               <div class="author-mode-info">
                 <span class="author-mode-icon">✍️</span>
+
                 <div>
                   <h3>Author Studio</h3>
                   <p>Manage your stories and build your world.</p>
                 </div>
               </div>
-              <button id="authorModeButton" type="button">✦ Enter Author Mode</button>
+
+              <button id="authorModeButton" type="button">
+                ✦ Enter Author Mode
+              </button>
+
               <p id="authorModeStatus" hidden></p>
             </div>
 
@@ -3122,6 +2678,7 @@
                 <h2>Author Studio</h2>
                 <p>Your stories. Your world. Your rules.</p>
               </div>
+
               <div class="author-studio-content">
                 <h3>Welcome back, Author!</h3>
                 <p>
@@ -3129,33 +2686,44 @@
                   Manage your novels, chapters, characters, and world-building
                   from one place.
                 </p>
+
                 <div class="author-studio-grid">
                   <article class="author-studio-card">
                     <span>📚</span>
                     <h4>Novels</h4>
                     <p>Create and manage your stories.</p>
                   </article>
+
                   <article class="author-studio-card">
                     <span>📖</span>
                     <h4>Chapters</h4>
                     <p>Organize your story chapters.</p>
                   </article>
+
                   <article class="author-studio-card">
                     <span>👥</span>
                     <h4>Characters</h4>
                     <p>Build your characters and their stories.</p>
                   </article>
+
                   <article class="author-studio-card">
                     <span>🌌</span>
                     <h4>World Building</h4>
                     <p>Manage locations, maps, and lore.</p>
                   </article>
                 </div>
-                <button id="exitAuthorModeButton" type="button">← Exit Author Mode</button>
+
+                <button id="exitAuthorModeButton" type="button">
+                  ← Exit Author Mode
+                </button>
               </div>
             </section>
 
-            <button class="secondary-button" id="logoutButton" type="button">
+            <button
+              class="secondary-button"
+              id="logoutButton"
+              type="button"
+            >
               Sign out of camp
             </button>
 
@@ -3163,9 +2731,11 @@
               <span class="tiny-star">&#10022;</span>
               Keep your eyes on the woods.
             </div>
+
           </div>
 
         </div>
+
       </section>
 
     </main>
@@ -3176,211 +2746,170 @@
 
     <main id="campApp" class="camp-app" hidden>
 
-      <!-- Camp Gate Background -->
-      <div class="camp-gate-bg" aria-hidden="true">
-        <div class="gate-moon"></div>
-        <div class="gate-stars"></div>
-        <div class="gate-trees-left"></div>
-        <div class="gate-trees-right"></div>
-        <div class="gate-fence left"></div>
-        <div class="gate-fence right"></div>
+      <!-- MAIN BAR (center top) -->
+      <nav class="main-bar" id="mainBar" aria-label="Main navigation">
 
-        <div class="gate-structure">
-          <div class="gate-post left"></div>
-          <div class="gate-post right"></div>
-          <div class="gate-crossbeam"></div>
-          <div class="gate-roof"></div>
-          <div class="gate-sign">BLACKWOOD CAMP</div>
-          <div class="gate-banner">WELCOME</div>
-          <div class="gate-lamp left"></div>
-          <div class="gate-lamp right"></div>
+        <div class="bar-brand" aria-hidden="true">
+          <span class="bar-brand-mark">H</span>
+          <span>Hollow Night</span>
         </div>
 
-        <div class="gate-bear">🐻</div>
+        <button class="camp-nav-item active" data-page="campfire" type="button">
+          <span>🔥</span><span>Campfire</span>
+        </button>
+        <button class="camp-nav-item" data-page="novels" type="button">
+          <span>📚</span><span>Novels</span>
+        </button>
+        <button class="camp-nav-item" data-page="theories" type="button">
+          <span>🔎</span><span>Theories</span>
+        </button>
+        <button class="camp-nav-item" data-page="arcade" type="button">
+          <span>🎲</span><span>Arcade</span>
+        </button>
+        <button class="camp-nav-item" data-page="settings" type="button">
+          <span>⚙️</span><span>Settings</span>
+        </button>
 
-        <div class="gate-truck">
-          <div class="truck-cab"></div>
-          <div class="truck-bed"></div>
-          <div class="truck-wheel front"></div>
-          <div class="truck-wheel back"></div>
-        </div>
+        <!-- Author only -->
+        <button id="authorStudioToggle" class="camp-nav-item author-toggle" type="button"
+                aria-expanded="false" aria-controls="homeAuthorStudio" hidden>
+          <span>✍️</span><span class="toggle-label">Author Studio</span>
+        </button>
 
-        <div class="gate-path"></div>
-        <div class="gate-fog"></div>
-      </div>
+        <button class="bar-icon-button" id="notificationButton" type="button"
+                aria-label="Notifications" title="Notifications">
+          🔔<span class="notification-dot"></span>
+        </button>
 
-      <!-- MAIN NAVIGATION -->
-      <nav class="camp-navigation" aria-label="Main navigation">
-        <button class="camp-nav-item active" data-page="campfire">
-          <span>🔥</span>
-          <span>Campfire</span>
-        </button>
-        <button class="camp-nav-item" data-page="novels">
-          <span>📚</span>
-          <span>Novels</span>
-        </button>
-        <button class="camp-nav-item" data-page="theories">
-          <span>🔎</span>
-          <span>Theories</span>
-        </button>
-        <button class="camp-nav-item" data-page="arcade">
-          <span>🎲</span>
-          <span>Corners Arcade</span>
-        </button>
-        <button class="camp-nav-item" data-page="settings">
-          <span>⚙️</span>
-          <span>Settings</span>
-        </button>
-        <button class="notification-button" id="notificationButton" type="button" aria-label="Notifications" title="Notifications">
-          🔔
-          <span class="notification-dot"></span>
-        </button>
       </nav>
+
+      <!-- ⋮ menu: replaces the Main Bar inside the chapter editor -->
+      <button id="editorMenuButton" class="editor-menu-button" type="button"
+              aria-label="Open menu" aria-expanded="false" aria-controls="editorMenu" hidden>⋮</button>
+      <div id="editorMenu" class="editor-menu" hidden>
+        <button class="camp-nav-item" data-page="campfire" type="button"><span>🔥</span><span>Campfire</span></button>
+        <button class="camp-nav-item" data-page="novels" type="button"><span>📚</span><span>Novels</span></button>
+        <button class="camp-nav-item" data-page="theories" type="button"><span>🔎</span><span>Theories</span></button>
+        <button class="camp-nav-item" data-page="arcade" type="button"><span>🎲</span><span>Arcade</span></button>
+        <button class="camp-nav-item" data-page="settings" type="button"><span>⚙️</span><span>Settings</span></button>
+      </div>
 
       <!-- CAMPFIRE HOME -->
       <section class="camp-page" id="page-campfire">
 
-        <div class="camp-welcome">
-          <div>
-            <div class="camp-eyebrow">✦ YOUR LITTLE CORNER OF THE UNKNOWN</div>
-            <h1>Welcome to the <span>Camp.</span></h1>
-            <p>
-              Pull up a chair. There's always another story
-              waiting to be told around the fire.
-            </p>
-          </div>
-          <div class="camp-welcome-icon" aria-hidden="true">
-            🔥
-          </div>
+        <div class="camp-hero">
+          <h1>Welcome to the Camp, <em id="homeNickname">camper</em>.</h1>
+          <p>Pull up a chair. There's always another story waiting to be told around the fire.</p>
         </div>
 
-        <!-- AUTHOR STUDIO: AUTHOR ONLY -->
+        <!-- AUTHOR STUDIO: Author only, opened from the Main Bar toggle -->
         <section id="homeAuthorStudio" class="home-author-studio" hidden>
-          <div class="home-section-heading">
-            <div>
-              <span class="camp-eyebrow">YOUR CREATIVE WORKSPACE</span>
-              <h2>✍️ Author Studio</h2>
-              <p>Every great mystery starts with a story.</p>
-            </div>
-            <span class="author-badge">AUTHOR</span>
+
+          <div class="studio-head">
+            <h2>✍️ Author Studio</h2>
+            <p>Every great mystery starts with a story.</p>
           </div>
+
           <div class="author-home-grid">
-            <button class="author-home-card" data-author-action="new-novel">
+            <button class="author-home-card" data-author-action="new-novel" type="button">
               <span class="author-home-icon">✚</span>
               <span class="author-home-title">Create New Novel</span>
               <span class="author-home-description">Start writing your next story.</span>
             </button>
-            <button class="author-home-card" data-author-action="manage-novels">
+            <button class="author-home-card" data-author-action="manage-novels" type="button">
               <span class="author-home-icon">📚</span>
               <span class="author-home-title">Manage Novels</span>
               <span class="author-home-description">Organize your stories and collections.</span>
             </button>
-            <button class="author-home-card" data-author-action="manage-chapters">
+            <button class="author-home-card" data-author-action="manage-chapters" type="button">
               <span class="author-home-icon">📖</span>
               <span class="author-home-title">Manage Chapters</span>
               <span class="author-home-description">Continue working on your chapters.</span>
             </button>
-            <button class="author-home-card" data-author-action="world-building">
+            <button class="author-home-card" data-author-action="world-building" type="button">
               <span class="author-home-icon">🌌</span>
               <span class="author-home-title">World Building</span>
               <span class="author-home-description">Build characters, locations, and lore.</span>
             </button>
           </div>
+
           <p id="authorHomeStatus" class="home-status" role="status" hidden></p>
+
         </section>
 
-        <!-- FEATURED STORIES -->
+        <!-- NAVIGATION CARDS -->
+        <div class="nav-card-grid">
+          <button class="nav-card" data-go-page="novels" type="button">
+            <span class="nav-card-icon" aria-hidden="true">📚</span>
+            <h3>Novels &amp; Stories</h3>
+            <p>The camp library. Find a story and settle in.</p>
+          </button>
+          <button class="nav-card" data-go-page="theories" type="button">
+            <span class="nav-card-icon" aria-hidden="true">🔎</span>
+            <h3>Theories</h3>
+            <p>Connect the clues. Question everything.</p>
+          </button>
+          <button class="nav-card" data-go-page="arcade" type="button">
+            <span class="nav-card-icon" aria-hidden="true">🎲</span>
+            <h3>Corners Arcade</h3>
+            <p>Roll the dice. Take a break.</p>
+          </button>
+          <button class="nav-card" data-go-page="settings" type="button">
+            <span class="nav-card-icon" aria-hidden="true">⚙️</span>
+            <h3>Settings</h3>
+            <p>Your camp, your rules.</p>
+          </button>
+        </div>
+
+        <!-- FEATURED STORY -->
         <section class="home-section">
           <div class="home-section-heading">
-            <div>
-              <span class="camp-eyebrow">PICK YOUR NEXT ADVENTURE</span>
-              <h2>Stories by the Fire</h2>
-            </div>
-            <button class="text-action" data-go-page="novels">Explore novels →</button>
+            <h2>Stories by the Fire</h2>
+            <button class="text-action" data-go-page="novels" type="button">Explore novels →</button>
           </div>
+
           <article class="featured-story-card">
-            <div class="featured-story-art" aria-hidden="true">
-              <span>?</span>
-            </div>
+            <div class="featured-story-art" aria-hidden="true"><span>?</span></div>
             <div class="featured-story-content">
               <span class="story-tag">MYSTERY · UNKNOWN</span>
               <h3>The woods are keeping secrets.</h3>
-              <p>
-                Somewhere beyond the trees, a story is waiting
-                for someone curious enough to uncover it.
-              </p>
-              <button class="camp-action-button" data-go-page="novels">
-                Explore the Library →
-              </button>
+              <p>Somewhere beyond the trees, a story is waiting for someone curious enough to uncover it.</p>
+              <button class="camp-action-button" data-go-page="novels" type="button">Explore the Library →</button>
             </div>
           </article>
-        </section>
-
-        <!-- COMMUNITY -->
-        <section class="home-section">
-          <div class="home-section-heading">
-            <div>
-              <span class="camp-eyebrow">AROUND THE CAMPFIRE</span>
-              <h2>Make Yourself at Home</h2>
-            </div>
-          </div>
-          <div class="community-home-grid">
-            <button class="community-home-card" data-go-page="theories">
-              <span>🔎</span>
-              <h3>Theories & Mysteries</h3>
-              <p>Connect the clues. Share your theories. Question everything.</p>
-              <span class="card-link">Investigate →</span>
-            </button>
-            <button class="community-home-card" data-go-page="arcade">
-              <span>🎲</span>
-              <h3>Corners Arcade</h3>
-              <p>Roll the dice, test your luck, and take a break from the mysteries.</p>
-              <span class="card-link">Play a little →</span>
-            </button>
-          </div>
         </section>
 
         <!-- PROFILE ON HOME -->
         <section class="home-section home-profile-section">
           <div class="home-section-heading">
-            <div>
-              <span class="camp-eyebrow">YOUR CAMP IDENTITY</span>
-              <h2>Your Camp Profile</h2>
-            </div>
+            <h2>Your Camp Profile</h2>
           </div>
           <p class="home-profile-description">
-            Make yourself comfortable. You can always change
-            your profile details later.
+            Make yourself comfortable. You can always change your profile details later.
           </p>
           <div id="homeProfileContainer"></div>
-          <button id="homeLogoutButton" class="home-logout-button" type="button">
-            Sign out of camp
-          </button>
+          <button id="homeLogoutButton" class="home-logout-button" type="button">Sign out of camp</button>
         </section>
 
       </section>
 
       <!-- PLACEHOLDER PAGES -->
       <section class="camp-page camp-placeholder-page" id="page-novels" hidden>
-        <span class="camp-eyebrow">THE CAMP LIBRARY</span>
         <h1>Novels & Stories</h1>
         <p>The library is waiting to be built. Stay curious.</p>
       </section>
 
       <section class="camp-page camp-placeholder-page" id="page-theories" hidden>
-        <span class="camp-eyebrow">INVESTIGATION BOARD</span>
         <h1>Theories & Mysteries</h1>
         <p>Every clue matters. The investigation begins here.</p>
       </section>
 
       <section class="camp-page camp-placeholder-page" id="page-arcade" hidden>
-        <span class="camp-eyebrow">TAKE A BREAK, CAMPER</span>
         <h1>Corners Arcade</h1>
         <p>Dice, games, and a little bit of luck. Coming soon.</p>
       </section>
 
       <section class="camp-page camp-placeholder-page" id="page-settings" hidden>
-        <span class="camp-eyebrow">YOUR CAMP, YOUR RULES</span>
         <h1>Settings</h1>
         <p>Your preferences and camp settings will live here.</p>
       </section>
@@ -3414,36 +2943,94 @@
 
     const landingMain = document.querySelector('.main');
     const campApp = document.getElementById('campApp');
-    const homeProfileContainer = document.getElementById('homeProfileContainer');
-    const homeLogoutButton = document.getElementById('homeLogoutButton');
-    const homeAuthorStudio = document.getElementById('homeAuthorStudio');
-    const authorHomeStatus = document.getElementById('authorHomeStatus');
+    const homeProfileContainer =
+      document.getElementById('homeProfileContainer');
 
-    const welcomeScreen = document.getElementById('welcomeScreen');
-    const enterCampButton = document.getElementById('enterCampButton');
+    const homeLogoutButton =
+      document.getElementById('homeLogoutButton');
+
+    const homeAuthorStudio =
+      document.getElementById('homeAuthorStudio');
+
+    const authorHomeStatus =
+      document.getElementById('authorHomeStatus');
 
     const authForm = document.getElementById('authForm');
+
     const usernameField = document.getElementById('usernameField');
     const usernameInput = document.getElementById('username');
+
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
+
     const passwordHelp = document.getElementById('passwordHelp');
+
     const submitButton = document.getElementById('submitButton');
     const logoutButton = document.getElementById('logoutButton');
+
     const message = document.getElementById('message');
     const sessionMessage = document.getElementById('sessionMessage');
+
     const accountEmail = document.getElementById('accountEmail');
+
     const loginTab = document.getElementById('loginTab');
     const registerTab = document.getElementById('registerTab');
+
     const formHeading = document.getElementById('formHeading');
     const formDescription = document.getElementById('formDescription');
 
     let mode = 'login';
     let busy = false;
 
+    // STAGE CONTROLLER: login -> welcome -> home
+    const authorStudioToggle = document.getElementById('authorStudioToggle');
+    const editorMenuButton = document.getElementById('editorMenuButton');
+    const editorMenu = document.getElementById('editorMenu');
+    const welcomeScreen = document.getElementById('welcomeScreen');
+    const enterCampButton = document.getElementById('enterCampButton');
+    const ENTERED_KEY = 'hnc_entered';
+    let stage = 'login';
+    let enterTimer = null;
+
+    function setStage(next) {
+      stage = next;
+
+      document.body.classList.remove('stage-login', 'stage-welcome', 'stage-home');
+      document.body.classList.add('stage-' + next);
+
+      landingMain.hidden = next !== 'login';
+      welcomeScreen.hidden = next !== 'welcome';
+      campApp.hidden = next !== 'home';
+
+      clearTimeout(enterTimer);
+      enterCampButton.classList.remove('show');
+
+      if (next === 'welcome') {
+        // button appears 1 second after the transition screen opens
+        enterTimer = setTimeout(() => {
+          enterCampButton.classList.add('show');
+          enterCampButton.focus({ preventScroll: true });
+        }, 1000);
+      }
+
+      if (next !== 'home') {
+        setEditorMode(false);
+      }
+
+      window.scrollTo(0, 0);
+    }
+
+    enterCampButton.addEventListener('click', () => {
+      try { sessionStorage.setItem(ENTERED_KEY, '1'); } catch (e) {}
+      setStage('home');
+      navigateCampPage('campfire');
+    });
+
+
     function showMessage(text, type = '') {
       message.textContent = text;
       message.className = 'message visible';
+
       if (type) {
         message.classList.add(type);
       }
@@ -3456,191 +3043,308 @@
 
     function setMode(nextMode) {
       mode = nextMode;
+
       clearMessage();
+
       const isRegister = mode === 'register';
 
       loginTab.classList.toggle('active', !isRegister);
       registerTab.classList.toggle('active', isRegister);
-      loginTab.setAttribute('aria-selected', String(!isRegister));
-      registerTab.setAttribute('aria-selected', String(isRegister));
+
+      loginTab.setAttribute(
+        'aria-selected',
+        String(!isRegister)
+      );
+
+      registerTab.setAttribute(
+        'aria-selected',
+        String(isRegister)
+      );
 
       usernameField.hidden = !isRegister;
       usernameInput.required = isRegister;
+
       passwordHelp.hidden = !isRegister;
-      passwordInput.autocomplete = isRegister ? 'new-password' : 'current-password';
 
-      formHeading.textContent = isRegister ? 'Join the camp!' : 'Hey, stranger!';
-      formDescription.textContent = isRegister ? 'New around here? Pull up a chair.' : 'Got an account? Come on in.';
-      submitButton.textContent = isRegister ? 'JOIN THE CAMP' : 'LET ME IN';
+      passwordInput.autocomplete = isRegister
+        ? 'new-password'
+        : 'current-password';
+
+      formHeading.textContent = isRegister
+        ? 'Join the camp!'
+        : 'Hey, stranger!';
+
+      formDescription.textContent = isRegister
+        ? 'New around here? Pull up a chair.'
+        : 'Got an account? Come on in.';
+
+      submitButton.textContent = isRegister
+        ? 'JOIN THE CAMP'
+        : 'LET ME IN';
     }
 
-    // CAMP ACCOUNT & ROLE SYSTEM
-    let currentUserId = null;
-    let currentUserRole = 'reader';
-    let profileEditor = null;
-    let profileNickname = null;
-    let profileBio = null;
-    let profileRole = null;
-    let profileStatus = null;
-    let profileSaveButton = null;
-    let currentAvatarUrl = null;
+// CAMP ACCOUNT & ROLE SYSTEM
+let currentUserId = null;
+let currentUserRole = 'reader';
 
-    function isAuthor() {
-      return currentUserRole === 'author';
-    }
+let profileEditor = null;
+let profileNickname = null;
+let profileBio = null;
+let profileRole = null;
+let profileStatus = null;
+let profileSaveButton = null;
+let currentAvatarUrl = null;
 
-    // AUTHOR MODE CONTROLS
-    const authorModeButton = document.getElementById('authorModeButton');
-    const authorStudioPanel = document.getElementById('authorStudioPanel');
-    const exitAuthorModeButton = document.getElementById('exitAuthorModeButton');
+// Memeriksa apakah akun yang login adalah Author
+function isAuthor() {
+  return currentUserRole === 'author';
+}
+
+// AUTHOR MODE CONTROLS
+const authorModeButton =
+  document.getElementById('authorModeButton');
+
+const authorStudioPanel =
+  document.getElementById('authorStudioPanel');
+
+const exitAuthorModeButton =
+  document.getElementById('exitAuthorModeButton');
+
+if (authorModeButton) {
+  authorModeButton.addEventListener('click', () => {
+    if (!isAuthor()) return;
+
+    authorStudioPanel.hidden = false;
+    authorModeButton.textContent = '✦ Author Mode Active';
+
+    authorStudioPanel.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    });
+  });
+}
+
+if (exitAuthorModeButton) {
+  exitAuthorModeButton.addEventListener('click', () => {
+    authorStudioPanel.hidden = true;
 
     if (authorModeButton) {
-      authorModeButton.addEventListener('click', () => {
-        if (!isAuthor()) return;
-        authorStudioPanel.hidden = false;
-        authorModeButton.textContent = '✦ Author Mode Active';
-        authorStudioPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
+      authorModeButton.textContent = '✦ Enter Author Mode';
+    }
+  });
+}
+
+async function showSignedIn(user) {
+  currentUserId = user.id;
+
+  authPanel.hidden = true;
+  accountPanel.classList.add('visible');
+
+  accountEmail.textContent = user.email || 'Camp member';
+
+  sessionMessage.textContent =
+    'Checking your camp account...';
+
+  try {
+    const profile = await getReaderProfile(user.id);
+
+    // Ambil role asli dari Supabase
+    currentUserRole = profile.role === 'author'
+      ? 'author'
+      : 'reader';
+
+    // login -> welcome (first entry) or straight to home (same tab session)
+    if (stage === 'login') {
+      let entered = false;
+      try { entered = sessionStorage.getItem(ENTERED_KEY) === '1'; } catch (e) {}
+      setStage(entered ? 'home' : 'welcome');
     }
 
-    if (exitAuthorModeButton) {
-      exitAuthorModeButton.addEventListener('click', () => {
-        authorStudioPanel.hidden = true;
-        if (authorModeButton) {
-          authorModeButton.textContent = '✦ Enter Author Mode';
-        }
-      });
+    const homeNickname = document.getElementById('homeNickname');
+    if (homeNickname) {
+      homeNickname.textContent = profile.nickname || 'camper';
     }
 
-    async function showSignedIn(user) {
-      currentUserId = user.id;
-      authPanel.hidden = true;
-      accountPanel.classList.add('visible');
-      accountEmail.textContent = user.email || 'Camp member';
-      sessionMessage.textContent = 'Checking your camp account...';
+    // Author Studio toggle (Main Bar) hanya untuk akun Author
+    authorStudioToggle.hidden = !isAuthor();
+    if (!isAuthor()) {
+      homeAuthorStudio.hidden = true;
+      authorStudioToggle.setAttribute('aria-expanded', 'false');
+    }
 
-      try {
-        const profile = await getReaderProfile(user.id);
-        currentUserRole = profile.role === 'author' ? 'author' : 'reader';
+    // Tampilkan Mode Penulis hanya untuk akun Author
+const authorModeBox = document.getElementById('authorModeBox');
 
-        // Tampilkan layar sambutan (Welcome Screen)
-        landingMain.hidden = true;
-        campApp.hidden = true;
-        welcomeScreen.hidden = false;
-        document.body.style.overflow = 'hidden';
+if (authorModeBox) {
+  authorModeBox.hidden = !isAuthor();
+}
 
-        homeAuthorStudio.hidden = !isAuthor();
+    sessionMessage.textContent = isAuthor()
+      ? 'Welcome back, Author! Your writer account is active.'
+      : 'Your Reader account is signed in successfully.';
 
-        const authorModeBox = document.getElementById('authorModeBox');
-        if (authorModeBox) {
-          authorModeBox.hidden = !isAuthor();
+    // Buat editor profil satu kali saja
+    if (!profileEditor) {
+      profileEditor = document.createElement('form');
+      profileEditor.id = 'readerProfileEditor';
+
+      profileEditor.innerHTML = `
+        <div class="reader-profile">
+          <h2>Your Camp Profile</h2>
+
+          <p class="profile-label">CAMP NICKNAME</p>
+          <input
+            id="profileNickname"
+            type="text"
+            minlength="3"
+            maxlength="30"
+            required
+            placeholder="Your nickname"
+          >
+
+          <p class="profile-hint">You can still change this later.</p>
+
+          <p class="profile-label">YOUR BIO</p>
+          <textarea
+            id="profileBio"
+            maxlength="300"
+            rows="4"
+            placeholder="Tell the camp a little about yourself..."
+          ></textarea>
+
+          <p class="profile-label">ACCOUNT ROLE</p>
+          <p id="profileRole"></p>
+
+          <button id="profileSaveButton" type="submit">
+            SAVE PROFILE
+          </button>
+
+          <p id="profileStatus" role="status"></p>
+        </div>
+      `;
+
+      homeProfileContainer.appendChild(profileEditor);
+
+      profileNickname =
+        profileEditor.querySelector('#profileNickname');
+
+      profileBio =
+        profileEditor.querySelector('#profileBio');
+
+      profileRole =
+        profileEditor.querySelector('#profileRole');
+
+      profileStatus =
+        profileEditor.querySelector('#profileStatus');
+
+      profileSaveButton =
+        profileEditor.querySelector('#profileSaveButton');
+
+      profileEditor.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const nickname = profileNickname.value.trim();
+        const bio = profileBio.value.trim();
+
+        if (nickname.length < 3) {
+          profileStatus.textContent =
+            'Nickname must contain at least 3 characters.';
+          return;
         }
 
-        sessionMessage.textContent = isAuthor()
-          ? 'Welcome back, Author! Your writer account is active.'
-          : 'Your Reader account is signed in successfully.';
-
-        // Buat editor profil satu kali saja
-        if (!profileEditor) {
-          profileEditor = document.createElement('form');
-          profileEditor.id = 'readerProfileEditor';
-          profileEditor.innerHTML = `
-            <div class="reader-profile">
-              <h2>Your Camp Profile</h2>
-              <p class="profile-label">CAMP NICKNAME</p>
-              <input id="profileNickname" type="text" minlength="3" maxlength="30" required placeholder="Your nickname">
-              <p class="profile-hint">You can still change this later.</p>
-              <p class="profile-label">YOUR BIO</p>
-              <textarea id="profileBio" maxlength="300" rows="4" placeholder="Tell the camp a little about yourself..."></textarea>
-              <p class="profile-label">ACCOUNT ROLE</p>
-              <p id="profileRole"></p>
-              <button id="profileSaveButton" type="submit">SAVE PROFILE</button>
-              <p id="profileStatus" role="status"></p>
-            </div>
-          `;
-          homeProfileContainer.appendChild(profileEditor);
-
-          profileNickname = profileEditor.querySelector('#profileNickname');
-          profileBio = profileEditor.querySelector('#profileBio');
-          profileRole = profileEditor.querySelector('#profileRole');
-          profileStatus = profileEditor.querySelector('#profileStatus');
-          profileSaveButton = profileEditor.querySelector('#profileSaveButton');
-
-          profileEditor.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const nickname = profileNickname.value.trim();
-            const bio = profileBio.value.trim();
-
-            if (nickname.length < 3) {
-              profileStatus.textContent = 'Nickname must contain at least 3 characters.';
-              return;
-            }
-
-            profileSaveButton.disabled = true;
-            profileSaveButton.textContent = 'SAVING...';
-            profileStatus.textContent = '';
-
-            try {
-              const updatedProfile = await updateReaderProfile(currentUserId, {
-                nickname,
-                bio,
-                avatar_url: currentAvatarUrl
-              });
-              profileNickname.value = updatedProfile.nickname;
-              profileBio.value = updatedProfile.bio;
-              profileRole.textContent = updatedProfile.role.toUpperCase();
-              profileStatus.textContent = 'Profile saved successfully!';
-            } catch (error) {
-              console.error('Profile update failed:', error);
-              profileStatus.textContent = error.message || 'Could not save your profile.';
-            } finally {
-              profileSaveButton.disabled = false;
-              profileSaveButton.textContent = 'SAVE PROFILE';
-            }
-          });
-        }
-
-        profileNickname.value = profile.nickname || '';
-        profileBio.value = profile.bio || '';
-        profileRole.textContent = (profile.role || 'reader').toUpperCase();
-        currentAvatarUrl = profile.avatar_url || null;
+        profileSaveButton.disabled = true;
+        profileSaveButton.textContent = 'SAVING...';
         profileStatus.textContent = '';
 
-      } catch (error) {
-        console.error('Unable to load reader profile:', error);
-        sessionMessage.textContent = 'You are signed in, but your profile could not be loaded. Please refresh the page.';
-      }
+        try {
+          const updatedProfile = await updateReaderProfile(
+            currentUserId,
+            {
+              nickname,
+              bio,
+              avatar_url: currentAvatarUrl
+            }
+          );
+
+          profileNickname.value = updatedProfile.nickname;
+          profileBio.value = updatedProfile.bio;
+          profileRole.textContent =
+            updatedProfile.role.toUpperCase();
+
+          profileStatus.textContent =
+            'Profile saved successfully!';
+
+        } catch (error) {
+          console.error('Profile update failed:', error);
+
+          profileStatus.textContent =
+            error.message || 'Could not save your profile.';
+        } finally {
+          profileSaveButton.disabled = false;
+          profileSaveButton.textContent = 'SAVE PROFILE';
+        }
+      });
     }
 
-    function showSignedOut() {
-      currentUserId = null;
-      currentUserRole = 'reader';
-      const authorModeBox = document.getElementById('authorModeBox');
-      if (authorModeBox) {
-        authorModeBox.hidden = true;
-      }
-      if (authorStudioPanel) {
-        authorStudioPanel.hidden = true;
-      }
-      if (authorModeButton) {
-        authorModeButton.textContent = '✦ Enter Author Mode';
-      }
+    // Isi formulir dengan data dari Supabase
+    profileNickname.value = profile.nickname || '';
+    profileBio.value = profile.bio || '';
+    profileRole.textContent =
+      (profile.role || 'reader').toUpperCase();
 
-      welcomeScreen.hidden = true;
-      campApp.hidden = true;
-      landingMain.hidden = false;
-      document.body.style.overflow = '';
-      document.body.classList.remove('in-camp');
+    currentAvatarUrl = profile.avatar_url || null;
 
-      authPanel.hidden = false;
-      accountPanel.classList.remove('visible');
-    }
+    profileStatus.textContent = '';
 
-    loginTab.addEventListener('click', () => setMode('login'));
-    registerTab.addEventListener('click', () => setMode('register'));
+  } catch (error) {
+    console.error('Unable to load reader profile:', error);
+
+    sessionMessage.textContent =
+      'You are signed in, but your profile could not be loaded. Please refresh the page.';
+  }
+}
+
+function showSignedOut() {
+  currentUserId = null;
+  currentUserRole = 'reader';
+
+  const authorModeBox = document.getElementById('authorModeBox');
+
+if (authorModeBox) {
+  authorModeBox.hidden = true;
+}
+
+  if (authorStudioPanel) {
+    authorStudioPanel.hidden = true;
+  }
+
+  if (authorModeButton) {
+    authorModeButton.textContent = '✦ Enter Author Mode';
+  }
+
+  try { sessionStorage.removeItem(ENTERED_KEY); } catch (e) {}
+
+  homeAuthorStudio.hidden = true;
+  authorStudioToggle.hidden = true;
+  authorStudioToggle.setAttribute('aria-expanded', 'false');
+
+  setStage('login');
+
+  authPanel.hidden = false;
+  accountPanel.classList.remove('visible');
+}
+
+    loginTab.addEventListener('click', () => {
+      setMode('login');
+    });
+
+    registerTab.addEventListener('click', () => {
+      setMode('register');
+    });
 
     authForm.addEventListener('submit', async (event) => {
       event.preventDefault();
+
       if (busy) return;
 
       const email = emailInput.value.trim();
@@ -3649,93 +3353,173 @@
 
       if (mode === 'register') {
         if (username.length < 3) {
-          showMessage('Your nickname needs at least 3 characters.', 'error');
+          showMessage(
+            'Your nickname needs at least 3 characters.',
+            'error'
+          );
+
           return;
         }
+
         if (password.length < 8) {
-          showMessage('Your password needs at least 8 characters.', 'error');
+          showMessage(
+            'Your password needs at least 8 characters.',
+            'error'
+          );
+
           return;
         }
       }
 
       busy = true;
+
       submitButton.disabled = true;
       loginTab.disabled = true;
       registerTab.disabled = true;
+
       submitButton.textContent = 'HOLD ON A SEC...';
+
       clearMessage();
 
       try {
+
         if (mode === 'register') {
-          const result = await registerReader(username, email, password);
+
+          const result = await registerReader(
+            username,
+            email,
+            password
+          );
+
           if (result.user && !result.session) {
-            showMessage('Your account has been created! Check your email and click the verification link before logging in.', 'success');
+
+            showMessage(
+              'Your account has been created! Check your email and click the verification link before logging in.',
+              'success'
+            );
+
           } else if (result.session) {
-            showMessage('Welcome to camp! Your account is ready.', 'success');
+
+            showMessage(
+              'Welcome to camp! Your account is ready.',
+              'success'
+            );
+
           } else {
-            showMessage('Registration submitted. Check your email for the next step.', 'success');
+
+            showMessage(
+              'Registration submitted. Check your email for the next step.',
+              'success'
+            );
+
           }
+
           authForm.reset();
+
         } else {
-          const result = await loginReader(email, password);
+
+          const result = await loginReader(
+            email,
+            password
+          );
+
           if (result.user) {
             showSignedIn(result.user);
           }
+
         }
+
       } catch (error) {
-        showMessage(error.message || 'Something went wrong. Please try again.', 'error');
+
+        showMessage(
+          error.message ||
+          'Something went wrong. Please try again.',
+          'error'
+        );
+
       } finally {
+
         busy = false;
+
         submitButton.disabled = false;
         loginTab.disabled = false;
         registerTab.disabled = false;
-        submitButton.textContent = mode === 'register' ? 'JOIN THE CAMP' : 'LET ME IN';
-      }
-    });
 
-    enterCampButton.addEventListener('click', () => {
-      welcomeScreen.hidden = true;
-      campApp.hidden = false;
-      document.body.style.overflow = '';
-      document.body.classList.add('in-camp');
-      navigateCampPage('campfire');
+        submitButton.textContent = mode === 'register'
+          ? 'JOIN THE CAMP'
+          : 'LET ME IN';
+
+      }
     });
 
     homeLogoutButton.addEventListener('click', async () => {
+
       homeLogoutButton.disabled = true;
       homeLogoutButton.textContent = 'HEADING OUT...';
+
       try {
+
         await logoutReader();
+
         showSignedOut();
+
         authForm.reset();
+
         setMode('login');
-        showMessage('You have signed out. The campfire will be waiting!', 'success');
+
+        showMessage(
+          'You have signed out. The campfire will be waiting!',
+          'success'
+        );
+
       } catch (error) {
-        sessionMessage.textContent = error.message || 'Could not sign out. Please try again.';
+
+        sessionMessage.textContent =
+          error.message ||
+          'Could not sign out. Please try again.';
+
       } finally {
+
         homeLogoutButton.disabled = false;
         homeLogoutButton.textContent = 'Sign out of camp';
+
       }
+
     });
 
     try {
+
       observeAuthState((event, session) => {
+
         if (session?.user) {
           showSignedIn(session.user);
         } else {
           showSignedOut();
         }
+
       });
+
     } catch (error) {
-      console.error('Unable to initialize authentication state:', error);
-      showMessage('Unable to connect to the account service. Please refresh the page.', 'error');
+
+      console.error(
+        'Unable to initialize authentication state:',
+        error
+      );
+
+      showMessage(
+        'Unable to connect to the account service. Please refresh the page.',
+        'error'
+      );
+
     }
 
+
     // CAMP NAVIGATION
-    const campNavButtons = document.querySelectorAll('.camp-nav-item');
+    const campNavButtons = document.querySelectorAll('.camp-nav-item[data-page]');
 
     function navigateCampPage(pageName) {
       const targetPage = document.getElementById(`page-${pageName}`);
+
       if (!targetPage || !campApp || campApp.hidden) {
         return;
       }
@@ -3746,7 +3530,9 @@
 
       campNavButtons.forEach((button) => {
         const active = button.dataset.page === pageName;
+
         button.classList.toggle('active', active);
+
         if (active) {
           button.setAttribute('aria-current', 'page');
         } else {
@@ -3754,7 +3540,13 @@
         }
       });
 
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      editorMenu.hidden = true;
+      editorMenuButton.setAttribute('aria-expanded', 'false');
+
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
     }
 
     campNavButtons.forEach((button) => {
@@ -3769,20 +3561,56 @@
       });
     });
 
+    // AUTHOR STUDIO TOGGLE (Main Bar)
+    authorStudioToggle.addEventListener('click', () => {
+      if (!isAuthor()) return;
+
+      const open = homeAuthorStudio.hidden;
+      homeAuthorStudio.hidden = !open;
+      authorStudioToggle.setAttribute('aria-expanded', String(open));
+
+      if (open) {
+        navigateCampPage('campfire');
+        homeAuthorStudio.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+
+    // EDITOR MODE: Main Bar becomes the round ⋮ button (top-left)
+    function setEditorMode(on) {
+      document.body.classList.toggle('editor-mode', on);
+      editorMenuButton.hidden = !on;
+      editorMenu.hidden = true;
+      editorMenuButton.setAttribute('aria-expanded', 'false');
+    }
+
+    editorMenuButton.addEventListener('click', () => {
+      const open = editorMenu.hidden;
+      editorMenu.hidden = !open;
+      editorMenuButton.setAttribute('aria-expanded', String(open));
+    });
+
+    // Hook for the upcoming chapter editor: window.HNC.setEditorMode(true)
+    window.HNC = { setEditorMode, navigateCampPage };
+
     // Fondasi tombol Author Studio
     document.querySelectorAll('[data-author-action]').forEach((button) => {
       button.addEventListener('click', () => {
         if (!isAuthor()) {
           return;
         }
+
         const action = button.dataset.authorAction;
+
         const messages = {
           'new-novel': 'The Create New Novel feature is coming next.',
           'manage-novels': 'Novel management is coming next.',
           'manage-chapters': 'Chapter management is coming next.',
           'world-building': 'World Building tools are coming next.'
         };
-        authorHomeStatus.textContent = messages[action] || 'This feature is coming soon.';
+
+        authorHomeStatus.textContent =
+          messages[action] || 'This feature is coming soon.';
+
         authorHomeStatus.hidden = false;
       });
     });
