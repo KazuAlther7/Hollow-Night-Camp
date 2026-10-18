@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Special+Elite&family=Fredoka:wght@400;500;600;700&display=swap"
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Sans:wght@400;500;600;700&family=Special+Elite&family=Fredoka:wght@400;500;600;700&display=swap"
     rel="stylesheet">
 
   <style>
@@ -2373,12 +2373,567 @@
         padding: 16px;
       }
     }
+
+    /* =========================================
+       WELCOME TRANSITION SCREEN
+    ========================================= */
+    .welcome-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(10, 15, 12, 0.92);
+      backdrop-filter: blur(4px);
+      animation: fadeIn 1s ease both;
+    }
+
+    .welcome-screen[hidden] {
+      display: none !important;
+    }
+
+    .welcome-content {
+      text-align: center;
+      padding: 50px 40px;
+      background: rgba(10, 8, 6, 0.85);
+      border: 1px solid #8a6d3b;
+      border-radius: 12px;
+      box-shadow: 0 0 60px rgba(0, 0, 0, 0.9), inset 0 0 40px rgba(0, 0, 0, 0.6);
+      max-width: 650px;
+      width: 90%;
+      animation: revealUp 1s .2s var(--ease) both;
+    }
+
+    .welcome-content h1 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(30px, 5vw, 52px);
+      color: #d4af37;
+      margin: 0 0 20px;
+      line-height: 1.2;
+      text-shadow: 0 0 25px rgba(212, 175, 55, 0.5);
+      letter-spacing: 1px;
+    }
+
+    .welcome-content p {
+      font-family: 'Special Elite', monospace;
+      color: #c0b090;
+      font-size: clamp(13px, 2vw, 16px);
+      margin-bottom: 35px;
+      letter-spacing: 1px;
+      opacity: 0.9;
+    }
+
+    .enter-camp-button {
+      padding: 16px 45px;
+      background: linear-gradient(180deg, #2a1f14, #0a0806);
+      border: 2px solid #8a6d3b;
+      border-radius: 6px;
+      color: #d4af37;
+      font-family: 'Cinzel', serif;
+      font-size: clamp(16px, 2.5vw, 20px);
+      font-weight: 700;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 25px rgba(212, 175, 55, 0.25);
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    }
+
+    .enter-camp-button:hover {
+      background: linear-gradient(180deg, #3a2e1e, #1a1410);
+      box-shadow: 0 0 40px rgba(212, 175, 55, 0.5);
+      transform: scale(1.05);
+      color: #f0d4a0;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* =========================================
+       CAMP GATE BACKGROUND (Image 1 style)
+    ========================================= */
+    .camp-gate-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      pointer-events: none;
+      background: linear-gradient(180deg, #0a1114 0%, #141e22 40%, #1a2a24 100%);
+    }
+
+    body.in-camp .scene {
+      display: none;
+    }
+
+    .camp-gate-bg .gate-moon {
+      position: absolute;
+      top: 8%;
+      left: 15%;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: #e8e0c8;
+      box-shadow: 0 0 40px rgba(232, 224, 200, 0.15);
+    }
+
+    .camp-gate-bg .gate-stars {
+      position: absolute;
+      inset: 0;
+      opacity: 0.6;
+      background-image:
+        radial-gradient(circle, #e8e0c8 1px, transparent 1.5px),
+        radial-gradient(circle, #e8e0c8 1px, transparent 1.5px);
+      background-size: 150px 150px, 200px 200px;
+      background-position: 20px 30px, 80px 10px;
+    }
+
+    .camp-gate-bg .gate-trees-left,
+    .camp-gate-bg .gate-trees-right {
+      position: absolute;
+      bottom: 0;
+      width: 200px;
+      height: 60%;
+      background: repeating-linear-gradient(90deg, transparent, transparent 30px, #0d1611 30px, #0d1611 60px);
+      opacity: 0.8;
+    }
+
+    .camp-gate-bg .gate-trees-left { left: 0; transform: skewY(5deg); }
+    .camp-gate-bg .gate-trees-right { right: 0; transform: skewY(-5deg); }
+
+    .camp-gate-bg .gate-fence {
+      position: absolute;
+      bottom: 15%;
+      width: 220px;
+      height: 70px;
+      border-top: 4px solid #4a2e1b;
+      border-bottom: 4px solid #4a2e1b;
+      background: repeating-linear-gradient(90deg, transparent, transparent 18px, #4a2e1b 18px, #4a2e1b 22px);
+    }
+
+    .camp-gate-bg .gate-fence.left { left: 5%; transform: skewY(6deg); }
+    .camp-gate-bg .gate-fence.right { right: 5%; transform: skewY(-6deg); }
+
+    .camp-gate-bg .gate-structure {
+      position: absolute;
+      bottom: 15%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 650px;
+      height: 420px;
+    }
+
+    .camp-gate-bg .gate-post {
+      position: absolute;
+      bottom: 0;
+      width: 45px;
+      height: 320px;
+      background: linear-gradient(90deg, #4a2e1b, #6b4226);
+      border: 2px solid #3a2210;
+      border-radius: 4px;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    .camp-gate-bg .gate-post.left { left: 0; }
+    .camp-gate-bg .gate-post.right { right: 0; }
+
+    .camp-gate-bg .gate-crossbeam {
+      position: absolute;
+      bottom: 300px;
+      left: 22px;
+      right: 22px;
+      height: 45px;
+      background: linear-gradient(0deg, #4a2e1b, #6b4226);
+      border: 2px solid #3a2210;
+      border-radius: 6px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.5);
+    }
+
+    .camp-gate-bg .gate-roof {
+      position: absolute;
+      bottom: 320px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 325px solid transparent;
+      border-right: 325px solid transparent;
+      border-bottom: 130px solid #4a2e1b;
+      filter: drop-shadow(0 6px 8px rgba(0,0,0,0.6));
+    }
+
+    .camp-gate-bg .gate-roof::after {
+      content: "";
+      position: absolute;
+      bottom: -130px;
+      left: -305px;
+      width: 0;
+      height: 0;
+      border-left: 305px solid transparent;
+      border-right: 305px solid transparent;
+      border-bottom: 120px solid #2e1a0e;
+    }
+
+    .camp-gate-bg .gate-sign {
+      position: absolute;
+      bottom: 310px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 340px;
+      padding: 12px 0;
+      background: #2e1a0e;
+      border: 3px solid #8a6d3b;
+      border-radius: 6px;
+      color: #d4af37;
+      font-family: 'Cinzel', serif;
+      font-size: 28px;
+      font-weight: 700;
+      text-align: center;
+      letter-spacing: 3px;
+      text-shadow: 0 2px 6px #000;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.7);
+    }
+
+    .camp-gate-bg .gate-banner {
+      position: absolute;
+      bottom: 230px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 220px;
+      padding: 18px 0;
+      background: #e8e0c8;
+      color: #4a2e1b;
+      font-family: 'Special Elite', monospace;
+      font-size: 15px;
+      text-align: center;
+      border-radius: 0 0 30px 30px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.6);
+      clip-path: polygon(0 0, 100% 0, 100% 85%, 95% 100%, 85% 85%, 15% 85%, 5% 100%, 0 85%);
+    }
+
+    .camp-gate-bg .gate-lamp {
+      position: absolute;
+      bottom: 275px;
+      width: 35px;
+      height: 35px;
+      background: #f2d58b;
+      border-radius: 50%;
+      box-shadow: 0 0 50px 20px rgba(242, 213, 139, 0.3);
+    }
+
+    .camp-gate-bg .gate-lamp.left { left: -18px; }
+    .camp-gate-bg .gate-lamp.right { right: -18px; }
+
+    .camp-gate-bg .gate-bear {
+      position: absolute;
+      bottom: 12%;
+      right: 16%;
+      font-size: 120px;
+      filter: brightness(0.25) drop-shadow(0 15px 15px rgba(0,0,0,0.9));
+      transform: scaleX(-1);
+      opacity: 0.9;
+    }
+
+    .camp-gate-bg .gate-truck {
+      position: absolute;
+      bottom: 18%;
+      left: 13%;
+      width: 200px;
+      height: 90px;
+      filter: brightness(0.6);
+    }
+
+    .camp-gate-bg .truck-cab {
+      position: absolute;
+      left: 0;
+      bottom: 20px;
+      width: 70px;
+      height: 55px;
+      background: #2a4a5a;
+      border-radius: 5px 0 0 0;
+      border: 2px solid #1a2a3a;
+    }
+
+    .camp-gate-bg .truck-bed {
+      position: absolute;
+      left: 70px;
+      bottom: 20px;
+      width: 130px;
+      height: 65px;
+      background: #1e3a4a;
+      border: 2px solid #1a2a3a;
+      border-radius: 0 5px 5px 0;
+    }
+
+    .camp-gate-bg .truck-wheel {
+      position: absolute;
+      bottom: 0;
+      width: 35px;
+      height: 35px;
+      background: #111;
+      border-radius: 50%;
+      border: 4px solid #333;
+    }
+
+    .camp-gate-bg .truck-wheel.front { left: 15px; }
+    .camp-gate-bg .truck-wheel.back { right: 25px; }
+
+    .camp-gate-bg .gate-path {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 30%;
+      background: radial-gradient(ellipse at center bottom, #3a2e1e 0%, transparent 70%);
+      border-radius: 50% 50% 0 0;
+      opacity: 0.8;
+    }
+
+    .camp-gate-bg .gate-fog {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 80%, rgba(100, 120, 100, 0.12), transparent 60%);
+      pointer-events: none;
+      animation: fogMove 12s ease-in-out infinite alternate;
+    }
+
+    @keyframes fogMove {
+      from { transform: translateX(-3%); }
+      to { transform: translateX(3%); }
+    }
+
+    /* =========================================
+       DARK FANTASY UI OVERRIDES (Image 2 style)
+    ========================================= */
+    .camp-navigation {
+      background: rgba(15, 12, 10, 0.95);
+      border: 1px solid #5a4a2a;
+      border-radius: 4px;
+      padding: 0;
+      justify-content: center;
+      gap: 0;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8);
+      margin-bottom: 28px;
+    }
+
+    .camp-nav-item {
+      border-right: 1px solid #3a2e1e;
+      border-radius: 0;
+      padding: 16px 28px;
+      font-family: 'Cinzel', serif;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-size: 11px;
+      color: #8a7a5a;
+      background: transparent;
+    }
+
+    .camp-nav-item:last-child {
+      border-right: none;
+    }
+
+    .camp-nav-item.active {
+      color: #d4af37;
+      background: rgba(212, 175, 55, 0.06);
+      box-shadow: inset 0 -3px 0 #d4af37;
+    }
+
+    .camp-nav-item:hover {
+      color: #e8e0c8;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .notification-button {
+      border-left: 1px solid #3a2e1e;
+      border-radius: 0;
+      padding: 16px 20px;
+      color: #8a7a5a;
+      font-size: 18px;
+    }
+
+    .notification-button:hover {
+      color: #d4af37;
+      background: rgba(212, 175, 55, 0.06);
+    }
+
+    .notification-dot {
+      background: #d4af37;
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.8);
+    }
+
+    .camp-welcome {
+      background: rgba(10, 8, 6, 0.85);
+      border: 1px solid #8a6d3b;
+      border-radius: 4px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,0,0,0.6);
+      backdrop-filter: blur(5px);
+      padding: 40px;
+      text-align: center;
+      flex-direction: column;
+    }
+
+    .camp-welcome h1 {
+      font-family: 'Cinzel', serif;
+      color: #d4af37;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+      font-size: clamp(32px, 5vw, 55px);
+    }
+
+    .camp-welcome p {
+      color: #c0b090;
+      font-family: 'Special Elite', monospace;
+    }
+
+    .camp-welcome-icon {
+      display: none; /* Hide the big fire icon to match the UI */
+    }
+
+    .camp-eyebrow {
+      color: #d4af37;
+      font-family: 'Cinzel', serif;
+      letter-spacing: 2px;
+    }
+
+    .featured-story-card {
+      background: rgba(15, 12, 10, 0.9);
+      border: 1px solid #5a4a2a;
+      border-radius: 4px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+
+    .featured-story-art {
+      background: radial-gradient(circle at 50% 50%, #2a1f14, #0a0806);
+      border-right: 1px solid #5a4a2a;
+    }
+
+    .featured-story-art span {
+      color: #d4af37;
+      border-color: #8a6d3b;
+      box-shadow: 0 0 40px rgba(212, 175, 55, 0.15);
+    }
+
+    .featured-story-content h3 {
+      font-family: 'Cinzel', serif;
+      color: #d4af37;
+      font-size: clamp(22px, 3vw, 30px);
+    }
+
+    .featured-story-content p {
+      color: #b0a080;
+    }
+
+    .camp-action-button {
+      background: linear-gradient(180deg, #2a1f14, #0a0806);
+      border: 1px solid #8a6d3b;
+      color: #d4af37;
+      font-family: 'Cinzel', serif;
+      letter-spacing: 1px;
+      padding: 14px 20px;
+      border-radius: 4px;
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
+    }
+
+    .camp-action-button:hover {
+      background: linear-gradient(180deg, #3a2e1e, #1a1410);
+      box-shadow: 0 0 25px rgba(212, 175, 55, 0.3);
+    }
+
+    .community-home-card {
+      background: rgba(15, 12, 10, 0.9);
+      border: 1px solid #5a4a2a;
+      border-radius: 4px;
+      color: #b0a080;
+    }
+
+    .community-home-card h3 {
+      font-family: 'Cinzel', serif;
+      color: #d4af37;
+    }
+
+    .community-home-card .card-link {
+      color: #d4af37;
+    }
+
+    .home-author-studio {
+      background: rgba(15, 12, 10, 0.95);
+      border: 1px solid #8a6d3b;
+      border-radius: 4px;
+    }
+
+    .author-badge {
+      border-color: #8a6d3b;
+      color: #d4af37;
+      background: rgba(212, 175, 55, 0.08);
+      font-family: 'Cinzel', serif;
+    }
+
+    .author-home-card {
+      background: rgba(25, 20, 15, 0.9);
+      border: 1px solid #5a4a2a;
+      border-radius: 4px;
+      color: #b0a080;
+    }
+
+    .author-home-title {
+      font-family: 'Cinzel', serif;
+      color: #d4af37;
+    }
+
+    .author-home-description {
+      color: #a09070;
+    }
+
+    .author-home-icon {
+      color: #d4af37;
+    }
+
+    .home-section-heading h2 {
+      font-family: 'Cinzel', serif;
+      color: #d4af37;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+    }
+
+    .text-action {
+      color: #d4af37;
+      font-family: 'Cinzel', serif;
+      letter-spacing: 1px;
+    }
+
+    .home-profile-section {
+      border-top: 1px solid #5a4a2a;
+    }
+
+    .home-logout-button {
+      border: 1px solid #8a6d3b;
+      color: #d4af37;
+      background: rgba(212, 175, 55, 0.05);
+      font-family: 'Cinzel', serif;
+      letter-spacing: 1px;
+    }
+
+    .home-logout-button:hover {
+      background: rgba(212, 175, 55, 0.12);
+    }
+
+    .camp-placeholder-page {
+      background: rgba(15, 12, 10, 0.9);
+      border: 1px solid #5a4a2a;
+      border-radius: 4px;
+    }
+
+    .camp-placeholder-page h1 {
+      font-family: 'Cinzel', serif;
+      color: #d4af37;
+    }
   </style>
 </head>
 
 <body>
 
-  <!-- Illustrated night forest -->
+  <!-- Illustrated night forest (Global Scene) -->
   <div class="scene" aria-hidden="true">
     <div class="stars"></div>
     <div class="moon"></div>
@@ -2412,51 +2967,48 @@
     <div class="ground"></div>
 
     <!-- Campfire: part of the forest background -->
-        <div class="campfire" aria-label="Illustration of a glowing campfire">
+    <div class="campfire" aria-label="Illustration of a glowing campfire">
+      <div class="fire-glow"></div>
+      <div class="ember"></div>
+      <div class="ember"></div>
+      <div class="ember"></div>
+      <div class="log one"></div>
+      <div class="log two"></div>
+      <div class="fire">
+        <div class="flame outer"></div>
+        <div class="flame middle"></div>
+        <div class="flame inner"></div>
+      </div>
+      <div class="campfire-caption">
+        Best stories are told<br>around the fire.
+      </div>
+    </div>
+  </div>
 
-          <div class="fire-glow"></div>
-
-          <div class="ember"></div>
-          <div class="ember"></div>
-          <div class="ember"></div>
-
-          <div class="log one"></div>
-          <div class="log two"></div>
-
-          <div class="fire">
-            <div class="flame outer"></div>
-            <div class="flame middle"></div>
-            <div class="flame inner"></div>
-          </div>
-
-          <div class="campfire-caption">
-            Best stories are told<br>
-            around the fire.
-          </div>
-
-        </div>
-
+  <!-- Welcome Transition Screen -->
+  <div id="welcomeScreen" class="welcome-screen" hidden>
+    <div class="welcome-content">
+      <h1>WELCOME TO<br>HOLLOW NIGHT CAMP</h1>
+      <p>The fire is warm. The woods are watching.</p>
+      <button id="enterCampButton" class="enter-camp-button">🔥 ENTER THE CAMP</button>
+    </div>
   </div>
 
   <div class="page">
 
     <!-- Header -->
     <header class="topbar">
-
       <a class="brand" href="./" aria-label="Hollow Night Camp home">
         <div class="brand-mark" aria-hidden="true">H</div>
-
         <div class="brand-copy">
           <div class="brand-title">Hollow Night</div>
           <div class="brand-subtitle">CAMP &middot; EST. 1997</div>
         </div>
       </a>
-
       <div class="top-note">
         <span class="status-dot"></span>
         <span>THE FIRE IS STILL BURNING</span>
       </div>
-
     </header>
 
     <!-- Main -->
@@ -2464,16 +3016,11 @@
 
       <!-- Welcome story -->
       <section class="story">
-
-        <div class="story-label">
-          A little mystery awaits
-        </div>
-
+        <div class="story-label">A little mystery awaits</div>
         <h1>
           Welcome to<br>
           The <span class="highlight">Camp.</span>
         </h1>
-
         <p class="story-description">
           Somewhere beyond the pine trees, past the old wooden
           sign, there's a place where <strong>strange stories come
@@ -2483,178 +3030,75 @@
           So grab your flashlight, pull up a chair, and stay a
           little while. The woods get weird after dark.
         </p>
-
-
       </section>
 
       <!-- Authentication card -->
       <section class="auth-wrap">
-
         <div class="card-pin" aria-hidden="true"></div>
-
         <div class="auth-card">
 
           <!-- Login/Register -->
           <div id="authPanel">
-
             <div class="card-header">
-
               <div>
-                <div class="card-eyebrow">
-                  Field Journal No. 001
-                </div>
-
-                <h2 class="card-heading" id="formHeading">
-                  Hey, stranger!
-                </h2>
-
+                <div class="card-eyebrow">Field Journal No. 001</div>
+                <h2 class="card-heading" id="formHeading">Hey, stranger!</h2>
                 <p class="card-description" id="formDescription">
                   Got an account? Come on in.
                 </p>
               </div>
-
-              <div class="stamp" aria-hidden="true">
-                CAMP<br>ACCESS
-              </div>
-
+              <div class="stamp" aria-hidden="true">CAMP<br>ACCESS</div>
             </div>
 
             <div class="tabs" role="tablist" aria-label="Account access">
-
-              <button
-                class="tab active"
-                id="loginTab"
-                type="button"
-                role="tab"
-                aria-selected="true"
-              >
+              <button class="tab active" id="loginTab" type="button" role="tab" aria-selected="true">
                 Login
               </button>
-
-              <button
-                class="tab"
-                id="registerTab"
-                type="button"
-                role="tab"
-                aria-selected="false"
-              >
+              <button class="tab" id="registerTab" type="button" role="tab" aria-selected="false">
                 Join Camp
               </button>
-
             </div>
 
             <form id="authForm">
-
               <div class="field" id="usernameField" hidden>
-
-                <label for="username">
-                  YOUR CAMP NICKNAME
-                </label>
-
-                <input
-                  id="username"
-                  type="text"
-                  placeholder="What should we call you?"
-                  minlength="3"
-                  maxlength="30"
-                  autocomplete="nickname"
-                >
-
-                <p class="field-help">
-                  At least 3 characters.
-                </p>
-
+                <label for="username">YOUR CAMP NICKNAME</label>
+                <input id="username" type="text" placeholder="What should we call you?" minlength="3" maxlength="30" autocomplete="nickname">
+                <p class="field-help">At least 3 characters.</p>
               </div>
 
               <div class="field">
-
-                <label for="email">
-                  EMAIL ADDRESS
-                </label>
-
-                <input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  autocomplete="email"
-                  required
-                >
-
+                <label for="email">EMAIL ADDRESS</label>
+                <input id="email" type="email" placeholder="you@example.com" autocomplete="email" required>
               </div>
 
               <div class="field">
-
-                <label for="password">
-                  PASSWORD
-                </label>
-
-                <input
-                  id="password"
-                  type="password"
-                  placeholder="Your secret password"
-                  minlength="8"
-                  autocomplete="current-password"
-                  required
-                >
-
-                <p class="field-help" id="passwordHelp" hidden>
-                  Use at least 8 characters.
-                </p>
-
+                <label for="password">PASSWORD</label>
+                <input id="password" type="password" placeholder="Your secret password" minlength="8" autocomplete="current-password" required>
+                <p class="field-help" id="passwordHelp" hidden>Use at least 8 characters.</p>
               </div>
 
-              <button
-                class="primary-button"
-                id="submitButton"
-                type="submit"
-              >
-                LET ME IN
-              </button>
-
+              <button class="primary-button" id="submitButton" type="submit">LET ME IN</button>
             </form>
 
-            <div
-              class="message"
-              id="message"
-              role="status"
-              aria-live="polite"
-            ></div>
+            <div class="message" id="message" role="status" aria-live="polite"></div>
 
             <div class="card-footer">
               <span class="tiny-star">&#10022;</span>
-              No monsters allowed after midnight.
-              <br>
-              Probably.
+              No monsters allowed after midnight.<br>Probably.
             </div>
-
           </div>
 
           <!-- Signed-in account -->
           <div class="account-panel" id="accountPanel">
-
             <div class="account-avatar" aria-hidden="true">H</div>
-
-            <div class="account-eyebrow">
-              CLASSIFIED: CAMP MEMBER
-            </div>
-
-            <h2 class="account-heading">
-              You're back!
-            </h2>
-
+            <div class="account-eyebrow">CLASSIFIED: CAMP MEMBER</div>
+            <h2 class="account-heading">You're back!</h2>
             <p class="account-description">
               The fire is warm, the coffee is questionable,
               and the mysteries aren't going to solve themselves.
             </p>
-
             <div class="account-email" id="accountEmail"></div>
-
-            <div
-              class="message visible"
-              id="sessionMessage"
-              role="status"
-              aria-live="polite"
-            >
+            <div class="message visible" id="sessionMessage" role="status" aria-live="polite">
               You're signed in.
             </div>
 
@@ -2662,17 +3106,12 @@
             <div id="authorModeBox" class="author-mode-box" hidden>
               <div class="author-mode-info">
                 <span class="author-mode-icon">✍️</span>
-
                 <div>
                   <h3>Author Studio</h3>
                   <p>Manage your stories and build your world.</p>
                 </div>
               </div>
-
-              <button id="authorModeButton" type="button">
-                ✦ Enter Author Mode
-              </button>
-
+              <button id="authorModeButton" type="button">✦ Enter Author Mode</button>
               <p id="authorModeStatus" hidden></p>
             </div>
 
@@ -2683,7 +3122,6 @@
                 <h2>Author Studio</h2>
                 <p>Your stories. Your world. Your rules.</p>
               </div>
-
               <div class="author-studio-content">
                 <h3>Welcome back, Author!</h3>
                 <p>
@@ -2691,44 +3129,33 @@
                   Manage your novels, chapters, characters, and world-building
                   from one place.
                 </p>
-
                 <div class="author-studio-grid">
                   <article class="author-studio-card">
                     <span>📚</span>
                     <h4>Novels</h4>
                     <p>Create and manage your stories.</p>
                   </article>
-
                   <article class="author-studio-card">
                     <span>📖</span>
                     <h4>Chapters</h4>
                     <p>Organize your story chapters.</p>
                   </article>
-
                   <article class="author-studio-card">
                     <span>👥</span>
                     <h4>Characters</h4>
                     <p>Build your characters and their stories.</p>
                   </article>
-
                   <article class="author-studio-card">
                     <span>🌌</span>
                     <h4>World Building</h4>
                     <p>Manage locations, maps, and lore.</p>
                   </article>
                 </div>
-
-                <button id="exitAuthorModeButton" type="button">
-                  ← Exit Author Mode
-                </button>
+                <button id="exitAuthorModeButton" type="button">← Exit Author Mode</button>
               </div>
             </section>
 
-            <button
-              class="secondary-button"
-              id="logoutButton"
-              type="button"
-            >
+            <button class="secondary-button" id="logoutButton" type="button">
               Sign out of camp
             </button>
 
@@ -2736,11 +3163,9 @@
               <span class="tiny-star">&#10022;</span>
               Keep your eyes on the woods.
             </div>
-
           </div>
 
         </div>
-
       </section>
 
     </main>
@@ -2751,232 +3176,186 @@
 
     <main id="campApp" class="camp-app" hidden>
 
+      <!-- Camp Gate Background -->
+      <div class="camp-gate-bg" aria-hidden="true">
+        <div class="gate-moon"></div>
+        <div class="gate-stars"></div>
+        <div class="gate-trees-left"></div>
+        <div class="gate-trees-right"></div>
+        <div class="gate-fence left"></div>
+        <div class="gate-fence right"></div>
+
+        <div class="gate-structure">
+          <div class="gate-post left"></div>
+          <div class="gate-post right"></div>
+          <div class="gate-crossbeam"></div>
+          <div class="gate-roof"></div>
+          <div class="gate-sign">BLACKWOOD CAMP</div>
+          <div class="gate-banner">WELCOME</div>
+          <div class="gate-lamp left"></div>
+          <div class="gate-lamp right"></div>
+        </div>
+
+        <div class="gate-bear">🐻</div>
+
+        <div class="gate-truck">
+          <div class="truck-cab"></div>
+          <div class="truck-bed"></div>
+          <div class="truck-wheel front"></div>
+          <div class="truck-wheel back"></div>
+        </div>
+
+        <div class="gate-path"></div>
+        <div class="gate-fog"></div>
+      </div>
+
       <!-- MAIN NAVIGATION -->
       <nav class="camp-navigation" aria-label="Main navigation">
-
         <button class="camp-nav-item active" data-page="campfire">
           <span>🔥</span>
           <span>Campfire</span>
         </button>
-
         <button class="camp-nav-item" data-page="novels">
           <span>📚</span>
           <span>Novels</span>
         </button>
-
         <button class="camp-nav-item" data-page="theories">
           <span>🔎</span>
           <span>Theories</span>
         </button>
-
         <button class="camp-nav-item" data-page="arcade">
           <span>🎲</span>
           <span>Corners Arcade</span>
         </button>
-
         <button class="camp-nav-item" data-page="settings">
           <span>⚙️</span>
           <span>Settings</span>
         </button>
-
-        <button
-          class="notification-button"
-          id="notificationButton"
-          type="button"
-          aria-label="Notifications"
-          title="Notifications"
-        >
+        <button class="notification-button" id="notificationButton" type="button" aria-label="Notifications" title="Notifications">
           🔔
           <span class="notification-dot"></span>
         </button>
-
       </nav>
 
       <!-- CAMPFIRE HOME -->
       <section class="camp-page" id="page-campfire">
 
         <div class="camp-welcome">
-
           <div>
-            <div class="camp-eyebrow">
-              ✦ YOUR LITTLE CORNER OF THE UNKNOWN
-            </div>
-
-            <h1>
-              Welcome to the <span>Camp.</span>
-            </h1>
-
+            <div class="camp-eyebrow">✦ YOUR LITTLE CORNER OF THE UNKNOWN</div>
+            <h1>Welcome to the <span>Camp.</span></h1>
             <p>
               Pull up a chair. There's always another story
               waiting to be told around the fire.
             </p>
           </div>
-
           <div class="camp-welcome-icon" aria-hidden="true">
             🔥
           </div>
-
         </div>
 
         <!-- AUTHOR STUDIO: AUTHOR ONLY -->
         <section id="homeAuthorStudio" class="home-author-studio" hidden>
-
           <div class="home-section-heading">
-
             <div>
               <span class="camp-eyebrow">YOUR CREATIVE WORKSPACE</span>
               <h2>✍️ Author Studio</h2>
               <p>Every great mystery starts with a story.</p>
             </div>
-
             <span class="author-badge">AUTHOR</span>
-
           </div>
-
           <div class="author-home-grid">
-
             <button class="author-home-card" data-author-action="new-novel">
               <span class="author-home-icon">✚</span>
               <span class="author-home-title">Create New Novel</span>
-              <span class="author-home-description">
-                Start writing your next story.
-              </span>
+              <span class="author-home-description">Start writing your next story.</span>
             </button>
-
             <button class="author-home-card" data-author-action="manage-novels">
               <span class="author-home-icon">📚</span>
               <span class="author-home-title">Manage Novels</span>
-              <span class="author-home-description">
-                Organize your stories and collections.
-              </span>
+              <span class="author-home-description">Organize your stories and collections.</span>
             </button>
-
             <button class="author-home-card" data-author-action="manage-chapters">
               <span class="author-home-icon">📖</span>
               <span class="author-home-title">Manage Chapters</span>
-              <span class="author-home-description">
-                Continue working on your chapters.
-              </span>
+              <span class="author-home-description">Continue working on your chapters.</span>
             </button>
-
             <button class="author-home-card" data-author-action="world-building">
               <span class="author-home-icon">🌌</span>
               <span class="author-home-title">World Building</span>
-              <span class="author-home-description">
-                Build characters, locations, and lore.
-              </span>
+              <span class="author-home-description">Build characters, locations, and lore.</span>
             </button>
-
           </div>
-
           <p id="authorHomeStatus" class="home-status" role="status" hidden></p>
-
         </section>
 
         <!-- FEATURED STORIES -->
         <section class="home-section">
-
           <div class="home-section-heading">
-
             <div>
               <span class="camp-eyebrow">PICK YOUR NEXT ADVENTURE</span>
               <h2>Stories by the Fire</h2>
             </div>
-
-            <button class="text-action" data-go-page="novels">
-              Explore novels →
-            </button>
-
+            <button class="text-action" data-go-page="novels">Explore novels →</button>
           </div>
-
           <article class="featured-story-card">
-
             <div class="featured-story-art" aria-hidden="true">
               <span>?</span>
             </div>
-
             <div class="featured-story-content">
-
               <span class="story-tag">MYSTERY · UNKNOWN</span>
-
               <h3>The woods are keeping secrets.</h3>
-
               <p>
                 Somewhere beyond the trees, a story is waiting
                 for someone curious enough to uncover it.
               </p>
-
               <button class="camp-action-button" data-go-page="novels">
                 Explore the Library →
               </button>
-
             </div>
-
           </article>
-
         </section>
 
         <!-- COMMUNITY -->
         <section class="home-section">
-
           <div class="home-section-heading">
-
             <div>
               <span class="camp-eyebrow">AROUND THE CAMPFIRE</span>
               <h2>Make Yourself at Home</h2>
             </div>
-
           </div>
-
           <div class="community-home-grid">
-
             <button class="community-home-card" data-go-page="theories">
               <span>🔎</span>
               <h3>Theories & Mysteries</h3>
-              <p>
-                Connect the clues. Share your theories.
-                Question everything.
-              </p>
+              <p>Connect the clues. Share your theories. Question everything.</p>
               <span class="card-link">Investigate →</span>
             </button>
-
             <button class="community-home-card" data-go-page="arcade">
               <span>🎲</span>
               <h3>Corners Arcade</h3>
-              <p>
-                Roll the dice, test your luck,
-                and take a break from the mysteries.
-              </p>
+              <p>Roll the dice, test your luck, and take a break from the mysteries.</p>
               <span class="card-link">Play a little →</span>
             </button>
-
           </div>
-
         </section>
 
         <!-- PROFILE ON HOME -->
         <section class="home-section home-profile-section">
-
           <div class="home-section-heading">
-
             <div>
               <span class="camp-eyebrow">YOUR CAMP IDENTITY</span>
               <h2>Your Camp Profile</h2>
             </div>
-
           </div>
-
           <p class="home-profile-description">
             Make yourself comfortable. You can always change
             your profile details later.
           </p>
-
           <div id="homeProfileContainer"></div>
-
           <button id="homeLogoutButton" class="home-logout-button" type="button">
             Sign out of camp
           </button>
-
         </section>
 
       </section>
@@ -3035,39 +3414,27 @@
 
     const landingMain = document.querySelector('.main');
     const campApp = document.getElementById('campApp');
-    const homeProfileContainer =
-      document.getElementById('homeProfileContainer');
+    const homeProfileContainer = document.getElementById('homeProfileContainer');
+    const homeLogoutButton = document.getElementById('homeLogoutButton');
+    const homeAuthorStudio = document.getElementById('homeAuthorStudio');
+    const authorHomeStatus = document.getElementById('authorHomeStatus');
 
-    const homeLogoutButton =
-      document.getElementById('homeLogoutButton');
-
-    const homeAuthorStudio =
-      document.getElementById('homeAuthorStudio');
-
-    const authorHomeStatus =
-      document.getElementById('authorHomeStatus');
+    const welcomeScreen = document.getElementById('welcomeScreen');
+    const enterCampButton = document.getElementById('enterCampButton');
 
     const authForm = document.getElementById('authForm');
-
     const usernameField = document.getElementById('usernameField');
     const usernameInput = document.getElementById('username');
-
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
-
     const passwordHelp = document.getElementById('passwordHelp');
-
     const submitButton = document.getElementById('submitButton');
     const logoutButton = document.getElementById('logoutButton');
-
     const message = document.getElementById('message');
     const sessionMessage = document.getElementById('sessionMessage');
-
     const accountEmail = document.getElementById('accountEmail');
-
     const loginTab = document.getElementById('loginTab');
     const registerTab = document.getElementById('registerTab');
-
     const formHeading = document.getElementById('formHeading');
     const formDescription = document.getElementById('formDescription');
 
@@ -3077,7 +3444,6 @@
     function showMessage(text, type = '') {
       message.textContent = text;
       message.className = 'message visible';
-
       if (type) {
         message.classList.add(type);
       }
@@ -3090,291 +3456,191 @@
 
     function setMode(nextMode) {
       mode = nextMode;
-
       clearMessage();
-
       const isRegister = mode === 'register';
 
       loginTab.classList.toggle('active', !isRegister);
       registerTab.classList.toggle('active', isRegister);
-
-      loginTab.setAttribute(
-        'aria-selected',
-        String(!isRegister)
-      );
-
-      registerTab.setAttribute(
-        'aria-selected',
-        String(isRegister)
-      );
+      loginTab.setAttribute('aria-selected', String(!isRegister));
+      registerTab.setAttribute('aria-selected', String(isRegister));
 
       usernameField.hidden = !isRegister;
       usernameInput.required = isRegister;
-
       passwordHelp.hidden = !isRegister;
+      passwordInput.autocomplete = isRegister ? 'new-password' : 'current-password';
 
-      passwordInput.autocomplete = isRegister
-        ? 'new-password'
-        : 'current-password';
-
-      formHeading.textContent = isRegister
-        ? 'Join the camp!'
-        : 'Hey, stranger!';
-
-      formDescription.textContent = isRegister
-        ? 'New around here? Pull up a chair.'
-        : 'Got an account? Come on in.';
-
-      submitButton.textContent = isRegister
-        ? 'JOIN THE CAMP'
-        : 'LET ME IN';
+      formHeading.textContent = isRegister ? 'Join the camp!' : 'Hey, stranger!';
+      formDescription.textContent = isRegister ? 'New around here? Pull up a chair.' : 'Got an account? Come on in.';
+      submitButton.textContent = isRegister ? 'JOIN THE CAMP' : 'LET ME IN';
     }
 
-// CAMP ACCOUNT & ROLE SYSTEM
-let currentUserId = null;
-let currentUserRole = 'reader';
+    // CAMP ACCOUNT & ROLE SYSTEM
+    let currentUserId = null;
+    let currentUserRole = 'reader';
+    let profileEditor = null;
+    let profileNickname = null;
+    let profileBio = null;
+    let profileRole = null;
+    let profileStatus = null;
+    let profileSaveButton = null;
+    let currentAvatarUrl = null;
 
-let profileEditor = null;
-let profileNickname = null;
-let profileBio = null;
-let profileRole = null;
-let profileStatus = null;
-let profileSaveButton = null;
-let currentAvatarUrl = null;
+    function isAuthor() {
+      return currentUserRole === 'author';
+    }
 
-// Memeriksa apakah akun yang login adalah Author
-function isAuthor() {
-  return currentUserRole === 'author';
-}
-
-// AUTHOR MODE CONTROLS
-const authorModeButton =
-  document.getElementById('authorModeButton');
-
-const authorStudioPanel =
-  document.getElementById('authorStudioPanel');
-
-const exitAuthorModeButton =
-  document.getElementById('exitAuthorModeButton');
-
-if (authorModeButton) {
-  authorModeButton.addEventListener('click', () => {
-    if (!isAuthor()) return;
-
-    authorStudioPanel.hidden = false;
-    authorModeButton.textContent = '✦ Author Mode Active';
-
-    authorStudioPanel.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start'
-    });
-  });
-}
-
-if (exitAuthorModeButton) {
-  exitAuthorModeButton.addEventListener('click', () => {
-    authorStudioPanel.hidden = true;
+    // AUTHOR MODE CONTROLS
+    const authorModeButton = document.getElementById('authorModeButton');
+    const authorStudioPanel = document.getElementById('authorStudioPanel');
+    const exitAuthorModeButton = document.getElementById('exitAuthorModeButton');
 
     if (authorModeButton) {
-      authorModeButton.textContent = '✦ Enter Author Mode';
+      authorModeButton.addEventListener('click', () => {
+        if (!isAuthor()) return;
+        authorStudioPanel.hidden = false;
+        authorModeButton.textContent = '✦ Author Mode Active';
+        authorStudioPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
     }
-  });
-}
 
-async function showSignedIn(user) {
-  currentUserId = user.id;
-
-  authPanel.hidden = true;
-  accountPanel.classList.add('visible');
-
-  accountEmail.textContent = user.email || 'Camp member';
-
-  sessionMessage.textContent =
-    'Checking your camp account...';
-
-  try {
-    const profile = await getReaderProfile(user.id);
-
-    // Ambil role asli dari Supabase
-    currentUserRole = profile.role === 'author'
-      ? 'author'
-      : 'reader';
-
-    // Beralih dari halaman login ke Home
-    landingMain.hidden = true;
-    campApp.hidden = false;
-
-    // Author Studio hanya tersedia untuk akun Author
-    homeAuthorStudio.hidden = !isAuthor();
-
-    // Tampilkan Mode Penulis hanya untuk akun Author
-const authorModeBox = document.getElementById('authorModeBox');
-
-if (authorModeBox) {
-  authorModeBox.hidden = !isAuthor();
-}
-
-    sessionMessage.textContent = isAuthor()
-      ? 'Welcome back, Author! Your writer account is active.'
-      : 'Your Reader account is signed in successfully.';
-
-    // Buat editor profil satu kali saja
-    if (!profileEditor) {
-      profileEditor = document.createElement('form');
-      profileEditor.id = 'readerProfileEditor';
-
-      profileEditor.innerHTML = `
-        <div class="reader-profile">
-          <h2>Your Camp Profile</h2>
-
-          <p class="profile-label">CAMP NICKNAME</p>
-          <input
-            id="profileNickname"
-            type="text"
-            minlength="3"
-            maxlength="30"
-            required
-            placeholder="Your nickname"
-          >
-
-          <p class="profile-hint">You can still change this later.</p>
-
-          <p class="profile-label">YOUR BIO</p>
-          <textarea
-            id="profileBio"
-            maxlength="300"
-            rows="4"
-            placeholder="Tell the camp a little about yourself..."
-          ></textarea>
-
-          <p class="profile-label">ACCOUNT ROLE</p>
-          <p id="profileRole"></p>
-
-          <button id="profileSaveButton" type="submit">
-            SAVE PROFILE
-          </button>
-
-          <p id="profileStatus" role="status"></p>
-        </div>
-      `;
-
-      homeProfileContainer.appendChild(profileEditor);
-
-      profileNickname =
-        profileEditor.querySelector('#profileNickname');
-
-      profileBio =
-        profileEditor.querySelector('#profileBio');
-
-      profileRole =
-        profileEditor.querySelector('#profileRole');
-
-      profileStatus =
-        profileEditor.querySelector('#profileStatus');
-
-      profileSaveButton =
-        profileEditor.querySelector('#profileSaveButton');
-
-      profileEditor.addEventListener('submit', async (event) => {
-        event.preventDefault();
-
-        const nickname = profileNickname.value.trim();
-        const bio = profileBio.value.trim();
-
-        if (nickname.length < 3) {
-          profileStatus.textContent =
-            'Nickname must contain at least 3 characters.';
-          return;
-        }
-
-        profileSaveButton.disabled = true;
-        profileSaveButton.textContent = 'SAVING...';
-        profileStatus.textContent = '';
-
-        try {
-          const updatedProfile = await updateReaderProfile(
-            currentUserId,
-            {
-              nickname,
-              bio,
-              avatar_url: currentAvatarUrl
-            }
-          );
-
-          profileNickname.value = updatedProfile.nickname;
-          profileBio.value = updatedProfile.bio;
-          profileRole.textContent =
-            updatedProfile.role.toUpperCase();
-
-          profileStatus.textContent =
-            'Profile saved successfully!';
-
-        } catch (error) {
-          console.error('Profile update failed:', error);
-
-          profileStatus.textContent =
-            error.message || 'Could not save your profile.';
-        } finally {
-          profileSaveButton.disabled = false;
-          profileSaveButton.textContent = 'SAVE PROFILE';
+    if (exitAuthorModeButton) {
+      exitAuthorModeButton.addEventListener('click', () => {
+        authorStudioPanel.hidden = true;
+        if (authorModeButton) {
+          authorModeButton.textContent = '✦ Enter Author Mode';
         }
       });
     }
 
-    // Isi formulir dengan data dari Supabase
-    profileNickname.value = profile.nickname || '';
-    profileBio.value = profile.bio || '';
-    profileRole.textContent =
-      (profile.role || 'reader').toUpperCase();
+    async function showSignedIn(user) {
+      currentUserId = user.id;
+      authPanel.hidden = true;
+      accountPanel.classList.add('visible');
+      accountEmail.textContent = user.email || 'Camp member';
+      sessionMessage.textContent = 'Checking your camp account...';
 
-    currentAvatarUrl = profile.avatar_url || null;
+      try {
+        const profile = await getReaderProfile(user.id);
+        currentUserRole = profile.role === 'author' ? 'author' : 'reader';
 
-    profileStatus.textContent = '';
+        // Tampilkan layar sambutan (Welcome Screen)
+        landingMain.hidden = true;
+        campApp.hidden = true;
+        welcomeScreen.hidden = false;
+        document.body.style.overflow = 'hidden';
 
-  } catch (error) {
-    console.error('Unable to load reader profile:', error);
+        homeAuthorStudio.hidden = !isAuthor();
 
-    sessionMessage.textContent =
-      'You are signed in, but your profile could not be loaded. Please refresh the page.';
-  }
-}
+        const authorModeBox = document.getElementById('authorModeBox');
+        if (authorModeBox) {
+          authorModeBox.hidden = !isAuthor();
+        }
 
-function showSignedOut() {
-  currentUserId = null;
-  currentUserRole = 'reader';
+        sessionMessage.textContent = isAuthor()
+          ? 'Welcome back, Author! Your writer account is active.'
+          : 'Your Reader account is signed in successfully.';
 
-  const authorModeBox = document.getElementById('authorModeBox');
+        // Buat editor profil satu kali saja
+        if (!profileEditor) {
+          profileEditor = document.createElement('form');
+          profileEditor.id = 'readerProfileEditor';
+          profileEditor.innerHTML = `
+            <div class="reader-profile">
+              <h2>Your Camp Profile</h2>
+              <p class="profile-label">CAMP NICKNAME</p>
+              <input id="profileNickname" type="text" minlength="3" maxlength="30" required placeholder="Your nickname">
+              <p class="profile-hint">You can still change this later.</p>
+              <p class="profile-label">YOUR BIO</p>
+              <textarea id="profileBio" maxlength="300" rows="4" placeholder="Tell the camp a little about yourself..."></textarea>
+              <p class="profile-label">ACCOUNT ROLE</p>
+              <p id="profileRole"></p>
+              <button id="profileSaveButton" type="submit">SAVE PROFILE</button>
+              <p id="profileStatus" role="status"></p>
+            </div>
+          `;
+          homeProfileContainer.appendChild(profileEditor);
 
-if (authorModeBox) {
-  authorModeBox.hidden = true;
-}
+          profileNickname = profileEditor.querySelector('#profileNickname');
+          profileBio = profileEditor.querySelector('#profileBio');
+          profileRole = profileEditor.querySelector('#profileRole');
+          profileStatus = profileEditor.querySelector('#profileStatus');
+          profileSaveButton = profileEditor.querySelector('#profileSaveButton');
 
-  if (authorStudioPanel) {
-    authorStudioPanel.hidden = true;
-  }
+          profileEditor.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const nickname = profileNickname.value.trim();
+            const bio = profileBio.value.trim();
 
-  if (authorModeButton) {
-    authorModeButton.textContent = '✦ Enter Author Mode';
-  }
+            if (nickname.length < 3) {
+              profileStatus.textContent = 'Nickname must contain at least 3 characters.';
+              return;
+            }
 
-  landingMain.hidden = false;
-  campApp.hidden = true;
+            profileSaveButton.disabled = true;
+            profileSaveButton.textContent = 'SAVING...';
+            profileStatus.textContent = '';
 
-  authPanel.hidden = false;
-  accountPanel.classList.remove('visible');
-}
+            try {
+              const updatedProfile = await updateReaderProfile(currentUserId, {
+                nickname,
+                bio,
+                avatar_url: currentAvatarUrl
+              });
+              profileNickname.value = updatedProfile.nickname;
+              profileBio.value = updatedProfile.bio;
+              profileRole.textContent = updatedProfile.role.toUpperCase();
+              profileStatus.textContent = 'Profile saved successfully!';
+            } catch (error) {
+              console.error('Profile update failed:', error);
+              profileStatus.textContent = error.message || 'Could not save your profile.';
+            } finally {
+              profileSaveButton.disabled = false;
+              profileSaveButton.textContent = 'SAVE PROFILE';
+            }
+          });
+        }
 
-    loginTab.addEventListener('click', () => {
-      setMode('login');
-    });
+        profileNickname.value = profile.nickname || '';
+        profileBio.value = profile.bio || '';
+        profileRole.textContent = (profile.role || 'reader').toUpperCase();
+        currentAvatarUrl = profile.avatar_url || null;
+        profileStatus.textContent = '';
 
-    registerTab.addEventListener('click', () => {
-      setMode('register');
-    });
+      } catch (error) {
+        console.error('Unable to load reader profile:', error);
+        sessionMessage.textContent = 'You are signed in, but your profile could not be loaded. Please refresh the page.';
+      }
+    }
+
+    function showSignedOut() {
+      currentUserId = null;
+      currentUserRole = 'reader';
+      const authorModeBox = document.getElementById('authorModeBox');
+      if (authorModeBox) {
+        authorModeBox.hidden = true;
+      }
+      if (authorStudioPanel) {
+        authorStudioPanel.hidden = true;
+      }
+      if (authorModeButton) {
+        authorModeButton.textContent = '✦ Enter Author Mode';
+      }
+
+      welcomeScreen.hidden = true;
+      campApp.hidden = true;
+      landingMain.hidden = false;
+      document.body.style.overflow = '';
+      document.body.classList.remove('in-camp');
+
+      authPanel.hidden = false;
+      accountPanel.classList.remove('visible');
+    }
+
+    loginTab.addEventListener('click', () => setMode('login'));
+    registerTab.addEventListener('click', () => setMode('register'));
 
     authForm.addEventListener('submit', async (event) => {
       event.preventDefault();
-
       if (busy) return;
 
       const email = emailInput.value.trim();
@@ -3383,173 +3649,93 @@ if (authorModeBox) {
 
       if (mode === 'register') {
         if (username.length < 3) {
-          showMessage(
-            'Your nickname needs at least 3 characters.',
-            'error'
-          );
-
+          showMessage('Your nickname needs at least 3 characters.', 'error');
           return;
         }
-
         if (password.length < 8) {
-          showMessage(
-            'Your password needs at least 8 characters.',
-            'error'
-          );
-
+          showMessage('Your password needs at least 8 characters.', 'error');
           return;
         }
       }
 
       busy = true;
-
       submitButton.disabled = true;
       loginTab.disabled = true;
       registerTab.disabled = true;
-
       submitButton.textContent = 'HOLD ON A SEC...';
-
       clearMessage();
 
       try {
-
         if (mode === 'register') {
-
-          const result = await registerReader(
-            username,
-            email,
-            password
-          );
-
+          const result = await registerReader(username, email, password);
           if (result.user && !result.session) {
-
-            showMessage(
-              'Your account has been created! Check your email and click the verification link before logging in.',
-              'success'
-            );
-
+            showMessage('Your account has been created! Check your email and click the verification link before logging in.', 'success');
           } else if (result.session) {
-
-            showMessage(
-              'Welcome to camp! Your account is ready.',
-              'success'
-            );
-
+            showMessage('Welcome to camp! Your account is ready.', 'success');
           } else {
-
-            showMessage(
-              'Registration submitted. Check your email for the next step.',
-              'success'
-            );
-
+            showMessage('Registration submitted. Check your email for the next step.', 'success');
           }
-
           authForm.reset();
-
         } else {
-
-          const result = await loginReader(
-            email,
-            password
-          );
-
+          const result = await loginReader(email, password);
           if (result.user) {
             showSignedIn(result.user);
           }
-
         }
-
       } catch (error) {
-
-        showMessage(
-          error.message ||
-          'Something went wrong. Please try again.',
-          'error'
-        );
-
+        showMessage(error.message || 'Something went wrong. Please try again.', 'error');
       } finally {
-
         busy = false;
-
         submitButton.disabled = false;
         loginTab.disabled = false;
         registerTab.disabled = false;
-
-        submitButton.textContent = mode === 'register'
-          ? 'JOIN THE CAMP'
-          : 'LET ME IN';
-
+        submitButton.textContent = mode === 'register' ? 'JOIN THE CAMP' : 'LET ME IN';
       }
+    });
+
+    enterCampButton.addEventListener('click', () => {
+      welcomeScreen.hidden = true;
+      campApp.hidden = false;
+      document.body.style.overflow = '';
+      document.body.classList.add('in-camp');
+      navigateCampPage('campfire');
     });
 
     homeLogoutButton.addEventListener('click', async () => {
-
       homeLogoutButton.disabled = true;
       homeLogoutButton.textContent = 'HEADING OUT...';
-
       try {
-
         await logoutReader();
-
         showSignedOut();
-
         authForm.reset();
-
         setMode('login');
-
-        showMessage(
-          'You have signed out. The campfire will be waiting!',
-          'success'
-        );
-
+        showMessage('You have signed out. The campfire will be waiting!', 'success');
       } catch (error) {
-
-        sessionMessage.textContent =
-          error.message ||
-          'Could not sign out. Please try again.';
-
+        sessionMessage.textContent = error.message || 'Could not sign out. Please try again.';
       } finally {
-
         homeLogoutButton.disabled = false;
         homeLogoutButton.textContent = 'Sign out of camp';
-
       }
-
     });
 
     try {
-
       observeAuthState((event, session) => {
-
         if (session?.user) {
           showSignedIn(session.user);
         } else {
           showSignedOut();
         }
-
       });
-
     } catch (error) {
-
-      console.error(
-        'Unable to initialize authentication state:',
-        error
-      );
-
-      showMessage(
-        'Unable to connect to the account service. Please refresh the page.',
-        'error'
-      );
-
+      console.error('Unable to initialize authentication state:', error);
+      showMessage('Unable to connect to the account service. Please refresh the page.', 'error');
     }
-
 
     // CAMP NAVIGATION
     const campNavButtons = document.querySelectorAll('.camp-nav-item');
 
     function navigateCampPage(pageName) {
       const targetPage = document.getElementById(`page-${pageName}`);
-
       if (!targetPage || !campApp || campApp.hidden) {
         return;
       }
@@ -3560,9 +3746,7 @@ if (authorModeBox) {
 
       campNavButtons.forEach((button) => {
         const active = button.dataset.page === pageName;
-
         button.classList.toggle('active', active);
-
         if (active) {
           button.setAttribute('aria-current', 'page');
         } else {
@@ -3570,10 +3754,7 @@ if (authorModeBox) {
         }
       });
 
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     campNavButtons.forEach((button) => {
@@ -3594,19 +3775,14 @@ if (authorModeBox) {
         if (!isAuthor()) {
           return;
         }
-
         const action = button.dataset.authorAction;
-
         const messages = {
           'new-novel': 'The Create New Novel feature is coming next.',
           'manage-novels': 'Novel management is coming next.',
           'manage-chapters': 'Chapter management is coming next.',
           'world-building': 'World Building tools are coming next.'
         };
-
-        authorHomeStatus.textContent =
-          messages[action] || 'This feature is coming soon.';
-
+        authorHomeStatus.textContent = messages[action] || 'This feature is coming soon.';
         authorHomeStatus.hidden = false;
       });
     });
