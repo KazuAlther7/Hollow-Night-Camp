@@ -91,3 +91,14 @@ throw new Error(
 
 return data[0];
 }
+
+// SESI SAAT INI (dipakai guard di semua halaman)
+export async function getCurrentSession() {
+  const { data, error } = await supabase.auth.getSession();
+
+  if (error) {
+    throw error;
+  }
+
+  return data.session;
+}
