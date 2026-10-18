@@ -2125,8 +2125,10 @@
         : 'LET ME IN';
     }
 
-// READER PROFILE
+// CAMP ACCOUNT & ROLE SYSTEM
 let currentUserId = null;
+let currentUserRole = 'reader';
+
 let profileEditor = null;
 let profileNickname = null;
 let profileBio = null;
@@ -2135,16 +2137,35 @@ let profileStatus = null;
 let profileSaveButton = null;
 let currentAvatarUrl = null;
 
+// Memeriksa apakah akun yang login adalah Author
+function isAuthor() {
+  return currentUserRole === 'author';
+}
+
 async function showSignedIn(user) {
-currentUserId = user.id;
+  currentUserId = user.id;
 
-authPanel.hidden = true;
-accountPanel.classList.add('visible');
+  authPanel.hidden = true;
+  accountPanel.classList.add('visible');
 
-accountEmail.textContent = user.email || 'Camp member';
+  accountEmail.textContent = user.email || 'Camp member';
 
-sessionMessage.textContent =
-'Your account is signed in successfully.';
+  sessionMessage.textContent =
+    'Checking your camp account...';
+
+  try {
+    const profile = await getReaderProfile(user.id);
+
+    // Ambil role asli dari Supabase
+    currentUserRole = profile.role === 'author'
+      ? 'author'
+      : 'reader';
+
+    sessionMessage.textContent = isAuthor()
+      ? 'Welcome back, Author! Your writer account is active.'
+      : 'Your Reader account is signed in successfully.';
+
+    // Lanjutkan kode editor profil yang sudah ada
   
   try {
     const profile = await getReaderProfile(user.id);
@@ -2268,12 +2289,13 @@ sessionMessage.textContent =
   }
 }
 
-    function showSignedOut() {
-      currentUserId = null;
-      
-      authPanel.hidden = false;
-      accountPanel.classList.remove('visible');
-    }
+function showSignedOut() {
+  currentUserId = null;
+  currentUserRole = 'reader';
+
+  authPanel.hidden = false;
+  accountPanel.classList.remove('visible');
+}
 
     loginTab.addEventListener('click', () => {
       setMode('login');
