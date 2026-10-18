@@ -2179,6 +2179,13 @@ async function showSignedIn(user) {
       ? 'author'
       : 'reader';
 
+    // Tampilkan Mode Penulis hanya untuk akun Author
+const authorModeBox = document.getElementById('authorModeBox');
+
+if (authorModeBox) {
+  authorModeBox.hidden = !isAuthor();
+}
+
     sessionMessage.textContent = isAuthor()
       ? 'Welcome back, Author! Your writer account is active.'
       : 'Your Reader account is signed in successfully.';
@@ -2305,6 +2312,12 @@ async function showSignedIn(user) {
 function showSignedOut() {
   currentUserId = null;
   currentUserRole = 'reader';
+
+  const authorModeBox = document.getElementById('authorModeBox');
+
+if (authorModeBox) {
+  authorModeBox.hidden = true;
+}
 
   authPanel.hidden = false;
   accountPanel.classList.remove('visible');
