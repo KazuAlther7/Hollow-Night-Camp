@@ -1711,6 +1711,128 @@
   }
 }
     
+
+    /* AUTHOR STUDIO */
+    .author-mode-box {
+      margin-top: 22px;
+      padding: 20px;
+      border: 1px solid rgba(170, 150, 255, 0.35);
+      border-radius: 18px;
+      background: rgba(20, 24, 43, 0.92);
+      color: #f4f0ff;
+    }
+
+    .author-mode-box[hidden],
+    #authorStudioPanel[hidden] {
+      display: none !important;
+    }
+
+    .author-mode-info {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .author-mode-icon {
+      font-size: 32px;
+    }
+
+    .author-mode-info h3 {
+      margin: 0 0 5px;
+    }
+
+    .author-mode-info p {
+      margin: 0;
+      color: #c0bdd3;
+      font-size: 13px;
+    }
+
+    #authorModeButton,
+    #exitAuthorModeButton {
+      padding: 12px 18px;
+      border: 1px solid rgba(190, 170, 255, 0.5);
+      border-radius: 12px;
+      background: linear-gradient(135deg, #5647a8, #302b62);
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    #authorModeButton:hover,
+    #exitAuthorModeButton:hover {
+      filter: brightness(1.2);
+    }
+
+    #authorStudioPanel {
+      margin-top: 25px;
+      padding: 24px;
+      border: 1px solid rgba(170, 150, 255, 0.3);
+      border-radius: 20px;
+      background: rgba(15, 19, 35, 0.96);
+      color: #f4f0ff;
+    }
+
+    .author-studio-header {
+      padding-bottom: 22px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .author-studio-header > span {
+      color: #b7a5ff;
+      font-size: 11px;
+      letter-spacing: 2px;
+    }
+
+    .author-studio-header h2 {
+      margin: 12px 0 8px;
+      font-size: 28px;
+    }
+
+    .author-studio-header p,
+    .author-studio-content > p {
+      color: #c0bdd3;
+      line-height: 1.7;
+    }
+
+    .author-studio-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 24px 0;
+    }
+
+    .author-studio-card {
+      padding: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .author-studio-card > span {
+      font-size: 26px;
+    }
+
+    .author-studio-card h4 {
+      margin: 12px 0 6px;
+    }
+
+    .author-studio-card p {
+      margin: 0;
+      color: #c0bdd3;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 480px) {
+      .author-studio-grid {
+        grid-template-columns: 1fr;
+      }
+
+      #authorStudioPanel {
+        padding: 16px;
+      }
+    }
   </style>
 </head>
 
@@ -2014,6 +2136,54 @@
               <p id="authorModeStatus" hidden></p>
             </div>
 
+            <!-- AUTHOR STUDIO PANEL -->
+            <section id="authorStudioPanel" hidden>
+              <div class="author-studio-header">
+                <span>✦ HOLLOW NIGHT CAMP</span>
+                <h2>Author Studio</h2>
+                <p>Your stories. Your world. Your rules.</p>
+              </div>
+
+              <div class="author-studio-content">
+                <h3>Welcome back, Author!</h3>
+                <p>
+                  Your creative workspace is ready to grow.
+                  Manage your novels, chapters, characters, and world-building
+                  from one place.
+                </p>
+
+                <div class="author-studio-grid">
+                  <article class="author-studio-card">
+                    <span>📚</span>
+                    <h4>Novels</h4>
+                    <p>Create and manage your stories.</p>
+                  </article>
+
+                  <article class="author-studio-card">
+                    <span>📖</span>
+                    <h4>Chapters</h4>
+                    <p>Organize your story chapters.</p>
+                  </article>
+
+                  <article class="author-studio-card">
+                    <span>👥</span>
+                    <h4>Characters</h4>
+                    <p>Build your characters and their stories.</p>
+                  </article>
+
+                  <article class="author-studio-card">
+                    <span>🌌</span>
+                    <h4>World Building</h4>
+                    <p>Manage locations, maps, and lore.</p>
+                  </article>
+                </div>
+
+                <button id="exitAuthorModeButton" type="button">
+                  ← Exit Author Mode
+                </button>
+              </div>
+            </section>
+
             <button
               class="secondary-button"
               id="logoutButton"
@@ -2158,6 +2328,40 @@ let currentAvatarUrl = null;
 // Memeriksa apakah akun yang login adalah Author
 function isAuthor() {
   return currentUserRole === 'author';
+}
+
+// AUTHOR MODE CONTROLS
+const authorModeButton =
+  document.getElementById('authorModeButton');
+
+const authorStudioPanel =
+  document.getElementById('authorStudioPanel');
+
+const exitAuthorModeButton =
+  document.getElementById('exitAuthorModeButton');
+
+if (authorModeButton) {
+  authorModeButton.addEventListener('click', () => {
+    if (!isAuthor()) return;
+
+    authorStudioPanel.hidden = false;
+    authorModeButton.textContent = '✦ Author Mode Active';
+
+    authorStudioPanel.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    });
+  });
+}
+
+if (exitAuthorModeButton) {
+  exitAuthorModeButton.addEventListener('click', () => {
+    authorStudioPanel.hidden = true;
+
+    if (authorModeButton) {
+      authorModeButton.textContent = '✦ Enter Author Mode';
+    }
+  });
 }
 
 async function showSignedIn(user) {
@@ -2318,6 +2522,14 @@ function showSignedOut() {
 if (authorModeBox) {
   authorModeBox.hidden = true;
 }
+
+  if (authorStudioPanel) {
+    authorStudioPanel.hidden = true;
+  }
+
+  if (authorModeButton) {
+    authorModeButton.textContent = '✦ Enter Author Mode';
+  }
 
   authPanel.hidden = false;
   accountPanel.classList.remove('visible');
