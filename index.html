@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#17251d">
+  <title>Hollow Night Camp — Enter The Camp</title>
+  <meta name="description" content="Welcome to Hollow Night Camp. Gather around the fire, discover forgotten stories, and investigate the mysteries hidden beyond the woods.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Special+Elite&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+
+<body>
+
+  <!-- Illustrated night forest -->
+  <div class="scene" aria-hidden="true">
+    <div class="stars"></div>
+    <div class="moon"></div>
+
+    <div class="firefly"></div>
+    <div class="firefly"></div>
+    <div class="firefly"></div>
+    <div class="firefly"></div>
+
+    <div class="tree-line far">
+      <div class="tree"></div>
+      <div class="tree"></div>
+      <div class="tree"></div>
+      <div class="tree"></div>
+      <div class="tree"></div>
+      <div class="tree"></div>
+      <div class="tree"></div>
+    </div>
+
+    <div class="tree-line">
+      <div class="tree"></div>
+      <div class="tree"></div>
+      <div class="tree"></div>
+      <div class="tree"></div>
+      <div class="tree"></div>
+      <div class="tree"></div>
+      <div class="tree"></div>
+      <div class="tree"></div>
+    </div>
+
+    <div class="ground"></div>
+
+    <!-- Campfire: part of the forest background -->
+        <div class="campfire" aria-label="Illustration of a glowing campfire">
+
+          <div class="fire-glow"></div>
+
+          <div class="ember"></div>
+          <div class="ember"></div>
+          <div class="ember"></div>
+
+          <div class="log one"></div>
+          <div class="log two"></div>
+
+          <div class="fire">
+            <div class="flame outer"></div>
+            <div class="flame middle"></div>
+            <div class="flame inner"></div>
+          </div>
+
+          <div class="campfire-caption">
+            Best stories are told<br>
+            around the fire.
+          </div>
+
+        </div>
+
+  </div>
+
+
+  <div class="page">
+
+    <!-- Header -->
+    <header class="topbar">
+
+      <a class="brand" href="./" aria-label="Hollow Night Camp home">
+        <div class="brand-mark" aria-hidden="true">H</div>
+
+        <div class="brand-copy">
+          <div class="brand-title">Hollow Night</div>
+          <div class="brand-subtitle">CAMP &middot; EST. 1997</div>
+        </div>
+      </a>
+
+      <div class="top-note">
+        <span class="status-dot"></span>
+        <span>THE FIRE IS STILL BURNING</span>
+      </div>
+
+    </header>
+
+    <!-- Main -->
+    <main class="main">
+
+      <!-- Welcome story -->
+      <section class="story">
+
+        <div class="story-label">
+          A little mystery awaits
+        </div>
+
+        <h1>
+          Welcome to<br>
+          The <span class="highlight">Camp.</span>
+        </h1>
+
+        <p class="story-description">
+          Somewhere beyond the pine trees, past the old wooden
+          sign, there's a place where <strong>strange stories come
+          alive</strong> and every little detail might be hiding
+          something bigger.
+          <br><br>
+          So grab your flashlight, pull up a chair, and stay a
+          little while. The woods get weird after dark.
+        </p>
+
+
+      </section>
+
+      <!-- Authentication card -->
+      <section class="auth-wrap">
+
+        <div class="card-pin" aria-hidden="true"></div>
+
+        <div class="auth-card">
+
+          <!-- Login/Register -->
+          <div id="authPanel">
+
+            <div class="card-header">
+
+              <div>
+                <div class="card-eyebrow">
+                  Field Journal No. 001
+                </div>
+
+                <h2 class="card-heading" id="formHeading">
+                  Hey, stranger!
+                </h2>
+
+                <p class="card-description" id="formDescription">
+                  Got an account? Come on in.
+                </p>
+              </div>
+
+              <div class="stamp" aria-hidden="true">
+                CAMP<br>ACCESS
+              </div>
+
+            </div>
+
+            <div class="tabs" role="tablist" aria-label="Account access">
+
+              <button
+                class="tab active"
+                id="loginTab"
+                type="button"
+                role="tab"
+                aria-selected="true"
+              >
+                Login
+              </button>
+
+              <button
+                class="tab"
+                id="registerTab"
+                type="button"
+                role="tab"
+                aria-selected="false"
+              >
+                Join Camp
+              </button>
+
+            </div>
+
+            <form id="authForm">
+
+              <div class="field" id="usernameField" hidden>
+
+                <label for="username">
+                  YOUR CAMP NICKNAME
+                </label>
+
+                <input
+                  id="username"
+                  type="text"
+                  placeholder="What should we call you?"
+                  minlength="3"
+                  maxlength="30"
+                  autocomplete="nickname"
+                >
+
+                <p class="field-help">
+                  At least 3 characters.
+                </p>
+
+              </div>
+
+              <div class="field">
+
+                <label for="email">
+                  EMAIL ADDRESS
+                </label>
+
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  autocomplete="email"
+                  required
+                >
+
+              </div>
+
+              <div class="field">
+
+                <label for="password">
+                  PASSWORD
+                </label>
+
+                <input
+                  id="password"
+                  type="password"
+                  placeholder="Your secret password"
+                  minlength="8"
+                  autocomplete="current-password"
+                  required
+                >
+
+                <p class="field-help" id="passwordHelp" hidden>
+                  Use at least 8 characters.
+                </p>
+
+              </div>
+
+              <button
+                class="primary-button"
+                id="submitButton"
+                type="submit"
+              >
+                LET ME IN
+              </button>
+
+            </form>
+
+            <div
+              class="message"
+              id="message"
+              role="status"
+              aria-live="polite"
+            ></div>
+
+            <div class="card-footer">
+              <span class="tiny-star">&#10022;</span>
+              No monsters allowed after midnight.
+              <br>
+              Probably.
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+    <footer class="footer">
+      <span>HOLLOW NIGHT CAMP</span>
+      <span class="footer-divider">&#10022;</span>
+      <span>STAY CURIOUS</span>
+      <span class="footer-divider">&#10022;</span>
+      <span>TRUST NO OWL</span>
+    </footer>
+
+  </div>
+
+  <script type="module" src="js/login.js"></script>
+
+</body>
+</html>
