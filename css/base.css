@@ -1,0 +1,127 @@
+/* HOLLOW NIGHT CAMP — base: tokens, reset, shared keyframes */
+/* =========================================
+   HOLLOW NIGHT CAMP
+   Mystery Cartoon Camp — Visual Foundation
+========================================= */
+
+:root {
+  --night: #17251d;
+  --night-deep: #101a16;
+  --forest: #293f30;
+  --forest-light: #405c40;
+  --moss: #84956b;
+
+  --paper: #f3e7c9;
+  --paper-dark: #ddcba4;
+  --ink: #27352a;
+
+  --orange: #f2a34b;
+  --fire: #ffce72;
+  --red: #d96e45;
+
+  --muted: #c3c8b1;
+  --line: rgba(243, 231, 201, .24);
+
+  --heading: "Fredoka", sans-serif;
+  --body: "DM Sans", sans-serif;
+  --typewriter: "Special Elite", monospace;
+
+  --radius: 18px;
+  --ease: cubic-bezier(.22, 1, .36, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+
+  background: var(--night);
+  color: var(--paper);
+  font-family: var(--body);
+  -webkit-font-smoothing: antialiased;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+
+  opacity: .12;
+
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.18'/%3E%3C/svg%3E");
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+input:focus-visible,
+a:focus-visible {
+  outline: 3px solid var(--orange);
+  outline-offset: 4px;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: .65;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+::selection {
+  background: var(--orange);
+  color: var(--ink);
+}
+
+
+@keyframes revealUp {
+  from {
+    opacity: 0;
+    transform: translateY(17px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes starTwinkle {
+  from {
+    opacity: .45;
+  }
+
+  to {
+    opacity: .95;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}
