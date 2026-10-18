@@ -2165,11 +2165,6 @@ async function showSignedIn(user) {
       ? 'Welcome back, Author! Your writer account is active.'
       : 'Your Reader account is signed in successfully.';
 
-    // Lanjutkan kode editor profil yang sudah ada
-  
-  try {
-    const profile = await getReaderProfile(user.id);
-
     // Buat editor profil satu kali saja
     if (!profileEditor) {
       profileEditor = document.createElement('form');
