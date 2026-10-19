@@ -24,9 +24,24 @@ const welcomeCanvas = document.getElementById('welcomeCanvas');
 const welcomeSparks = document.getElementById('welcomeSparks');
 
 // Welcome background: image + depth map -> parallax
+// "?v=2" forces browsers to fetch fresh copies (bump it when you replace the images)
+const ASSET_V = '?v=2';
+
+// open home.html?debug=1 to see parallax status on screen
+let debugBox = null;
+
+if (new URLSearchParams(window.location.search).get('debug')) {
+  debugBox = document.createElement('pre');
+  debugBox.className = 'w-debug';
+  welcomeScreen.appendChild(debugBox);
+}
+
 const parallax = createParallax(welcomeCanvas, {
-  image: 'assets/image/welcome-bg.jpg',
-  depth: 'assets/image/welcome-depth.png'
+  image: 'assets/image/welcome-bg.jpg' + ASSET_V,
+  depth: 'assets/image/welcome-depth.png' + ASSET_V,
+  onStatus: (text) => {
+    if (debugBox) debugBox.textContent += text + '\n';
+  }
 });
 
 // fireflies on top of the scene

@@ -66,7 +66,8 @@ export function createParallax(canvas, options) {
     depth,
     zoom = 1.08,        // enlarge so edges never show while shifting
     strength = 0.03,    // max shift (fraction of image width)
-    sway = 1            // idle motion when the pointer is still
+    sway = 1,           // idle motion when the pointer is still
+    onStatus = () => {} // optional debug hook
   } = options;
 
   const noop = { supported: false, start() {}, stop() {} };
@@ -75,7 +76,12 @@ export function createParallax(canvas, options) {
   const gl = canvas.getContext('webgl', { antialias: false, alpha: false })
     || canvas.getContext('experimental-webgl');
 
-  if (!gl) return noop;
+  if (!gl) {
+    onStatus('webgl: NOT available');
+    return noop;
+  }
+
+  onStatus('webgl: ok');
 
   let program;
 
@@ -90,6 +96,7 @@ export function createParallax(canvas, options) {
     }
   } catch (error) {
     console.error('Parallax shader failed:', error);
+    onStatus('shader error: ' + error.message);
     return noop;
   }
 
@@ -189,10 +196,15 @@ export function createParallax(canvas, options) {
     event.preventDefault();
     ready = false;
     canvas.classList.remove('ready'); // CSS background shows through
+    onStatus('webgl context lost');
   });
+
+  onStatus('loading ' + image);
+  onStatus('loading ' + depth);
 
   Promise.all([loadImage(image), loadImage(depth)])
     .then(([img, dep]) => {
+      onStatus('images loaded ' + img.naturalWidth + 'x' + img.naturalHeight + ' / ' + dep.naturalWidth + 'x' + dep.naturalHeight);
       imageAspect = img.naturalWidth / img.naturalHeight;
 
       makeTexture(0, img, 'uImage');
@@ -201,6 +213,7 @@ export function createParallax(canvas, options) {
       ready = true;
       draw(0);
       canvas.classList.add('ready');
+      onStatus('READY - parallax running');
 
       if (running && !reduceMotion) {
         frameId = requestAnimationFrame(loop);
@@ -208,6 +221,7 @@ export function createParallax(canvas, options) {
     })
     .catch((error) => {
       console.error('Parallax disabled:', error);
+      onStatus('FAILED: ' + error.message);
     });
 
   return {
