@@ -2,6 +2,7 @@
 
 import { updateReaderProfile } from './auth.js';
 import { initPage, signOut, ENTERED_KEY } from './shared.js';
+import { createParallax } from './parallax.js';
 
 const welcomeScreen = document.getElementById('welcomeScreen');
 const enterCampButton = document.getElementById('enterCampButton');
@@ -19,6 +20,28 @@ const profileRole = document.getElementById('profileRole');
 const profileStatus = document.getElementById('profileStatus');
 const profileSaveButton = document.getElementById('profileSaveButton');
 
+const welcomeCanvas = document.getElementById('welcomeCanvas');
+const welcomeSparks = document.getElementById('welcomeSparks');
+
+// Welcome background: image + depth map -> parallax
+const parallax = createParallax(welcomeCanvas, {
+  image: 'assets/images/welcome-bg.jpg',
+  depth: 'assets/images/welcome-depth.png'
+});
+
+// fireflies on top of the scene
+for (let i = 0; i < 18; i++) {
+  const spark = document.createElement('span');
+  spark.className = 'w-spark';
+  spark.style.left = (8 + Math.random() * 84) + '%';
+  spark.style.top = (40 + Math.random() * 50) + '%';
+  spark.style.setProperty('--dur', (7 + Math.random() * 8).toFixed(1) + 's');
+  spark.style.setProperty('--delay', (-Math.random() * 12).toFixed(1) + 's');
+  spark.style.setProperty('--dx', (Math.random() * 60 - 30).toFixed(0) + 'px');
+  spark.style.setProperty('--dy', (-20 - Math.random() * 50).toFixed(0) + 'px');
+  welcomeSparks.appendChild(spark);
+}
+
 let enterTimer = null;
 let currentAvatarUrl = null;
 
@@ -32,6 +55,13 @@ function setStage(next) {
 
   clearTimeout(enterTimer);
   enterCampButton.classList.remove('show');
+
+  // only run the WebGL loop while the Welcome screen is visible
+  if (next === 'welcome') {
+    parallax.start();
+  } else {
+    parallax.stop();
+  }
 
   if (next === 'welcome') {
     // the button appears 1 second after the transition screen opens
