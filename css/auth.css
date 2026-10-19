@@ -276,48 +276,24 @@
       text-decoration: none;
     }
 
-    .brand-mark {
-      position: relative;
+    .brand-logo {
+      display: block;
+      height: 54px;
+      width: auto;
 
-      width: 47px;
-      height: 47px;
-
-      display: grid;
-      place-items: center;
-
-      border: 2px solid var(--paper);
-      border-radius: 15px 11px 15px 11px;
-
-      color: var(--orange);
-      font-family: var(--heading);
-      font-size: 26px;
-      font-weight: 700;
-
-      transform: rotate(-4deg);
-
-      box-shadow: 4px 4px 0 rgba(0, 0, 0, .16);
+      filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, .22));
 
       transition: transform .35s var(--ease);
     }
 
-    .brand:hover .brand-mark {
-      transform: rotate(4deg) translateY(-2px);
-    }
-
-    .brand-copy {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-
-    .brand-title {
-      font-family: var(--heading);
-      font-size: 19px;
-      font-weight: 700;
-      letter-spacing: .4px;
+    .brand:hover .brand-logo {
+      transform: rotate(-2deg) translateY(-2px);
     }
 
     .brand-subtitle {
+      padding-left: 12px;
+      border-left: 1px solid rgba(243, 231, 201, .22);
+
       color: var(--moss);
       font-family: var(--typewriter);
       font-size: 9px;
@@ -1167,19 +1143,12 @@
     padding: 17px 18px;
   }
 
-  .brand-mark {
-    width: 41px;
-    height: 41px;
-    font-size: 23px;
-  }
-
-  .brand-title {
-    font-size: 16px;
+  .brand-logo {
+    height: 40px;
   }
 
   .brand-subtitle {
-    font-size: 8px;
-    letter-spacing: 1.4px;
+    display: none;
   }
 
   .top-note {
