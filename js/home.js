@@ -25,8 +25,8 @@ const welcomeSparks = document.getElementById('welcomeSparks');
 
 // Welcome background: image + depth map -> parallax
 const parallax = createParallax(welcomeCanvas, {
-  image: 'assets/images/welcome-bg.jpg',
-  depth: 'assets/images/welcome-depth.png'
+  image: 'assets/image/welcome-bg.jpg',
+  depth: 'assets/image/welcome-depth.png'
 });
 
 // fireflies on top of the scene
