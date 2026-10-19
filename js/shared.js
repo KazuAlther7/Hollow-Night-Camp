@@ -23,8 +23,8 @@ function icon(name) {
   return `<span class="icon icon-${name}" aria-hidden="true"></span>`;
 }
 
-function navLinks(active) {
-  return NAV.map((page) => `
+function navLinks(active, items = NAV) {
+  return items.map((page) => `
     <a class="camp-nav-item${page.id === active ? ' active' : ''}" href="${page.href}"${page.id === active ? ' aria-current="page"' : ''}>
       ${icon(page.icon)}<span>${page.label}</span>
     </a>`).join('');
@@ -53,18 +53,21 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
     <nav class="main-bar" id="mainBar" aria-label="Main navigation">
       <button class="bar-arrow-btn bar-to-side" id="barToSideButton" type="button" aria-label="Move navigation to sidebar" title="Move navigation to sidebar">${icon('back')}</button>
       <div class="bar-side-tools">
-        <button class="bar-arrow-btn bar-to-top" id="barToTopButton" type="button" aria-label="Move navigation to top bar" title="Move navigation to top bar">${icon('back')}</button>
-        <button class="bar-arrow-btn bar-shrink" id="barShrinkButton" type="button" aria-label="Shrink sidebar" title="Shrink sidebar">${icon('back')}</button>
+        <button class="bar-arrow-btn bar-shrink" id="barShrinkButton" type="button" aria-label="Collapse sidebar to menu" title="Collapse sidebar to menu">${icon('back')}</button>
+        <button class="bar-arrow-btn bar-to-top" id="barToTopButton" type="button" aria-label="Move navigation back to main bar" title="Move navigation back to main bar">${icon('back')}</button>
       </div>
       <button class="bar-arrow-btn bar-dots" id="barDotsButton" type="button" aria-label="Open sidebar" aria-expanded="false" title="Open sidebar">${icon('3-dots')}</button>
       <a class="bar-brand" href="home.html" aria-label="Hollow Night Camp home">
         <img class="bar-logo" src="assets/image/hollow-night-logo.png" alt="Hollow Night">
       </a>
-      <div class="bar-primary-links" id="barPrimaryLinks">${navLinks(active)}</div>
+      <div class="bar-primary-links" id="barPrimaryLinks">${navLinks(active, NAV.filter((page) => page.id !== 'settings'))}</div>
       <div class="bar-utility-links">
         ${authorEntry(isAuthor, Boolean(onAuthorToggle))}
+        <a class="bar-icon-button bar-util-link${active === 'settings' ? ' active' : ''}" href="settings.html" aria-label="Settings" title="Settings"${active === 'settings' ? ' aria-current="page"' : ''}>
+          ${icon('settings')}<span class="bar-util-label">Settings</span>
+        </a>
         <button class="bar-icon-button" id="notificationButton" type="button" aria-label="Notifications" title="Notifications">
-          ${icon('notification')}<span class="notification-dot"></span>
+          ${icon('notification')}<span class="bar-util-label">Notification</span><span class="notification-dot"></span>
         </button>
         <button class="bar-icon-button profile-menu-button" id="profileMenuButton" type="button" aria-label="Account menu" aria-expanded="false" title="Profile and sign out">
           ${profile?.avatar_url
@@ -113,10 +116,28 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
   };
   applyBarState();
 
-  toSideButton.addEventListener('click', () => { sidebar = true; compact = false; saveBarState(); applyBarState(); });
-  toTopButton.addEventListener('click', () => { sidebar = false; compact = false; saveBarState(); applyBarState(); });
-  shrinkButton.addEventListener('click', () => { compact = true; saveBarState(); applyBarState(); });
-  dotsButton.addEventListener('click', () => { compact = false; saveBarState(); applyBarState(); });
+  // Morph: View Transitions animate the bar between its two shapes (top pill, sidebar, 3-dots circle)
+  const morph = (change) => {
+    const update = () => { change(); saveBarState(); applyBarState(); };
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (document.startViewTransition && !reduced) {
+      document.startViewTransition(update);
+    } else {
+      update();
+    }
+  };
+
+  toSideButton.addEventListener('click', () => morph(() => { sidebar = true; compact = false; }));
+  toTopButton.addEventListener('click', () => morph(() => { sidebar = false; compact = false; }));
+  shrinkButton.addEventListener('click', () => morph(() => { compact = true; }));
+  dotsButton.addEventListener('click', () => morph(() => { compact = false; }));
+
+  // intro animation only on first paint (class removed afterwards so mode switches do not replay it)
+  const introClass = sidebar ? 'bar-intro-side' : 'bar-intro';
+  bar.classList.add(introClass);
+  bar.addEventListener('animationend', (event) => {
+    if (event.target === bar) bar.classList.remove(introClass);
+  }, { once: true });
 
   const authorToggle = document.getElementById('authorStudioToggle');
   if (authorToggle && onAuthorToggle) {

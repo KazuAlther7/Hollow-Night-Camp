@@ -1,7 +1,7 @@
 // HOLLOW NIGHT CAMP — home.html: Welcome transition + Campfire home
 
 import { updateReaderProfile } from './auth.js';
-import { initPage, signOut, ENTERED_KEY } from './shared.js?v=5';
+import { initPage, signOut, ENTERED_KEY } from './shared.js?v=6';
 import { createParallax } from './parallax.js';
 
 const welcomeScreen = document.getElementById('welcomeScreen');

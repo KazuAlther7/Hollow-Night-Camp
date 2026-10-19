@@ -1,6 +1,6 @@
 // HOLLOW NIGHT CAMP — novels.html (library) and novel.html (detail)
 
-import { initPage } from './shared.js?v=5';
+import { initPage } from './shared.js?v=6';
 
 const page = document.body.dataset.page;
 const ctx = await initPage({ active: 'novels' });
