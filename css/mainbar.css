@@ -52,15 +52,6 @@ body.camp-body {
   color: var(--paper);
   white-space: nowrap;
 }
-.bar-brand-mark {
-  display: grid;
-  place-items: center;
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  background: var(--orange);
-  color: var(--ink);
-  font-weight: 700;
-}
 
 .camp-nav-item,
 .bar-icon-button {
@@ -142,14 +133,17 @@ body.editor-mode .camp-app { padding-top: 84px; }
 .camp-nav-item { text-decoration: none; }
 
 @media (max-width: 700px) {
-  .bar-brand span:last-child { display: none; }
+  .main-bar .bar-logo { height: 26px; }
   .camp-nav-item span:last-child, .author-toggle .toggle-label { display: none; }
   .camp-nav-item { padding: 8px 11px; }
   .camp-app { padding-top: 92px; }
 }
 @media (max-width: 480px) {
   .main-bar { top: 10px; padding: 5px 6px; gap: 1px; }
-  .bar-brand { padding-right: 6px; }
+  .bar-brand { padding-right: 6px; margin-right: 2px; }
+  .camp-nav-item { padding: 8px 9px; }
+  .bar-icon-button { padding: 8px 8px; }
+  .main-bar .bar-logo { height: 22px; }
 }
 
 .home-logout-button {
@@ -158,3 +152,35 @@ body.editor-mode .camp-app { padding-top: 84px; }
   background: transparent; color: var(--paper); font-weight: 600; cursor: pointer;
 }
 .home-logout-button:hover { border-color: var(--red); color: #ffb69b; }
+
+
+/* =====================================
+   ICONS — single-colour PNG used as a mask, so it follows `color`
+===================================== */
+.icon {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 1.3em;
+  height: 1.3em;
+  background-color: currentColor;
+  -webkit-mask: var(--mask, none) center / contain no-repeat;
+  mask: var(--mask, none) center / contain no-repeat;
+  vertical-align: -0.2em;
+}
+.icon-campfire       { --mask: url("../assets/icons/campfire.png"); }
+.icon-novels         { --mask: url("../assets/icons/novels.png"); }
+.icon-theories       { --mask: url("../assets/icons/theories.png"); }
+.icon-arcade         { --mask: url("../assets/icons/arcade.png"); }
+.icon-settings       { --mask: url("../assets/icons/settings.png"); }
+.icon-author-studio  { --mask: url("../assets/icons/author-studio.png"); }
+.icon-notification   { --mask: url("../assets/icons/notification.png"); }
+.icon-add-novel      { --mask: url("../assets/icons/add-novel.png"); }
+.icon-chapters       { --mask: url("../assets/icons/chapters.png"); }
+.icon-world-building { --mask: url("../assets/icons/world-building.png"); }
+
+.bar-logo { display: block; height: 36px; width: auto; }
+.camp-nav-item .icon { width: 20px; height: 20px; vertical-align: 0; }
+.bar-icon-button .icon { width: 22px; height: 22px; vertical-align: 0; }
+
+/* inside the ⋮ menu labels stay visible on small screens */
+.editor-menu .camp-nav-item span:last-child { display: inline; }

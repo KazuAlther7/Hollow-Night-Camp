@@ -20,6 +20,7 @@
 }
 .empty-shelf strong { display: block; margin-bottom: 6px; color: var(--paper); font-family: var(--heading); font-size: 22px; }
 
+.author-hint .icon { width: 20px; height: 20px; vertical-align: -4px; margin-right: 4px; }
 .author-hint {
   margin: 0 0 22px; padding: 14px 18px; color: var(--fire);
   border: 1.5px solid rgba(242,163,75,.45); border-radius: 14px; background: rgba(242,163,75,.08);

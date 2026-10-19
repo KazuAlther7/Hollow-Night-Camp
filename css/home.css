@@ -13,7 +13,7 @@ body.stage-welcome .main-bar { display: none; }
   touch-action: none;
 
   /* fallback while WebGL loads (or if it is unavailable) */
-  background: #1a0b14 url("../assets/image/welcome-bg.jpg?v=2") center / cover no-repeat;
+  background: #1a0b14 url("../assets/image/welcome-bg.jpg?v=3") center / cover no-repeat;
   animation: welcomeIn 1.2s ease both;
 }
 .welcome-screen[hidden] { display: none !important; }
@@ -201,8 +201,9 @@ body.stage-welcome .main-bar { display: none; }
 .nav-card:nth-child(3) { grid-area: arcade; transform: rotate(-.5deg); background: #efc98f; }
 .nav-card:nth-child(4) { grid-area: settings; transform: rotate(.4deg); background: #c9d3b4; min-height: 120px; }
 .nav-card:hover { transform: rotate(0) translateY(-5px); box-shadow: 0 20px 38px rgba(0,0,0,.45); }
-.nav-card .nav-card-icon { font-size: 38px; line-height: 1; margin-bottom: auto; }
-.nav-card:nth-child(1) .nav-card-icon { font-size: 64px; }
+.nav-card .nav-card-icon { line-height: 1; margin-bottom: auto; }
+.nav-card .nav-card-icon .icon { width: 44px; height: 44px; vertical-align: top; }
+.nav-card:nth-child(1) .nav-card-icon .icon { width: 72px; height: 72px; }
 .nav-card h3 { margin: 0; font-family: var(--heading); font-size: 22px; font-weight: 600; }
 .nav-card:nth-child(1) h3 { font-size: 32px; }
 .nav-card p { margin: 0; font-size: 14px; line-height: 1.5; color: rgba(39,53,42,.82); }
@@ -219,6 +220,7 @@ body.stage-welcome .main-bar { display: none; }
 .home-author-studio { scroll-margin-top: 100px; }
 .home-author-studio[hidden] { display: none !important; }
 .home-author-studio h2 { margin: 0; font-family: var(--heading); font-size: 28px; }
+.home-author-studio h2 .icon { width: 30px; height: 30px; margin-right: 6px; color: var(--orange); vertical-align: -5px; }
 .home-author-studio > .studio-head p { margin: 6px 0 0; color: var(--muted); }
 .studio-head { margin-bottom: 20px; }
 .author-home-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }
@@ -235,7 +237,8 @@ body.stage-welcome .main-bar { display: none; }
   transition: background .2s ease, border-color .2s ease, transform .2s ease;
 }
 .author-home-card:hover { background: rgba(242,163,75,.14); border-color: var(--orange); transform: translateY(-3px); }
-.author-home-icon { font-size: 26px; }
+.author-home-icon { line-height: 1; color: var(--orange); }
+.author-home-icon .icon { width: 30px; height: 30px; vertical-align: top; }
 .author-home-title { font-family: var(--heading); font-size: 18px; font-weight: 600; }
 .author-home-description { font-size: 13px; line-height: 1.5; color: var(--muted); }
 .home-status { margin: 16px 0 0; color: var(--fire); font-size: 14px; }
