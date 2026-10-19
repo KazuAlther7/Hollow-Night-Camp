@@ -8,30 +8,145 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Special+Elite&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=3">
-  <link rel="stylesheet" href="css/mainbar.css?v=3">
+  <link rel="stylesheet" href="css/base.css?v=4">
+  <link rel="stylesheet" href="css/mainbar.css?v=4">
+  <style>
+    .settings-kicker { color:var(--orange); font-size:11px; letter-spacing:2px; font-weight:700; }
+    .settings-profile-form { max-width:620px; margin-top:28px; display:grid; gap:10px; }
+    .settings-profile-form label { margin-top:12px; color:var(--paper-dark); font-size:11px; font-weight:700; letter-spacing:1.5px; }
+    .settings-profile-form input:not([type=file]), .settings-profile-form textarea { width:100%; padding:13px 14px; border:1px solid rgba(243,231,201,.25); border-radius:12px; background:rgba(10,15,25,.45); color:var(--paper); font:inherit; outline:none; }
+    .settings-profile-form input:focus, .settings-profile-form textarea:focus { border-color:var(--orange); }
+    .settings-profile-form textarea { resize:vertical; }
+    .settings-avatar-row { display:flex; align-items:center; gap:18px; margin:8px 0 12px; }
+    .settings-avatar-preview,.settings-avatar-fallback { width:88px; height:88px; border-radius:50%; object-fit:cover; border:2px solid rgba(243,231,201,.5); }
+    .settings-avatar-fallback { display:grid; place-items:center; background:rgba(242,163,75,.18); color:var(--fire); font-size:30px; font-family:var(--heading); }
+    .settings-avatar-actions { display:grid; gap:8px; }
+    .settings-upload-button,.settings-save-button { display:inline-flex; justify-content:center; align-items:center; width:max-content; padding:11px 15px; border:1px solid rgba(243,231,201,.3); border-radius:11px; background:rgba(242,163,75,.14); color:var(--paper); font-size:12px; font-weight:700; cursor:pointer; }
+    .settings-avatar-actions small { color:var(--muted); font-size:11px; }
+    .settings-remove-avatar { width:max-content; border:0; padding:4px 0; background:transparent; color:#ffb69b; font-size:11px; cursor:pointer; }
+    .settings-role { color:var(--fire); font-size:13px; font-weight:700; }
+    .settings-save-button { margin-top:16px; background:linear-gradient(135deg,#e6a04c,#b96a3e); color:#192018; }
+    #settingsProfileStatus { min-height:20px; color:var(--muted); font-size:12px; line-height:1.6; }
+    @media(max-width:600px) { .settings-avatar-preview,.settings-avatar-fallback { width:70px;height:70px; } .settings-avatar-row { align-items:flex-start; } }
+  </style>
 </head>
 
 <body class="camp-body" data-page="settings">
 
   <main class="camp-app">
-    <section class="camp-page camp-placeholder-page">
-      <h1>Settings</h1>
-      <p>Your preferences and camp settings will live here.</p>
-      <p style="margin-top:28px"><button id="signOutButton" class="home-logout-button" type="button" style="margin:0">Sign out of camp</button></p>
+    <section class="camp-page camp-placeholder-page" id="profile">
+      <span class="settings-kicker">CAMP ACCOUNT</span>
+      <h1>Your Profile</h1>
+      <p>Update your camp identity. Your profile belongs to your account.</p>
+      <form id="settingsProfileForm" class="settings-profile-form">
+        <div class="settings-avatar-row">
+          <img id="settingsAvatarPreview" class="settings-avatar-preview" alt="Profile picture preview" hidden>
+          <div id="settingsAvatarFallback" class="settings-avatar-fallback">C</div>
+          <div class="settings-avatar-actions">
+            <label class="settings-upload-button" for="settingsAvatarInput">Upload profile picture</label>
+            <input id="settingsAvatarInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+            <small>PNG, JPG, WEBP or GIF · max 1.5 MB</small>
+            <button id="removeAvatarButton" type="button" class="settings-remove-avatar">Remove picture</button>
+          </div>
+        </div>
+        <label for="settingsNickname">CAMP NICKNAME</label>
+        <input id="settingsNickname" type="text" minlength="3" maxlength="30" required>
+        <label for="settingsBio">YOUR BIO</label>
+        <textarea id="settingsBio" maxlength="300" rows="4" placeholder="Tell the camp a little about yourself..."></textarea>
+        <label>ACCOUNT ROLE</label>
+        <div id="settingsRole" class="settings-role">READER</div>
+        <button id="saveSettingsProfile" class="settings-save-button" type="submit">SAVE PROFILE</button>
+        <p id="settingsProfileStatus" role="status"></p>
+      </form>
     </section>
   </main>
 
   <script type="module">
-    import { initPage, signOut } from './js/shared.js?v=3';
-    await initPage({ active: 'settings' });
-    const btn = document.getElementById('signOutButton');
-    btn.addEventListener('click', async () => {
-      btn.disabled = true;
-      btn.textContent = 'HEADING OUT...';
-      try { await signOut(); } catch (e) { btn.disabled = false; btn.textContent = 'Sign out of camp'; }
+    import { initPage, signOut } from './js/shared.js?v=4';
+    import { updateReaderProfile } from './js/auth.js';
+
+    const ctx = await initPage({ active: 'settings' });
+    const form = document.getElementById('settingsProfileForm');
+    const nickname = document.getElementById('settingsNickname');
+    const bio = document.getElementById('settingsBio');
+    const role = document.getElementById('settingsRole');
+    const avatarInput = document.getElementById('settingsAvatarInput');
+    const avatarPreview = document.getElementById('settingsAvatarPreview');
+    const avatarFallback = document.getElementById('settingsAvatarFallback');
+    const status = document.getElementById('settingsProfileStatus');
+    const saveButton = document.getElementById('saveSettingsProfile');
+    let avatarUrl = ctx.profile?.avatar_url || null;
+
+    nickname.value = ctx.profile?.nickname || '';
+    bio.value = ctx.profile?.bio || '';
+    role.textContent = (ctx.profile?.role || 'reader').toUpperCase();
+
+    function renderAvatar() {
+      if (avatarUrl) {
+        avatarPreview.src = avatarUrl;
+        avatarPreview.hidden = false;
+        avatarFallback.hidden = true;
+      } else {
+        avatarPreview.hidden = true;
+        avatarPreview.removeAttribute('src');
+        avatarFallback.hidden = false;
+        avatarFallback.textContent = (nickname.value.trim().charAt(0) || 'C').toUpperCase();
+      }
+    }
+    renderAvatar();
+
+    avatarInput.addEventListener('change', () => {
+      const file = avatarInput.files?.[0];
+      if (!file) return;
+      if (file.size > 1.5 * 1024 * 1024) {
+        status.textContent = 'Image is too large. Please choose a file under 1.5 MB.';
+        avatarInput.value = '';
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => { avatarUrl = String(reader.result); renderAvatar(); status.textContent = 'Picture ready. Save your profile to keep it.'; };
+      reader.onerror = () => { status.textContent = 'Could not read that image. Try another file.'; };
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById('removeAvatarButton').addEventListener('click', () => {
+      avatarUrl = null;
+      avatarInput.value = '';
+      renderAvatar();
+      status.textContent = 'Picture removed. Save your profile to confirm.';
+    });
+
+    nickname.addEventListener('input', renderAvatar);
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (nickname.value.trim().length < 3) {
+        status.textContent = 'Nickname must contain at least 3 characters.';
+        return;
+      }
+      saveButton.disabled = true;
+      saveButton.textContent = 'SAVING...';
+      status.textContent = '';
+      try {
+        const updated = await updateReaderProfile(ctx.user.id, {
+          nickname: nickname.value.trim(),
+          bio: bio.value.trim(),
+          avatar_url: avatarUrl
+        });
+        nickname.value = updated.nickname;
+        bio.value = updated.bio || '';
+        role.textContent = updated.role.toUpperCase();
+        avatarUrl = updated.avatar_url || null;
+        renderAvatar();
+        status.textContent = 'Profile saved successfully!';
+      } catch (error) {
+        console.error(error);
+        status.textContent = error.message || 'Could not save your profile.';
+      } finally {
+        saveButton.disabled = false;
+        saveButton.textContent = 'SAVE PROFILE';
+      }
     });
   </script>
-
 </body>
 </html>
