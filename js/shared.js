@@ -47,27 +47,101 @@ function authorEntry(isAuthor, hasToggleHandler) {
     </a>`;
 }
 
-// Main Bar: fixed, centered at the top
-function mountMainBar({ active, isAuthor, onAuthorToggle }) {
+// Main Bar: glass navigation with horizontal/sidebar and compact modes.
+function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
   document.body.insertAdjacentHTML('afterbegin', `
+    <button class="bar-layout-toggle" id="barLayoutToggle" type="button" aria-label="Move navigation to sidebar" title="Move navigation to sidebar">←</button>
     <nav class="main-bar" id="mainBar" aria-label="Main navigation">
+      <button class="bar-collapse-toggle" id="barCollapseToggle" type="button" aria-label="Collapse navigation items" aria-expanded="true" title="Show or hide navigation items">‹</button>
       <a class="bar-brand" href="home.html" aria-label="Hollow Night Camp home">
         <img class="bar-logo" src="assets/image/hollow-night-logo.png" alt="Hollow Night">
       </a>
-      ${navLinks(active)}
-      ${authorEntry(isAuthor, Boolean(onAuthorToggle))}
-      <button class="bar-icon-button" id="notificationButton" type="button"
-              aria-label="Notifications" title="Notifications">
-        ${icon('notification')}<span class="notification-dot"></span>
-      </button>
+      <div class="bar-primary-links" id="barPrimaryLinks">${navLinks(active)}</div>
+      <div class="bar-utility-links">
+        ${authorEntry(isAuthor, Boolean(onAuthorToggle))}
+        <button class="bar-icon-button" id="notificationButton" type="button" aria-label="Notifications" title="Notifications">
+          ${icon('notification')}<span class="notification-dot"></span>
+        </button>
+        <button class="bar-icon-button profile-menu-button" id="profileMenuButton" type="button" aria-label="Account menu" aria-expanded="false" title="Profile and sign out">
+          ${profile?.avatar_url
+            ? `<img class="bar-avatar" src="${escapeAttribute(profile.avatar_url)}" alt="">`
+            : `<span class="bar-avatar-fallback">${escapeHtml((profile?.nickname || user?.email || 'C').trim().charAt(0).toUpperCase())}</span>`}
+        </button>
+      </div>
+      <div class="bar-profile-menu" id="barProfileMenu" hidden>
+        <div class="bar-profile-summary">
+          <strong>${escapeHtml(profile?.nickname || 'Camper')}</strong>
+          <small>${escapeHtml(user?.email || '')}</small>
+        </div>
+        <a href="settings.html#profile">My Profile</a>
+        <button type="button" id="barSignOutButton">Sign out of camp</button>
+      </div>
     </nav>`);
 
-  const toggle = document.getElementById('authorStudioToggle');
+  const bar = document.getElementById('mainBar');
+  const layoutButton = document.getElementById('barLayoutToggle');
+  const collapseButton = document.getElementById('barCollapseToggle');
+  const profileButton = document.getElementById('profileMenuButton');
+  const profileMenu = document.getElementById('barProfileMenu');
 
-  if (toggle && onAuthorToggle) {
-    toggle.addEventListener('click', () => onAuthorToggle(toggle));
+  let sidebar = false;
+  let compact = false;
+  try {
+    sidebar = localStorage.getItem('hnc_bar_sidebar') === '1';
+    compact = localStorage.getItem('hnc_bar_compact') === '1';
+  } catch (e) {}
+
+  const applyBarState = () => {
+    document.body.classList.toggle('bar-sidebar', sidebar);
+    bar.classList.toggle('bar-compact', compact);
+    layoutButton.textContent = sidebar ? '→' : '←';
+    layoutButton.setAttribute('aria-label', sidebar ? 'Move navigation to top bar' : 'Move navigation to sidebar');
+    layoutButton.title = sidebar ? 'Move navigation to top bar' : 'Move navigation to sidebar';
+    collapseButton.textContent = compact ? '›' : '‹';
+    collapseButton.setAttribute('aria-expanded', String(!compact));
+    collapseButton.setAttribute('aria-label', compact ? 'Show navigation items' : 'Hide navigation items');
+  };
+  applyBarState();
+
+  layoutButton.addEventListener('click', () => {
+    sidebar = !sidebar;
+    try { localStorage.setItem('hnc_bar_sidebar', sidebar ? '1' : '0'); } catch (e) {}
+    applyBarState();
+  });
+  collapseButton.addEventListener('click', () => {
+    compact = !compact;
+    try { localStorage.setItem('hnc_bar_compact', compact ? '1' : '0'); } catch (e) {}
+    applyBarState();
+  });
+
+  const authorToggle = document.getElementById('authorStudioToggle');
+  if (authorToggle && onAuthorToggle) {
+    authorToggle.addEventListener('click', () => onAuthorToggle(authorToggle));
   }
+
+  profileButton.addEventListener('click', () => {
+    const open = profileMenu.hidden;
+    profileMenu.hidden = !open;
+    profileButton.setAttribute('aria-expanded', String(open));
+  });
+  document.addEventListener('click', (event) => {
+    if (!profileMenu.hidden && !profileMenu.contains(event.target) && !profileButton.contains(event.target)) {
+      profileMenu.hidden = true;
+      profileButton.setAttribute('aria-expanded', 'false');
+    }
+  });
+  document.getElementById('barSignOutButton').addEventListener('click', async (event) => {
+    const button = event.currentTarget;
+    button.disabled = true;
+    button.textContent = 'Signing out...';
+    try { await signOut(); } catch (error) { button.disabled = false; button.textContent = 'Sign out of camp'; }
+  });
 }
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (char) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+}
+function escapeAttribute(value) { return escapeHtml(value); }
 
 // Editor: the Main Bar becomes a round ⋮ button (top-left)
 function mountEditorMenu({ active, isAuthor }) {
@@ -155,7 +229,7 @@ export async function initPage(options = {}) {
   if (editor) {
     mountEditorMenu({ active, isAuthor });
   } else {
-    mountMainBar({ active, isAuthor, onAuthorToggle });
+    mountMainBar({ active, isAuthor, onAuthorToggle, profile, user: session.user });
   }
 
   observeAuthState((event) => {

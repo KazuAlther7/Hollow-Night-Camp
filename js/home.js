@@ -1,7 +1,7 @@
 // HOLLOW NIGHT CAMP — home.html: Welcome transition + Campfire home
 
 import { updateReaderProfile } from './auth.js';
-import { initPage, signOut, ENTERED_KEY } from './shared.js?v=3';
+import { initPage, signOut, ENTERED_KEY } from './shared.js?v=4';
 import { createParallax } from './parallax.js';
 
 const welcomeScreen = document.getElementById('welcomeScreen');
@@ -24,8 +24,8 @@ const welcomeCanvas = document.getElementById('welcomeCanvas');
 const welcomeSparks = document.getElementById('welcomeSparks');
 
 // Welcome background: image + depth map -> parallax
-// "?v=3" forces browsers to fetch fresh copies (bump it when you replace the images)
-const ASSET_V = '?v=3';
+// "?v=4" forces browsers to fetch fresh copies (bump it when you replace the images)
+const ASSET_V = '?v=4';
 
 // open home.html?debug=1 to see parallax status on screen
 let debugBox = null;
