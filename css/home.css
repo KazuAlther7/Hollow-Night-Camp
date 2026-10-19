@@ -6,52 +6,70 @@ body.stage-welcome .main-bar { display: none; }
    WELCOME TO HOLLOW NIGHT CAMP
 ===================================== */
 .welcome-screen {
-  --s: max(calc(100vw / 1600), calc(100vh / 900));
   position: fixed;
   inset: 0;
   z-index: 10;
   overflow: hidden;
-  background: #0b1a1e;
+  touch-action: none;
+
+  /* fallback while WebGL loads (or if it is unavailable) */
+  background: #1a0b14 url("../assets/images/welcome-bg.jpg") center / cover no-repeat;
   animation: welcomeIn 1.2s ease both;
 }
 .welcome-screen[hidden] { display: none !important; }
+@keyframes welcomeIn { from { opacity: 0; } to { opacity: 1; } }
 
-.welcome-svg {
+.welcome-canvas {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  animation: welcomeDrift 26s ease-in-out infinite alternate;
-  transform-origin: 50% 80%;
+  opacity: 0;
+  transition: opacity 1s ease;
 }
-@keyframes welcomeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes welcomeDrift { from { transform: scale(1); } to { transform: scale(1.045); } }
+.welcome-canvas.ready { opacity: 1; }
 
-.w-star { animation: starTwinkle 4s ease-in-out infinite; }
-.w-star:nth-child(3n) { animation-delay: -1.3s; }
-.w-star:nth-child(3n+1) { animation-delay: -2.6s; }
-
-.w-fog { animation: fogDrift 38s linear infinite alternate; }
-.w-fog.f2 { animation-duration: 52s; animation-direction: alternate-reverse; }
-.w-fog.f3 { animation-duration: 30s; }
-@keyframes fogDrift { from { transform: translateX(-90px); } to { transform: translateX(90px); } }
-
-.w-lantern { animation: lanternFlicker 3.2s ease-in-out infinite; }
-.w-lantern.r { animation-delay: -1.6s; }
-@keyframes lanternFlicker {
-  0%, 100% { opacity: .95; } 35% { opacity: .7; } 55% { opacity: 1; } 80% { opacity: .78; }
+/* readable title on the bright sky + moody edges */
+.welcome-scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(16,6,18,.62) 0%, rgba(16,6,18,.18) 34%, transparent 52%),
+    linear-gradient(0deg, rgba(10,4,12,.6) 0%, transparent 26%),
+    radial-gradient(ellipse at 50% 55%, transparent 55%, rgba(8,3,12,.55) 100%);
 }
 
-.w-fly { animation: flyFloat 9s ease-in-out infinite; }
-.w-fly:nth-of-type(2n) { animation-duration: 12s; animation-delay: -4s; }
-.w-fly:nth-of-type(3n) { animation-duration: 7s; animation-delay: -2s; }
-@keyframes flyFloat {
-  0%, 100% { transform: translate(0,0); opacity: .25; }
-  50% { transform: translate(26px,-34px); opacity: 1; }
+/* drifting mist */
+.welcome-mist {
+  position: absolute;
+  left: -20%;
+  width: 140%;
+  height: 34%;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 50%, rgba(255,226,214,.34), transparent 68%);
+  filter: blur(14px);
 }
+.welcome-mist.m1 { bottom: 4%;  animation: mistDrift 46s ease-in-out infinite alternate; }
+.welcome-mist.m2 { bottom: 26%; opacity: .6; animation: mistDrift 64s ease-in-out infinite alternate-reverse; }
+@keyframes mistDrift { from { transform: translateX(-7%); } to { transform: translateX(7%); } }
 
-.w-sign { transform-origin: 800px 520px; animation: signSway 6s ease-in-out infinite alternate; }
-@keyframes signSway { from { transform: rotate(-.7deg); } to { transform: rotate(.7deg); } }
+/* fireflies (created in home.js) */
+.welcome-sparks { position: absolute; inset: 0; pointer-events: none; }
+.w-spark {
+  position: absolute;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: #ffd98a;
+  box-shadow: 0 0 10px 3px rgba(255,206,114,.75);
+  opacity: 0;
+  animation: sparkFloat var(--dur, 9s) ease-in-out var(--delay, 0s) infinite;
+}
+@keyframes sparkFloat {
+  0%, 100% { transform: translate(0, 0); opacity: 0; }
+  20%, 80% { opacity: .95; }
+  50% { transform: translate(var(--dx, 24px), var(--dy, -40px)); opacity: .35; }
+}
 
 .welcome-copy {
   position: absolute;
@@ -87,7 +105,7 @@ body.stage-welcome .main-bar { display: none; }
 .enter-camp-button {
   position: absolute;
   left: 50%;
-  bottom: calc(var(--s) * 92);
+  bottom: clamp(56px, 12vh, 140px);
   z-index: 3;
   transform: translate(-50%, 18px);
   opacity: 0;
