@@ -50,9 +50,13 @@ function authorEntry(isAuthor, hasToggleHandler) {
 // Main Bar: glass navigation with horizontal/sidebar and compact modes.
 function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
   document.body.insertAdjacentHTML('afterbegin', `
-    <button class="bar-layout-toggle" id="barLayoutToggle" type="button" aria-label="Move navigation to sidebar" title="Move navigation to sidebar">←</button>
     <nav class="main-bar" id="mainBar" aria-label="Main navigation">
-      <button class="bar-collapse-toggle" id="barCollapseToggle" type="button" aria-label="Collapse navigation items" aria-expanded="true" title="Show or hide navigation items">‹</button>
+      <button class="bar-arrow-btn bar-to-side" id="barToSideButton" type="button" aria-label="Move navigation to sidebar" title="Move navigation to sidebar">${icon('back')}</button>
+      <div class="bar-side-tools">
+        <button class="bar-arrow-btn bar-to-top" id="barToTopButton" type="button" aria-label="Move navigation to top bar" title="Move navigation to top bar">${icon('back')}</button>
+        <button class="bar-arrow-btn bar-shrink" id="barShrinkButton" type="button" aria-label="Shrink sidebar" title="Shrink sidebar">${icon('back')}</button>
+      </div>
+      <button class="bar-arrow-btn bar-dots" id="barDotsButton" type="button" aria-label="Open sidebar" aria-expanded="false" title="Open sidebar">${icon('3-dots')}</button>
       <a class="bar-brand" href="home.html" aria-label="Hollow Night Camp home">
         <img class="bar-logo" src="assets/image/hollow-night-logo.png" alt="Hollow Night">
       </a>
@@ -79,8 +83,10 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
     </nav>`);
 
   const bar = document.getElementById('mainBar');
-  const layoutButton = document.getElementById('barLayoutToggle');
-  const collapseButton = document.getElementById('barCollapseToggle');
+  const toSideButton = document.getElementById('barToSideButton');
+  const toTopButton = document.getElementById('barToTopButton');
+  const shrinkButton = document.getElementById('barShrinkButton');
+  const dotsButton = document.getElementById('barDotsButton');
   const profileButton = document.getElementById('profileMenuButton');
   const profileMenu = document.getElementById('barProfileMenu');
 
@@ -91,28 +97,26 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
     compact = localStorage.getItem('hnc_bar_compact') === '1';
   } catch (e) {}
 
+  const saveBarState = () => {
+    try {
+      localStorage.setItem('hnc_bar_sidebar', sidebar ? '1' : '0');
+      localStorage.setItem('hnc_bar_compact', compact ? '1' : '0');
+    } catch (e) {}
+  };
+
+  // compact (3-dots) only exists in sidebar mode
   const applyBarState = () => {
     document.body.classList.toggle('bar-sidebar', sidebar);
-    bar.classList.toggle('bar-compact', compact);
-    layoutButton.textContent = sidebar ? '→' : '←';
-    layoutButton.setAttribute('aria-label', sidebar ? 'Move navigation to top bar' : 'Move navigation to sidebar');
-    layoutButton.title = sidebar ? 'Move navigation to top bar' : 'Move navigation to sidebar';
-    collapseButton.textContent = compact ? '›' : '‹';
-    collapseButton.setAttribute('aria-expanded', String(!compact));
-    collapseButton.setAttribute('aria-label', compact ? 'Show navigation items' : 'Hide navigation items');
+    bar.classList.toggle('bar-compact', sidebar && compact);
+    dotsButton.setAttribute('aria-expanded', String(!(sidebar && compact)));
+    if (!(sidebar && compact)) profileMenu.hidden = true;
   };
   applyBarState();
 
-  layoutButton.addEventListener('click', () => {
-    sidebar = !sidebar;
-    try { localStorage.setItem('hnc_bar_sidebar', sidebar ? '1' : '0'); } catch (e) {}
-    applyBarState();
-  });
-  collapseButton.addEventListener('click', () => {
-    compact = !compact;
-    try { localStorage.setItem('hnc_bar_compact', compact ? '1' : '0'); } catch (e) {}
-    applyBarState();
-  });
+  toSideButton.addEventListener('click', () => { sidebar = true; compact = false; saveBarState(); applyBarState(); });
+  toTopButton.addEventListener('click', () => { sidebar = false; compact = false; saveBarState(); applyBarState(); });
+  shrinkButton.addEventListener('click', () => { compact = true; saveBarState(); applyBarState(); });
+  dotsButton.addEventListener('click', () => { compact = false; saveBarState(); applyBarState(); });
 
   const authorToggle = document.getElementById('authorStudioToggle');
   if (authorToggle && onAuthorToggle) {
