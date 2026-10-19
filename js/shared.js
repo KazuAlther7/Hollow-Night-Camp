@@ -11,17 +11,22 @@ import {
 export const ENTERED_KEY = 'hnc_entered';
 
 const NAV = [
-  { id: 'campfire', href: 'home.html',     icon: '🔥', label: 'Campfire' },
-  { id: 'novels',   href: 'novels.html',   icon: '📚', label: 'Novels' },
-  { id: 'theories', href: 'theories.html', icon: '🔎', label: 'Theories' },
-  { id: 'arcade',   href: 'arcade.html',   icon: '🎲', label: 'Arcade' },
-  { id: 'settings', href: 'settings.html', icon: '⚙️', label: 'Settings' }
+  { id: 'campfire', href: 'home.html',     icon: 'campfire', label: 'Campfire' },
+  { id: 'novels',   href: 'novels.html',   icon: 'novels', label: 'Novels' },
+  { id: 'theories', href: 'theories.html', icon: 'theories', label: 'Theories' },
+  { id: 'arcade',   href: 'arcade.html',   icon: 'arcade', label: 'Arcade' },
+  { id: 'settings', href: 'settings.html', icon: 'settings', label: 'Settings' }
 ];
+
+// Icons are single-colour PNGs in assets/icons/, tinted with CSS mask (see mainbar.css)
+function icon(name) {
+  return `<span class="icon icon-${name}" aria-hidden="true"></span>`;
+}
 
 function navLinks(active) {
   return NAV.map((page) => `
     <a class="camp-nav-item${page.id === active ? ' active' : ''}" href="${page.href}"${page.id === active ? ' aria-current="page"' : ''}>
-      <span>${page.icon}</span><span>${page.label}</span>
+      ${icon(page.icon)}<span>${page.label}</span>
     </a>`).join('');
 }
 
@@ -32,13 +37,13 @@ function authorEntry(isAuthor, hasToggleHandler) {
     return `
       <button id="authorStudioToggle" class="camp-nav-item author-toggle" type="button"
               aria-expanded="false" aria-controls="homeAuthorStudio">
-        <span>✍️</span><span class="toggle-label">Author Studio</span>
+        ${icon('author-studio')}<span class="toggle-label">Author Studio</span>
       </button>`;
   }
 
   return `
     <a class="camp-nav-item author-toggle" href="home.html?studio=1">
-      <span>✍️</span><span class="toggle-label">Author Studio</span>
+      ${icon('author-studio')}<span class="toggle-label">Author Studio</span>
     </a>`;
 }
 
@@ -47,13 +52,13 @@ function mountMainBar({ active, isAuthor, onAuthorToggle }) {
   document.body.insertAdjacentHTML('afterbegin', `
     <nav class="main-bar" id="mainBar" aria-label="Main navigation">
       <a class="bar-brand" href="home.html" aria-label="Hollow Night Camp home">
-        <span class="bar-brand-mark">H</span><span>Hollow Night</span>
+        <img class="bar-logo" src="assets/image/hollow-night-logo.png" alt="Hollow Night">
       </a>
       ${navLinks(active)}
       ${authorEntry(isAuthor, Boolean(onAuthorToggle))}
       <button class="bar-icon-button" id="notificationButton" type="button"
               aria-label="Notifications" title="Notifications">
-        🔔<span class="notification-dot"></span>
+        ${icon('notification')}<span class="notification-dot"></span>
       </button>
     </nav>`);
 
@@ -73,7 +78,7 @@ function mountEditorMenu({ active, isAuthor }) {
             aria-label="Open menu" aria-expanded="false" aria-controls="editorMenu">⋮</button>
     <div id="editorMenu" class="editor-menu" hidden>
       ${navLinks(active)}
-      ${isAuthor ? '<a class="camp-nav-item" href="home.html?studio=1"><span>✍️</span><span>Author Studio</span></a>' : ''}
+      ${isAuthor ? `<a class="camp-nav-item" href="home.html?studio=1">${icon('author-studio')}<span>Author Studio</span></a>` : ''}
     </div>`);
 
   const button = document.getElementById('editorMenuButton');

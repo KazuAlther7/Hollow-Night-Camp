@@ -1,6 +1,6 @@
 // HOLLOW NIGHT CAMP — editor.html (Author only)
 
-import { initPage } from './shared.js';
+import { initPage } from './shared.js?v=3';
 
 await initPage({ active: 'novels', editor: true, requireAuthor: true });
 
