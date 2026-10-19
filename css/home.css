@@ -13,7 +13,7 @@ body.stage-welcome .main-bar { display: none; }
   touch-action: none;
 
   /* fallback while WebGL loads (or if it is unavailable) */
-  background: #1a0b14 url("../assets/images/welcome-bg.jpg") center / cover no-repeat;
+  background: #1a0b14 url("../assets/image/welcome-bg.jpg") center / cover no-repeat;
   animation: welcomeIn 1.2s ease both;
 }
 .welcome-screen[hidden] { display: none !important; }
