@@ -2,7 +2,7 @@
 
 import { initPage } from './shared.js?v=7';
 import { supabase } from '../config/supabase.js';
-import { el, formatDate } from './dom.js';
+import { el, formatDate, readingTime } from './dom.js';
 import { openImportDialog } from './import.js?v=1';
 
 const page = document.body.dataset.page;
@@ -318,7 +318,7 @@ if (page === 'novel') {
 
   function renderChapter(chapter, index) {
     const label = chapter.chapter_number != null ? 'Chapter ' + chapter.chapter_number : null;
-    const sub = [label, chapter.subtitle, chapter.status === 'published' && chapter.published_at ? formatDate(chapter.published_at) : null]
+    const sub = [label, chapter.subtitle, readingTime(chapter.word_count), chapter.status === 'published' && chapter.published_at ? formatDate(chapter.published_at) : null]
       .filter(Boolean).join(' · ');
 
     const titleNode = chapter.status === 'published' || ctx.isAuthor
@@ -355,7 +355,7 @@ if (page === 'novel') {
   async function loadChapters() {
     const { data, error } = await supabase
       .from('chapters')
-      .select('id, title, subtitle, chapter_number, volume, position, status, published_at')
+      .select('id, title, subtitle, chapter_number, volume, position, status, published_at, word_count')
       .eq('novel_id', novelId)
       .order('position', { ascending: true })
       .order('created_at', { ascending: true });

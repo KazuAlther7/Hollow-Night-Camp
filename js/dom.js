@@ -23,3 +23,9 @@ export function formatDate(value) {
   if (Number.isNaN(date.getTime())) return '';
   return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
+
+// ~200 words per minute
+export function readingTime(words) {
+  if (!words || words < 1) return null;
+  return '~' + Math.max(1, Math.ceil(words / 200)) + ' min read';
+}

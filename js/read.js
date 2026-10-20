@@ -30,6 +30,14 @@ if (!chapterId) {
     document.title = chapter.title + ' — Hollow Night Camp';
     titleEl.textContent = chapter.title;
 
+    // optional chapter cover: shown at the very top; without one the page stays as normal
+    if (chapter.cover_url) {
+      const cover = document.getElementById('readerCover');
+      cover.src = chapter.cover_url;
+      cover.alt = 'Cover of ' + chapter.title;
+      cover.hidden = false;
+    }
+
     if (chapter.subtitle) {
       subEl.textContent = chapter.subtitle;
       subEl.hidden = false;

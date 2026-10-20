@@ -21,6 +21,57 @@ const publishButton = document.getElementById('publishButton');
 const backLink = document.getElementById('backLink');
 const editorNovel = document.getElementById('editorNovel');
 
+const coverPreview = document.getElementById('coverPreview');
+const coverFileInput = document.getElementById('coverFile');
+const removeCoverButton = document.getElementById('removeCoverButton');
+
+const COVER_BUCKET = 'covers';
+const MAX_COVER_BYTES = 2 * 1024 * 1024;
+let coverUrl = null;       // saved cover (null = none)
+let coverFile = null;      // newly chosen file, uploaded on save
+let previewObjectUrl = null;
+
+function renderCover(src) {
+  coverPreview.replaceChildren();
+  if (src) {
+    const img = document.createElement('img');
+    img.src = src;
+    img.alt = '';
+    coverPreview.append(img);
+  }
+  removeCoverButton.hidden = !src;
+}
+
+coverFileInput.addEventListener('change', () => {
+  const file = coverFileInput.files?.[0];
+  if (!file) return;
+
+  if (!file.type.startsWith('image/')) {
+    setSaveState('Cover must be an image file.', true);
+    coverFileInput.value = '';
+    return;
+  }
+  if (file.size > MAX_COVER_BYTES) {
+    setSaveState('Cover is too large. Maximum size is 2 MB.', true);
+    coverFileInput.value = '';
+    return;
+  }
+
+  if (previewObjectUrl) URL.revokeObjectURL(previewObjectUrl);
+  previewObjectUrl = URL.createObjectURL(file);
+  coverFile = file;
+  renderCover(previewObjectUrl);
+  markDirty();
+});
+
+removeCoverButton.addEventListener('click', () => {
+  coverFile = null;
+  coverUrl = null;
+  coverFileInput.value = '';
+  renderCover(null);
+  markDirty();
+});
+
 const fields = [titleInput, subtitleInput, numberInput, volumeInput, chapterBody];
 
 let status = 'draft';      // status stored in the database for this chapter
@@ -84,7 +135,28 @@ async function save(nextStatus) {
   renderButtons();
   setSaveState('Saving…');
 
+  const id = chapterId || crypto.randomUUID();
+  let finalCover = coverUrl;
+
+  try {
+    if (coverFile) {
+      const ext = (coverFile.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+      const path = 'chapters/' + id + '/' + Date.now() + '.' + ext;
+      const { error: uploadError } = await supabase.storage
+        .from(COVER_BUCKET)
+        .upload(path, coverFile, { contentType: coverFile.type, upsert: false });
+      if (uploadError) throw uploadError;
+      finalCover = supabase.storage.from(COVER_BUCKET).getPublicUrl(path).data.publicUrl;
+    }
+  } catch (error) {
+    setSaveState('Cover upload failed: ' + (error?.message || 'unknown error') + ' Your text is still here.', true);
+    saving = false;
+    renderButtons();
+    return;
+  }
+
   const row = {
+    cover_url: finalCover,
     title,
     subtitle: subtitleInput.value.trim() || null,
     chapter_number: parseNumber(numberInput.value),
@@ -100,7 +172,7 @@ async function save(nextStatus) {
     } else {
       const { data, error } = await supabase
         .from('chapters')
-        .insert({ ...row, novel_id: novelId, position: position ?? 0 })
+        .insert({ id, ...row, novel_id: novelId, position: position ?? 0 })
         .select('id')
         .single();
       if (error) throw error;
@@ -113,6 +185,8 @@ async function save(nextStatus) {
     }
 
     status = nextStatus;
+    coverUrl = finalCover;
+    coverFile = null;
     dirty = false;
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     setSaveState((status === 'published' ? 'Published' : 'Saved as draft') + ' at ' + time + '.');
@@ -154,6 +228,8 @@ async function init() {
     numberInput.value = data.chapter_number ?? '';
     volumeInput.value = data.volume || '';
     chapterBody.value = data.body || '';
+    coverUrl = data.cover_url || null;
+    renderCover(coverUrl);
     setSaveState('Loaded.');
   } else if (novelId) {
     // new chapter: continue the numbering and ordering of this novel

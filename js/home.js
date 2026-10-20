@@ -163,7 +163,7 @@ async function loadLatestChapter() {
   // RLS already hides drafts from Readers; the status filter also keeps them off the Author's homepage.
   const { data: chapters, error } = await supabase
     .from('chapters')
-    .select('id, novel_id, title, chapter_number, published_at')
+    .select('id, novel_id, title, chapter_number, volume, cover_url, published_at')
     .eq('status', 'published')
     .order('published_at', { ascending: false })
     .limit(1);
@@ -185,11 +185,13 @@ async function loadLatestChapter() {
 
   const number = chapter.chapter_number ?? null;
   const novelTitle = novel?.title || '';
-  const coverUrl = novel?.cover_url || null;
+  // the chapter's own cover wins; without one the novel cover is shown as before
+  const coverUrl = chapter.cover_url || novel?.cover_url || null;
 
   const tagParts = [];
   if (novelTitle) tagParts.push(novelTitle);
   if (number != null) tagParts.push('Chapter ' + number);
+  if (chapter.volume) tagParts.push(chapter.volume);
   document.getElementById('latestChapterTag').textContent = (tagParts.join(' · ') || 'Latest chapter').toUpperCase();
 
   document.getElementById('latestChapterTitle').textContent = chapter.title || 'Untitled chapter';
@@ -205,7 +207,7 @@ async function loadLatestChapter() {
     const art = document.getElementById('latestChapterArt');
     const img = document.createElement('img');
     img.src = coverUrl;
-    img.alt = novelTitle ? 'Cover of ' + novelTitle : 'Chapter cover';
+    img.alt = chapter.cover_url ? 'Cover of ' + chapter.title : (novelTitle ? 'Cover of ' + novelTitle : 'Chapter cover');
     img.className = 'featured-story-cover';
     art.replaceChildren(img);
     art.classList.add('has-cover');
