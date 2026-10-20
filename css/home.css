@@ -305,6 +305,8 @@ body.stage-welcome .main-bar { display: none; }
 /* links styled as cards / buttons */
 .nav-card { text-decoration: none; }
 .camp-action-button { display: inline-block; text-decoration: none; }
+/* icon + label buttons: flex centring keeps the arrow level with the text (must come after the inline-block rule above) */
+.camp-action-button.has-icon, .text-action.has-icon { display: inline-flex; align-items: center; gap: 8px; }
 .text-action { text-decoration: none; }
 
 @media (max-width: 820px) {
