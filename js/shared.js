@@ -30,21 +30,25 @@ function navLinks(active, items = NAV) {
     </a>`).join('');
 }
 
-function authorEntry(isAuthor, hasToggleHandler) {
+// Author Studio is a persistent mode: it stays on across pages until the Author turns it off.
+const AUTHOR_MODE_KEY = 'hnc_author_mode';
+
+export function getAuthorMode() {
+  try { return localStorage.getItem(AUTHOR_MODE_KEY) === '1'; } catch (e) { return false; }
+}
+
+export function setAuthorMode(on) {
+  try { localStorage.setItem(AUTHOR_MODE_KEY, on ? '1' : '0'); } catch (e) {}
+}
+
+function authorEntry(isAuthor) {
   if (!isAuthor) return '';
 
-  if (hasToggleHandler) {
-    return `
-      <button id="authorStudioToggle" class="camp-nav-item author-toggle" type="button"
-              aria-expanded="false" aria-controls="homeAuthorStudio">
-        ${icon('author-studio')}<span class="toggle-label">Author Studio</span>
-      </button>`;
-  }
-
   return `
-    <a class="camp-nav-item author-toggle" href="home.html?studio=1">
+    <button id="authorStudioToggle" class="camp-nav-item author-toggle" type="button"
+            aria-pressed="false" aria-controls="homeAuthorStudio" title="Open Author Studio">
       ${icon('author-studio')}<span class="toggle-label">Author Studio</span>
-    </a>`;
+    </button>`;
 }
 
 // Main Bar: glass navigation with horizontal/sidebar and compact modes.
@@ -62,7 +66,7 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
       </a>
       <div class="bar-primary-links" id="barPrimaryLinks">${navLinks(active, NAV.filter((page) => page.id !== 'settings'))}</div>
       <div class="bar-utility-links">
-        ${authorEntry(isAuthor, Boolean(onAuthorToggle))}
+        ${authorEntry(isAuthor)}
         <a class="bar-icon-button bar-util-link${active === 'settings' ? ' active' : ''}" href="settings.html" aria-label="Settings" title="Settings"${active === 'settings' ? ' aria-current="page"' : ''}>
           ${icon('settings')}<span class="bar-util-label">Settings</span>
         </a>
@@ -140,8 +144,24 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
   }, { once: true });
 
   const authorToggle = document.getElementById('authorStudioToggle');
-  if (authorToggle && onAuthorToggle) {
-    authorToggle.addEventListener('click', () => onAuthorToggle(authorToggle));
+  if (authorToggle) {
+    const paint = (on) => {
+      authorToggle.setAttribute('aria-pressed', String(on));
+      authorToggle.title = on ? 'Exit Author Studio' : 'Open Author Studio';
+    };
+    paint(getAuthorMode());
+
+    authorToggle.addEventListener('click', () => {
+      const on = !getAuthorMode();
+      setAuthorMode(on);
+      paint(on);
+
+      if (onAuthorToggle) {
+        onAuthorToggle(on);          // home page: show / hide the studio panel
+      } else if (on) {
+        window.location.href = 'home.html';   // other pages: the studio panel lives on Campfire
+      }
+    });
   }
 
   profileButton.addEventListener('click', () => {

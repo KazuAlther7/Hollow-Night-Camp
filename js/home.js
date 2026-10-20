@@ -1,7 +1,7 @@
 // HOLLOW NIGHT CAMP — home.html: Welcome transition + Campfire home
 
 import { supabase } from '../config/supabase.js';
-import { initPage, ENTERED_KEY } from './shared.js?v=6';
+import { initPage, ENTERED_KEY, getAuthorMode, setAuthorMode } from './shared.js?v=7';
 import { createParallax } from './parallax.js';
 
 const welcomeScreen = document.getElementById('welcomeScreen');
@@ -80,23 +80,17 @@ function setStage(next) {
   window.scrollTo(0, 0);
 }
 
-function toggleStudio(toggle, forceOpen) {
-  const open = typeof forceOpen === 'boolean' ? forceOpen : homeAuthorStudio.hidden;
-
+function toggleStudio(open, { scroll = false } = {}) {
   homeAuthorStudio.hidden = !open;
 
-  if (toggle) {
-    toggle.setAttribute('aria-expanded', String(open));
-  }
-
-  if (open) {
+  if (open && scroll) {
     homeAuthorStudio.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 }
 
 const ctx = await initPage({
   active: 'campfire',
-  onAuthorToggle: (toggle) => toggleStudio(toggle)
+  onAuthorToggle: (open) => toggleStudio(open, { scroll: true })
 });
 
 const params = new URLSearchParams(window.location.search);
@@ -122,8 +116,12 @@ enterCampButton.addEventListener('click', () => {
 
 homeNickname.textContent = ctx.profile?.nickname || 'camper';
 
-if (wantsStudio) {
-  toggleStudio(document.getElementById('authorStudioToggle'), true);
+if (wantsStudio) setAuthorMode(true);
+
+// the studio panel follows the persistent Author Studio mode (also after a refresh)
+if (ctx.isAuthor && getAuthorMode()) {
+  toggleStudio(true, { scroll: wantsStudio });
+  document.getElementById('authorStudioToggle')?.setAttribute('aria-pressed', 'true');
 }
 
 // AUTHOR STUDIO ACTIONS

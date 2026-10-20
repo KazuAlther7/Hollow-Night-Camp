@@ -1,6 +1,6 @@
 // HOLLOW NIGHT CAMP — editor.html (Author only): write, save draft, publish chapters
 
-import { initPage } from './shared.js?v=6';
+import { initPage } from './shared.js?v=7';
 import { supabase } from '../config/supabase.js';
 
 await initPage({ active: 'novels', editor: true, requireAuthor: true });
