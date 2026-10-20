@@ -36,7 +36,7 @@ From exploring the novels to examining theories and hidden clues, visitors are i
 
 | Section | Purpose |
 | --- | --- |
-| **Home** | The main entry point to Hollow Night Camp. |
+| **Campfire** | The main entry point to Hollow Night Camp. |
 | **Novels** | Browse the stories available on the website. |
 | **Theories** | Explore investigations, interpretations, and possible connections. |
 | **Arcade** | Access the site's interactive arcade section. |
