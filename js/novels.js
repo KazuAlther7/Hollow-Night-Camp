@@ -3,6 +3,7 @@
 import { initPage } from './shared.js?v=7';
 import { supabase } from '../config/supabase.js';
 import { el, formatDate } from './dom.js';
+import { openImportDialog } from './import.js?v=1';
 
 const page = document.body.dataset.page;
 const ctx = await initPage({ active: 'novels' });
@@ -248,8 +249,10 @@ if (page === 'novel') {
   const newChapterLink = document.getElementById('newChapterLink');
   const settingsButton = document.getElementById('novelSettingsButton');
   const chapterList = document.getElementById('chapterList');
+  const importButton = document.getElementById('importButton');
 
   let novel = null;
+  let chapters = [];
 
   const listMessage = (text) => chapterList.replaceChildren(el('li', { text }));
 
@@ -290,7 +293,30 @@ if (page === 'novel') {
     await loadChapters();
   }
 
-  function renderChapter(chapter) {
+  // Reorder inside the same volume / arc: swap with the neighbour, then renumber positions 1..n
+  async function moveChapter(index, direction) {
+    const list = [...chapters];
+    const target = index + direction;
+    if (target < 0 || target >= list.length) return;
+    [list[index], list[target]] = [list[target], list[index]];
+
+    const updates = [];
+    list.forEach((chapter, i) => {
+      if (chapter.position !== i + 1) {
+        updates.push(supabase.from('chapters').update({ position: i + 1 }).eq('id', chapter.id));
+      }
+    });
+
+    chapterList.setAttribute('aria-busy', 'true');
+    const results = await Promise.all(updates);
+    chapterList.removeAttribute('aria-busy');
+
+    const failed = results.find((result) => result.error);
+    if (failed) window.alert('Could not reorder: ' + failed.error.message);
+    await loadChapters();
+  }
+
+  function renderChapter(chapter, index) {
     const label = chapter.chapter_number != null ? 'Chapter ' + chapter.chapter_number : null;
     const sub = [label, chapter.subtitle, chapter.status === 'published' && chapter.published_at ? formatDate(chapter.published_at) : null]
       .filter(Boolean).join(' · ');
@@ -302,7 +328,13 @@ if (page === 'novel') {
     const tools = el('div', { class: 'chapter-tools' });
 
     if (ctx.isAuthor) {
+      const prev = chapters[index - 1];
+      const next = chapters[index + 1];
+      const sameVolume = (other) => other && (other.volume || null) === (chapter.volume || null);
+
       tools.append(
+        el('button', { class: 'hn-btn ghost small', type: 'button', text: '↑', 'aria-label': 'Move chapter up', title: 'Move up', disabled: !sameVolume(prev), onclick: () => moveChapter(index, -1) }),
+        el('button', { class: 'hn-btn ghost small', type: 'button', text: '↓', 'aria-label': 'Move chapter down', title: 'Move down', disabled: !sameVolume(next), onclick: () => moveChapter(index, 1) }),
         el('span', { class: 'hn-badge ' + (chapter.status === 'published' ? 'live' : 'draft'), text: chapter.status === 'published' ? 'Published' : 'Draft' }),
         el('a', { class: 'hn-btn ghost small', href: 'editor.html?chapter=' + encodeURIComponent(chapter.id), text: 'Edit' }),
         el('button', {
@@ -338,13 +370,15 @@ if (page === 'novel') {
       return;
     }
 
+    chapters = data;
+
     const items = [];
     let lastVolume;
-    data.forEach((chapter) => {
+    data.forEach((chapter, index) => {
       const volume = chapter.volume || null;
       if (volume && volume !== lastVolume) items.push(el('li', { class: 'chapter-volume', text: volume }));
       lastVolume = volume;
-      items.push(renderChapter(chapter));
+      items.push(renderChapter(chapter, index));
     });
     chapterList.replaceChildren(...items);
   }
@@ -367,6 +401,7 @@ if (page === 'novel') {
       if (ctx.isAuthor) {
         actionsEl.hidden = false;
         newChapterLink.href = 'editor.html?novel=' + encodeURIComponent(novel.id);
+        importButton.addEventListener('click', () => openImportDialog({ novelId: novel.id }));
         settingsButton.addEventListener('click', () => openNovelDialog({
           novel,
           onSaved: (saved) => { novel = saved; renderNovel(); }
