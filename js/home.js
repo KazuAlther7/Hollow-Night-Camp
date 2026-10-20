@@ -1,7 +1,7 @@
 // HOLLOW NIGHT CAMP — home.html: Welcome transition + Campfire home
 
-import { updateReaderProfile } from './auth.js';
-import { initPage, signOut, ENTERED_KEY } from './shared.js?v=6';
+import { supabase } from '../config/supabase.js';
+import { initPage, ENTERED_KEY } from './shared.js?v=6';
 import { createParallax } from './parallax.js';
 
 const welcomeScreen = document.getElementById('welcomeScreen');
@@ -11,14 +11,6 @@ const campApp = document.getElementById('campApp');
 const homeAuthorStudio = document.getElementById('homeAuthorStudio');
 const authorHomeStatus = document.getElementById('authorHomeStatus');
 const homeNickname = document.getElementById('homeNickname');
-const homeLogoutButton = document.getElementById('homeLogoutButton');
-
-const profileForm = document.getElementById('readerProfileEditor');
-const profileNickname = document.getElementById('profileNickname');
-const profileBio = document.getElementById('profileBio');
-const profileRole = document.getElementById('profileRole');
-const profileStatus = document.getElementById('profileStatus');
-const profileSaveButton = document.getElementById('profileSaveButton');
 
 const welcomeCanvas = document.getElementById('welcomeCanvas');
 const welcomeSparks = document.getElementById('welcomeSparks');
@@ -58,7 +50,6 @@ for (let i = 0; i < 18; i++) {
 }
 
 let enterTimer = null;
-let currentAvatarUrl = null;
 
 // STAGES: welcome -> home
 function setStage(next) {
@@ -129,54 +120,11 @@ enterCampButton.addEventListener('click', () => {
   setStage('home');
 });
 
-// PROFILE + ROLE
 homeNickname.textContent = ctx.profile?.nickname || 'camper';
-
-profileNickname.value = ctx.profile?.nickname || '';
-profileBio.value = ctx.profile?.bio || '';
-profileRole.textContent = (ctx.profile?.role || 'reader').toUpperCase();
-currentAvatarUrl = ctx.profile?.avatar_url || null;
 
 if (wantsStudio) {
   toggleStudio(document.getElementById('authorStudioToggle'), true);
 }
-
-profileForm.addEventListener('submit', async (event) => {
-  event.preventDefault();
-
-  const nickname = profileNickname.value.trim();
-  const bio = profileBio.value.trim();
-
-  if (nickname.length < 3) {
-    profileStatus.textContent = 'Nickname must contain at least 3 characters.';
-    return;
-  }
-
-  profileSaveButton.disabled = true;
-  profileSaveButton.textContent = 'SAVING...';
-  profileStatus.textContent = '';
-
-  try {
-    const updated = await updateReaderProfile(ctx.user.id, {
-      nickname,
-      bio,
-      avatar_url: currentAvatarUrl
-    });
-
-    profileNickname.value = updated.nickname;
-    profileBio.value = updated.bio;
-    profileRole.textContent = updated.role.toUpperCase();
-    homeNickname.textContent = updated.nickname;
-
-    profileStatus.textContent = 'Profile saved successfully!';
-  } catch (error) {
-    console.error('Profile update failed:', error);
-    profileStatus.textContent = error.message || 'Could not save your profile.';
-  } finally {
-    profileSaveButton.disabled = false;
-    profileSaveButton.textContent = 'SAVE PROFILE';
-  }
-});
 
 // AUTHOR STUDIO ACTIONS
 document.querySelectorAll('[data-author-action]').forEach((button) => {
@@ -201,17 +149,68 @@ document.querySelectorAll('[data-author-action]').forEach((button) => {
   });
 });
 
-// SIGN OUT
-homeLogoutButton.addEventListener('click', async () => {
-  homeLogoutButton.disabled = true;
-  homeLogoutButton.textContent = 'HEADING OUT...';
+// THE LATEST CHAPTER
+// Matches supabase/001_novels_chapters.sql (chapters.status / published_at, novels.cover_url).
+function formatDate(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
 
-  try {
-    await signOut();
-  } catch (error) {
-    homeLogoutButton.disabled = false;
-    homeLogoutButton.textContent = 'Sign out of camp';
-    authorHomeStatus.textContent = error.message || 'Could not sign out. Please try again.';
-    authorHomeStatus.hidden = false;
+async function loadLatestChapter() {
+  // RLS already hides drafts from Readers; the status filter also keeps them off the Author's homepage.
+  const { data: chapters, error } = await supabase
+    .from('chapters')
+    .select('id, novel_id, title, chapter_number, published_at')
+    .eq('status', 'published')
+    .order('published_at', { ascending: false })
+    .limit(1);
+
+  if (error) throw error;
+
+  const chapter = chapters?.[0];
+  if (!chapter) return;
+
+  let novel = null;
+  if (chapter.novel_id != null) {
+    const { data, error: novelError } = await supabase
+      .from('novels')
+      .select('id, title, cover_url')
+      .eq('id', chapter.novel_id)
+      .maybeSingle();
+    if (!novelError) novel = data;
   }
+
+  const number = chapter.chapter_number ?? null;
+  const novelTitle = novel?.title || '';
+  const coverUrl = novel?.cover_url || null;
+
+  const tagParts = [];
+  if (novelTitle) tagParts.push(novelTitle);
+  if (number != null) tagParts.push('Chapter ' + number);
+  document.getElementById('latestChapterTag').textContent = (tagParts.join(' · ') || 'Latest chapter').toUpperCase();
+
+  document.getElementById('latestChapterTitle').textContent = chapter.title || 'Untitled chapter';
+
+  const posted = formatDate(chapter.published_at);
+  document.getElementById('latestChapterText').textContent = posted ? 'Posted ' + posted + '.' : 'Fresh from the campfire.';
+
+  const link = document.getElementById('latestChapterLink');
+  link.textContent = 'Read the Chapter →';
+  link.href = chapter.novel_id != null ? 'novel.html?id=' + encodeURIComponent(chapter.novel_id) : 'novels.html';
+
+  if (coverUrl) {
+    const art = document.getElementById('latestChapterArt');
+    const img = document.createElement('img');
+    img.src = coverUrl;
+    img.alt = novelTitle ? 'Cover of ' + novelTitle : 'Chapter cover';
+    img.className = 'featured-story-cover';
+    art.replaceChildren(img);
+    art.classList.add('has-cover');
+  }
+}
+
+loadLatestChapter().catch((error) => {
+  // keep the placeholder card when nothing can be loaded
+  console.warn('Latest chapter unavailable:', error?.message || error);
 });
