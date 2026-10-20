@@ -207,7 +207,10 @@ async function loadLatestChapter() {
   readEl.hidden = !read;
 
   const link = document.getElementById('latestChapterLink');
-  link.textContent = 'Read the Chapter →';
+  const arrow = document.createElement('span');
+  arrow.className = 'icon icon-back icon-flip';
+  arrow.setAttribute('aria-hidden', 'true');
+  link.replaceChildren('Read the Chapter ', arrow);
   link.href = 'read.html?id=' + encodeURIComponent(chapter.id);
 
   if (coverUrl) {

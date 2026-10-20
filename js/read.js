@@ -67,9 +67,9 @@ if (!chapterId) {
     const next = index >= 0 && index < list.length - 1 ? list[index + 1] : null;
 
     navEl.replaceChildren(
-      prev ? el('a', { class: 'hn-btn ghost', href: 'read.html?id=' + encodeURIComponent(prev.id), text: '← Previous' }) : el('span'),
+      prev ? el('a', { class: 'hn-btn ghost', href: 'read.html?id=' + encodeURIComponent(prev.id) }, el('span', { class: 'icon icon-back', 'aria-hidden': 'true' }), 'Previous') : el('span'),
       novel ? el('a', { class: 'hn-btn ghost', href: 'novel.html?id=' + encodeURIComponent(novel.id), text: 'Chapter list' }) : el('span'),
-      next ? el('a', { class: 'hn-btn', href: 'read.html?id=' + encodeURIComponent(next.id), text: 'Next →' }) : el('span')
+      next ? el('a', { class: 'hn-btn', href: 'read.html?id=' + encodeURIComponent(next.id) }, 'Next', el('span', { class: 'icon icon-back icon-flip', 'aria-hidden': 'true' })) : el('span')
     );
   }
 }

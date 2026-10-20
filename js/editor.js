@@ -245,7 +245,7 @@ async function init() {
   }
 
   backLink.href = 'novel.html?id=' + encodeURIComponent(novelId);
-  backLink.textContent = '← Back to novel';
+  backLink.querySelector('.back-label').textContent = 'Back to novel';
 
   const { data: novel } = await supabase.from('novels').select('title, is_published').eq('id', novelId).maybeSingle();
   if (novel) {
