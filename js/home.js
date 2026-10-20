@@ -133,14 +133,18 @@ document.querySelectorAll('[data-author-action]').forEach((button) => {
 
     const action = button.dataset.authorAction;
 
-    if (action === 'manage-novels') {
-      window.location.href = 'novels.html';
+    const destinations = {
+      'new-novel': 'novels.html?new=1',
+      'manage-novels': 'novels.html',
+      'manage-chapters': 'novels.html'
+    };
+
+    if (destinations[action]) {
+      window.location.href = destinations[action];
       return;
     }
 
     const messages = {
-      'new-novel': 'The Create New Novel feature is coming next.',
-      'manage-chapters': 'Chapter management is coming next.',
       'world-building': 'World Building tools are coming next.'
     };
 
@@ -197,7 +201,7 @@ async function loadLatestChapter() {
 
   const link = document.getElementById('latestChapterLink');
   link.textContent = 'Read the Chapter →';
-  link.href = chapter.novel_id != null ? 'novel.html?id=' + encodeURIComponent(chapter.novel_id) : 'novels.html';
+  link.href = 'read.html?id=' + encodeURIComponent(chapter.id);
 
   if (coverUrl) {
     const art = document.getElementById('latestChapterArt');
