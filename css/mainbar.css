@@ -390,3 +390,38 @@ body.bar-sidebar .bar-util-label { display: inline; }
 body.bar-sidebar .bar-icon-button:not(.profile-menu-button) { padding: 8px 14px; }
 body.bar-sidebar .bar-icon-button:not(.profile-menu-button) .icon { width: 20px; height: 20px; }
 body.bar-sidebar .notification-dot { top: 50%; right: 14px; margin-top: -4px; }
+
+
+/* =====================================
+   MOBILE: bar stays still, menu items scroll inside it (horizontal bar mode)
+===================================== */
+.bar-scroll { display: contents; }
+
+@media (max-width: 700px) {
+  body:not(.bar-sidebar) .main-bar {
+    width: max-content;
+    max-width: calc(100vw - 16px);
+  }
+  body:not(.bar-sidebar) .bar-scroll {
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    touch-action: pan-x;
+    padding: 2px 6px;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 8px, #000 calc(100% - 8px), transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 8px, #000 calc(100% - 8px), transparent 100%);
+  }
+  body:not(.bar-sidebar) .bar-scroll::-webkit-scrollbar { display: none; }
+  body:not(.bar-sidebar) .bar-primary-links,
+  body:not(.bar-sidebar) .bar-utility-links,
+  body:not(.bar-sidebar) .bar-scroll .camp-nav-item,
+  body:not(.bar-sidebar) .bar-scroll .bar-icon-button { flex-shrink: 0; }
+  body:not(.bar-sidebar) .bar-brand { flex-shrink: 0; }
+  body:not(.bar-sidebar) .bar-to-side { flex-shrink: 0; }
+}
