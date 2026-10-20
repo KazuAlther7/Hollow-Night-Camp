@@ -1,6 +1,6 @@
 // HOLLOW NIGHT CAMP — novels.html (library) and novel.html (detail + chapter management)
 
-import { initPage } from './shared.js?v=7';
+import { initPage } from './shared.js?v=8';
 import { supabase } from '../config/supabase.js';
 import { el, formatDate, readingTime, statusChip } from './dom.js?v=2';
 import { openImportDialog } from './import.js?v=1';

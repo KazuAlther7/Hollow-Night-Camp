@@ -64,6 +64,7 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
       <a class="bar-brand" href="home.html" aria-label="Hollow Night Camp home">
         <img class="bar-logo" src="assets/image/hollow-night-logo.png" alt="Hollow Night">
       </a>
+      <div class="bar-scroll" id="barScroll">
       <div class="bar-primary-links" id="barPrimaryLinks">${navLinks(active, NAV.filter((page) => page.id !== 'settings'))}</div>
       <div class="bar-utility-links">
         ${authorEntry(isAuthor)}
@@ -78,6 +79,7 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
             ? `<img class="bar-avatar" src="${escapeAttribute(profile.avatar_url)}" alt="">`
             : `<span class="bar-avatar-fallback">${escapeHtml((profile?.nickname || user?.email || 'C').trim().charAt(0).toUpperCase())}</span>`}
         </button>
+      </div>
       </div>
       <div class="bar-profile-menu" id="barProfileMenu" hidden>
         <div class="bar-profile-summary">
@@ -96,6 +98,17 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
   const dotsButton = document.getElementById('barDotsButton');
   const profileButton = document.getElementById('profileMenuButton');
   const profileMenu = document.getElementById('barProfileMenu');
+
+  // mobile: menu items scroll inside .bar-scroll, bar itself stays fixed; bring the active item into view
+  const activeItem = bar.querySelector('.bar-scroll .active');
+  if (activeItem) {
+    requestAnimationFrame(() => {
+      const scroller = document.getElementById('barScroll');
+      if (scroller && scroller.scrollWidth > scroller.clientWidth) {
+        scroller.scrollLeft = activeItem.offsetLeft - (scroller.clientWidth - activeItem.offsetWidth) / 2;
+      }
+    });
+  }
 
   let sidebar = false;
   let compact = false;
