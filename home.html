@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Special+Elite&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/base.css?v=4">
   <link rel="stylesheet" href="css/mainbar.css?v=6">
-  <link rel="stylesheet" href="css/home.css?v=4">
+  <link rel="stylesheet" href="css/home.css?v=5">
 </head>
 
 <body class="camp-body">
@@ -102,58 +102,29 @@
           </a>
         </div>
 
-        <!-- FEATURED STORY -->
+        <!-- THE LATEST CHAPTER: filled from Supabase by js/home.js (placeholder stays if nothing is published) -->
         <section class="home-section">
           <div class="home-section-heading">
-            <h2>Stories by the Fire</h2>
+            <h2>The Latest Chapter</h2>
             <a class="text-action" href="novels.html">Explore novels →</a>
           </div>
 
-          <article class="featured-story-card">
-            <div class="featured-story-art" aria-hidden="true"><span>?</span></div>
+          <article class="featured-story-card" id="latestChapterCard">
+            <div class="featured-story-art" id="latestChapterArt" aria-hidden="true"><span>?</span></div>
             <div class="featured-story-content">
-              <span class="story-tag">MYSTERY · UNKNOWN</span>
-              <h3>The woods are keeping secrets.</h3>
-              <p>Somewhere beyond the trees, a story is waiting for someone curious enough to uncover it.</p>
-              <a class="camp-action-button" href="novels.html">Explore the Library →</a>
+              <span class="story-tag" id="latestChapterTag">MYSTERY · UNKNOWN</span>
+              <h3 id="latestChapterTitle">The woods are keeping secrets.</h3>
+              <p id="latestChapterText">Somewhere beyond the trees, a story is waiting for someone curious enough to uncover it.</p>
+              <a class="camp-action-button" id="latestChapterLink" href="novels.html">Explore the Library →</a>
             </div>
           </article>
-        </section>
-
-        <!-- PROFILE ON HOME -->
-        <section class="home-section home-profile-section">
-          <div class="home-section-heading">
-            <h2>Your Camp Profile</h2>
-          </div>
-          <p class="home-profile-description">
-            Make yourself comfortable. You can always change your profile details later.
-          </p>
-          <form id="readerProfileEditor">
-            <div class="reader-profile">
-              <h2>Your Camp Profile</h2>
-
-              <p class="profile-label">CAMP NICKNAME</p>
-              <input id="profileNickname" type="text" minlength="3" maxlength="30" required placeholder="Your nickname">
-              <p class="profile-hint">You can still change this later.</p>
-
-              <p class="profile-label">YOUR BIO</p>
-              <textarea id="profileBio" maxlength="300" rows="4" placeholder="Tell the camp a little about yourself..."></textarea>
-
-              <p class="profile-label">ACCOUNT ROLE</p>
-              <p id="profileRole"></p>
-
-              <button id="profileSaveButton" type="submit">SAVE PROFILE</button>
-              <p id="profileStatus" role="status"></p>
-            </div>
-          </form>
-          <button id="homeLogoutButton" class="home-logout-button" type="button">Sign out of camp</button>
         </section>
 
       </section>
 
   </main>
 
-  <script type="module" src="js/home.js?v=4"></script>
+  <script type="module" src="js/home.js?v=6"></script>
 
 </body>
 </html>
