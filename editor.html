@@ -10,8 +10,8 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Special+Elite&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/base.css?v=4">
   <link rel="stylesheet" href="css/mainbar.css?v=7">
-  <link rel="stylesheet" href="css/editor.css?v=6">
-  <link rel="stylesheet" href="css/ui.css?v=2">
+  <link rel="stylesheet" href="css/editor.css?v=7">
+  <link rel="stylesheet" href="css/ui.css?v=3">
 </head>
 
 <body class="camp-body editor-mode" data-page="editor">
@@ -35,6 +35,17 @@
         </label>
       </div>
 
+      <div class="editor-cover">
+        <span class="editor-cover-label">Chapter cover (optional)</span>
+        <div class="hn-cover-row">
+          <div class="hn-cover-preview" id="coverPreview" aria-hidden="true"></div>
+          <label class="hn-btn ghost small" for="coverFile">Add / Replace</label>
+          <input id="coverFile" class="hn-file-input" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
+          <button class="hn-btn ghost small" id="removeCoverButton" type="button" hidden>Remove</button>
+        </div>
+        <p class="editor-cover-hint">Shown at the top of the chapter and on the homepage when this is the latest chapter. Without a cover, the novel cover is used on the homepage.</p>
+      </div>
+
       <textarea id="chapterBody" class="editor-paper" placeholder="Once upon a midnight in the hollow..." aria-label="Chapter text"></textarea>
 
       <div class="editor-status">
@@ -49,7 +60,7 @@
     </section>
   </main>
 
-  <script type="module" src="js/editor.js?v=5"></script>
+  <script type="module" src="js/editor.js?v=6"></script>
 
 </body>
 </html>
