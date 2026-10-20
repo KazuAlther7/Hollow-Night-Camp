@@ -90,3 +90,5 @@
 .reader-empty { color: var(--muted); }
 
 .hn-field textarea.tall { min-height: 240px; }
+
+.reader-cover { display: block; width: 100%; max-height: 460px; margin: 0 0 22px; object-fit: cover; border-radius: 16px; box-shadow: 0 18px 40px rgba(0,0,0,.4); }

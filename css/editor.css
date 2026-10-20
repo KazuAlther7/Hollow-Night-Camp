@@ -37,3 +37,7 @@
 .editor-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; margin: 16px 0 40px; }
 .editor-status #saveState.error { color: #ffb69b; }
 @media (max-width: 520px) { .editor-meta { grid-template-columns: 1fr; } }
+
+.editor-cover { margin: 0 0 16px; }
+.editor-cover-label { display: block; margin: 0 0 8px; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--orange); font-weight: 700; }
+.editor-cover-hint { margin: 8px 0 0; font-size: 13px; color: var(--muted); }
