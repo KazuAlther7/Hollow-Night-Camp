@@ -210,7 +210,7 @@ async function loadLatestChapter() {
   const arrow = document.createElement('span');
   arrow.className = 'icon icon-back icon-flip';
   arrow.setAttribute('aria-hidden', 'true');
-  link.replaceChildren('Read the Chapter ', arrow);
+  link.replaceChildren('Read the Chapter', arrow);
   link.href = 'read.html?id=' + encodeURIComponent(chapter.id);
 
   if (coverUrl) {
