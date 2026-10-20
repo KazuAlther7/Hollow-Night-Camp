@@ -79,6 +79,7 @@ body.camp-body {
   border: 1.5px solid rgba(242,163,75,.55);
   color: var(--fire);
 }
+.author-toggle[aria-pressed="true"],
 .author-toggle[aria-expanded="true"] { background: var(--orange); color: var(--ink); }
 
 .bar-icon-button { position: relative; font-size: 17px; padding: 8px 11px; }
