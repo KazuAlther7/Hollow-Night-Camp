@@ -10,23 +10,46 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Special+Elite&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/base.css?v=4">
   <link rel="stylesheet" href="css/mainbar.css?v=6">
-  <link rel="stylesheet" href="css/editor.css?v=4">
+  <link rel="stylesheet" href="css/editor.css?v=5">
+  <link rel="stylesheet" href="css/ui.css?v=1">
 </head>
 
 <body class="camp-body editor-mode" data-page="editor">
 
   <main class="camp-app">
     <section class="camp-page editor-shell">
-      <input id="chapterTitle" class="editor-title" type="text" placeholder="Chapter title" maxlength="120" aria-label="Chapter title">
+      <div class="editor-topline">
+        <a class="editor-back" id="backLink" href="novels.html">← Back</a>
+        <span class="editor-novel" id="editorNovel"></span>
+      </div>
+
+      <input id="chapterTitle" class="editor-title" type="text" placeholder="Chapter title" maxlength="160" aria-label="Chapter title">
+      <input id="chapterSubtitle" class="editor-subtitle" type="text" placeholder="Subtitle (optional)" maxlength="160" aria-label="Chapter subtitle">
+
+      <div class="editor-meta">
+        <label>Chapter no.
+          <input id="chapterNumber" type="number" min="0" step="1" inputmode="numeric">
+        </label>
+        <label>Volume / Arc
+          <input id="chapterVolume" type="text" maxlength="80" placeholder="e.g. Volume 1 — The Gate">
+        </label>
+      </div>
+
       <textarea id="chapterBody" class="editor-paper" placeholder="Once upon a midnight in the hollow..." aria-label="Chapter text"></textarea>
+
       <div class="editor-status">
         <span id="wordCount">0 words</span>
-        <span>Draft. Saving to Supabase comes next.</span>
+        <span id="saveState" role="status" aria-live="polite">Not saved yet.</span>
+      </div>
+
+      <div class="editor-actions">
+        <button class="hn-btn ghost" id="saveDraftButton" type="button">Save Draft</button>
+        <button class="hn-btn" id="publishButton" type="button">Publish</button>
       </div>
     </section>
   </main>
 
-  <script type="module" src="js/editor.js?v=4"></script>
+  <script type="module" src="js/editor.js?v=5"></script>
 
 </body>
 </html>

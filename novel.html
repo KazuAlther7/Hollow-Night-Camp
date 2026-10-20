@@ -10,25 +10,36 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Special+Elite&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/base.css?v=4">
   <link rel="stylesheet" href="css/mainbar.css?v=6">
-  <link rel="stylesheet" href="css/novels.css?v=4">
+  <link rel="stylesheet" href="css/novels.css?v=5">
+  <link rel="stylesheet" href="css/ui.css?v=1">
 </head>
 
 <body class="camp-body" data-page="novel">
 
   <main class="camp-app">
     <section class="camp-page novel-detail">
-      <div class="novel-cover" aria-hidden="true"></div>
+      <div class="novel-cover" id="novelCover" aria-hidden="true"></div>
       <div>
+        <p class="novel-back"><a href="novels.html">← All novels</a></p>
         <h1 id="novelTitle">Novel</h1>
-        <p id="novelMeta">Novel details will appear here.</p>
-        <ul class="chapter-list" id="chapterList">
-          <li>No chapters yet.</li>
+        <p id="novelMeta">Loading…</p>
+        <p class="novel-tagline" id="novelTagline" hidden></p>
+        <p class="novel-synopsis" id="novelSynopsis"></p>
+
+        <div class="novel-actions" id="novelActions" hidden>
+          <a class="hn-btn" id="newChapterLink" href="editor.html">+ New Chapter</a>
+          <button class="hn-btn ghost" id="novelSettingsButton" type="button">Novel Settings</button>
+        </div>
+
+        <h2 class="chapter-heading">Chapters</h2>
+        <ul class="chapter-list" id="chapterList" aria-live="polite">
+          <li>Loading…</li>
         </ul>
       </div>
     </section>
   </main>
 
-  <script type="module" src="js/novels.js?v=4"></script>
+  <script type="module" src="js/novels.js?v=5"></script>
 
 </body>
 </html>

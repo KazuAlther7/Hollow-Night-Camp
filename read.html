@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#17251d">
+  <title>Reading — Hollow Night Camp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Special+Elite&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css?v=4">
+  <link rel="stylesheet" href="css/mainbar.css?v=6">
+  <link rel="stylesheet" href="css/ui.css?v=1">
+</head>
+
+<body class="camp-body" data-page="read">
+
+  <main class="camp-app">
+    <article class="camp-page reader-shell">
+      <p class="reader-novel" id="readerNovel"></p>
+      <h1 id="readerTitle">Loading…</h1>
+      <p class="reader-sub" id="readerSub" hidden></p>
+      <div class="reader-body" id="readerBody" aria-live="polite"></div>
+      <nav class="reader-nav" id="readerNav" aria-label="Chapter navigation"></nav>
+    </article>
+  </main>
+
+  <script type="module" src="js/read.js?v=1"></script>
+
+</body>
+</html>

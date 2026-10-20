@@ -10,7 +10,8 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Special+Elite&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/base.css?v=4">
   <link rel="stylesheet" href="css/mainbar.css?v=6">
-  <link rel="stylesheet" href="css/novels.css?v=4">
+  <link rel="stylesheet" href="css/novels.css?v=5">
+  <link rel="stylesheet" href="css/ui.css?v=1">
 </head>
 
 <body class="camp-body" data-page="novels">
@@ -22,20 +23,20 @@
         <p>The camp library. Every shelf starts empty until someone brings a story.</p>
       </div>
 
-      <p class="author-hint" id="authorHint" hidden>
-        <i class="icon icon-author-studio" aria-hidden="true"></i> You are an Author. Creating novels from this page is coming next.
-      </p>
+      <div class="hn-toolbar" id="authorToolbar" hidden>
+        <button class="hn-btn" id="newNovelButton" type="button">+ New Novel</button>
+      </div>
 
       <div class="novel-grid" id="novelGrid"></div>
 
-      <div class="empty-shelf" id="emptyShelf">
+      <div class="empty-shelf" id="emptyShelf" role="status">
         <strong>No stories yet.</strong>
         The woods are quiet. Check back soon.
       </div>
     </section>
   </main>
 
-  <script type="module" src="js/novels.js?v=4"></script>
+  <script type="module" src="js/novels.js?v=5"></script>
 
 </body>
 </html>
