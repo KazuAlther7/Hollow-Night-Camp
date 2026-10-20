@@ -181,6 +181,11 @@ body.editor-mode .camp-app { padding-top: 84px; }
 .icon-back           { --mask: url("../assets/icons/back.png"); }
 .icon-3-dots         { --mask: url("../assets/icons/3-dots.png"); }
 
+/* arrow / plus icons next to text: back.png points left, .icon-flip turns it to point right */
+.icon-flip { transform: rotate(180deg); }
+.has-icon { display: inline-flex; align-items: center; gap: 8px; }
+.has-icon .icon { width: 1.25em; height: 1.25em; vertical-align: 0; }
+
 .bar-logo { display: block; height: 36px; width: auto; }
 .camp-nav-item .icon { width: 20px; height: 20px; vertical-align: 0; }
 .bar-icon-button .icon { width: 22px; height: 22px; vertical-align: 0; }
