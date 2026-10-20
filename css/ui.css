@@ -88,3 +88,5 @@
 .reader-body p:last-child { margin-bottom: 0; }
 .reader-nav { display: flex; justify-content: space-between; gap: 12px; margin: 24px 0 0; }
 .reader-empty { color: var(--muted); }
+
+.hn-field textarea.tall { min-height: 240px; }
