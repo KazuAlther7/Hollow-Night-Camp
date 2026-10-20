@@ -3,10 +3,10 @@
 > **Document type:** Product Requirements Document (PRD)  
 > **Product:** Hollow Night Camp  
 > **Document status:** Working specification  
-> **Audit basis:** `Hollow-Night-Camp (3).zip` supplied for review  
+> **Audit basis:** `Hollow-Night-Camp-main (5).zip` supplied on 2026-10-20, cross-checked against the current project conversation  
 > **Primary maintainer:** Kazu Alther  
 > **Repository:** https://github.com/KazuAlther7/Hollow-Night-Camp  
-> **Live-site reference:** https://kazualther7.github.io/Hollow-Night-Camp/
+> **Deployment reference:** Cloudflare Worker URL `https://hollow-night-camp.kazualtr.workers.dev/` (configured in Supabase Auth Redirect URLs per project progress). The repository README still references GitHub Pages; canonical production domain and final deployment routing should be verified.
 
 ---
 
@@ -47,52 +47,53 @@ The statuses below describe what is evidenced by the supplied ZIP's source code.
 
 ### 2.1 Feature status
 
-| Feature / requirement | Status | Findings from the supplied ZIP |
+Statuses reflect source code in the supplied ZIP plus deployment/setup progress explicitly confirmed in the ongoing project conversation. A source implementation is not treated as production-verified unless it was tested in the live environment.
+
+| Feature / requirement | Status | Current evidence / remaining work |
 | --- | --- | --- |
-| Login and registration UI | **DONE** | `index.html` contains Login and Join Camp forms. |
-| Supabase email/password authentication | **DONE** | `js/auth.js` uses Supabase Auth for sign-up, sign-in, sign-out, and session retrieval. Email verification messaging is present. |
-| Reader profile: nickname and bio | **DONE** | Profile read/update logic exists and is used by the homepage and Settings page. |
-| Reader profile picture UI | **PARTIAL** | `settings.html` supports preview, removal, and a 1.5 MB limit. The image is converted to a data URL; durable, scalable image storage through Supabase Storage has not been established. |
-| Reader / Author role distinction | **PARTIAL** | `profiles.role` is read, the Author Studio entry is hidden from readers, and the editor checks for the author role. The full Author Mode and content-management workflows are not implemented. |
-| Author-only editor route guard | **DONE** | `initPage({ requireAuthor: true })` redirects non-authors away from `editor.html`. Server/database authorization must still be verified independently. |
-| Campfire homepage / welcome screen | **DONE** | `home.html`, `css/home.css`, and `js/home.js` provide a welcome screen, campfire-themed content, firefly effects, and a homepage layout. |
-| Welcome background depth / parallax | **DONE** | `welcome-bg.jpg`, `welcome-depth.png`, and `js/parallax.js` are wired into the welcome screen. This is the welcome-screen depth effect, not the planned interactive distant-camera / FireWatcher exploration mode. |
-| Main Bar navigation | **DONE** | Shared navigation is generated in `js/shared.js` for Campfire, Novels, Theories, Arcade, and Settings. |
-| Glass-effect Main Bar | **DONE** | `css/mainbar.css` uses a translucent background, backdrop blur, border, and shadow. |
-| Main Bar top / sidebar / compact modes | **DONE** | Buttons and saved local preferences exist for top-bar, sidebar, and compact three-dot states. |
-| Editor's three-dot menu | **DONE** | `mountEditorMenu()` creates a compact menu for editor mode. |
-| Mobile Main Bar horizontal scrolling without clipping | **PARTIAL** | Responsive styles exist, but the supplied CSS hides some labels on small screens. A dedicated, tested horizontally scrollable navigation strip has not been verified. |
-| Ten requested navigation icons | **DONE** | Icon assets exist for Campfire, Novels, Theories, Arcade, Settings, Author Studio, Notifications, New Novel, Chapters, and World Building. Some icons are not yet used by complete feature workflows. |
-| Novel library page | **PARTIAL** | `novels.html` and a novel grid/empty state exist. `js/novels.js` still contains a TODO for loading novels from Supabase. |
-| Novel detail page | **PARTIAL** | `novel.html` has title, metadata, and chapter-list placeholders. Loading novel data and chapters is still a TODO. |
-| Create / edit / delete novels | **NOT STARTED** | Author Studio buttons exist, but creating a novel is explicitly reported as coming next. No complete CRUD workflow was found. |
-| Chapter editor UI | **PARTIAL** | `editor.html` has a title field, body textarea, and live word count. Chapter loading, saving, metadata, and persistence are TODOs. |
-| Chapter lists, volumes / arcs, drafts, publish states | **NOT STARTED** | No complete chapter-management workflow was found. |
-| Import chapters from PDF / DOC / DOCX / other documents | **NOT STARTED** | No import workflow or parser was found in the supplied source. |
-| Latest Chapter section | **NOT STARTED** | No functional latest-chapter data or rendering workflow was found. |
-| Theories page | **PARTIAL** | `theories.html` contains a heading and introductory text only. |
-| Theory posts stored in the cloud | **NOT STARTED** | No theory creation, listing, reply/chat, or persistence workflow was found. |
-| Theory categories: Confirmed / Likely / Speculation / Wild Theory | **NOT STARTED** | No category filters or classification workflow was found. |
-| Corners Arcade | **PARTIAL** | `arcade.html` is a placeholder and says the feature is coming soon. |
-| D&D-style dice roll with animation | **NOT STARTED** | No dice simulation or roll animation was found. |
-| Additional simple arcade games | **NOT STARTED** | No playable arcade games were found. |
-| Settings: profile details and avatar | **PARTIAL** | Profile editing is implemented. The other requested settings sections are missing. |
-| Theme: System / Light / Dark | **NOT STARTED** | No working theme selector or persistence was found in the supplied JavaScript. |
-| Language: English / Indonesian | **NOT STARTED** | No language switch or translation system was found. |
-| Notification bell button | **PARTIAL** | The bell button and visual indicator exist in the Main Bar, but a functional notification center and settings are not implemented. |
-| Notification preferences / On-Off switches | **NOT STARTED** | No working notification preferences were found. |
-| Latest novel / chapter update notifications | **NOT STARTED** | No notification data model or delivery workflow was found. |
-| Promotions / events notifications | **NOT STARTED** | No notification preference or delivery workflow was found. |
-| Reading history and bookmarks | **NOT STARTED** | No reading-progress or bookmark workflow was found. |
-| Help / FAQ | **NOT STARTED** | No help center or FAQ page was found. |
-| Bug reports / feature suggestions | **NOT STARTED** | The desired contact email is documented in the request, but no functional support workflow was found. |
-| Community social links and matching icons | **NOT STARTED** | No complete Community section with the requested social destinations was found. |
-| FireWatcher easter egg / inspectable location | **NOT STARTED** | No interactive FireWatcher or inspection system was found. |
-| Wide-angle / distant mountain camera mode | **NOT STARTED** | The current welcome parallax is not the requested user-controlled camera-angle mode. |
-| Cloudflare Pages integration | **VERIFY / NOT CONFIRMED** | No Cloudflare-specific deployment configuration was identified in the supplied ZIP. Confirm the actual hosting setup before changing deployment. |
-| Supabase backend connection | **DONE / VERIFY** | Client configuration exists in `config/supabase.js`. Live connectivity, schema, policies, and production settings must be tested in the Supabase project. |
-| Supabase database CRUD for novels / chapters / theories | **NOT STARTED** | The relevant frontend data workflows are not implemented in the supplied code. |
-| Security: role-based database policies | **VERIFY** | Frontend role checks exist, but the database's live RLS policies and privileges cannot be proven from source code alone. |
+| Login and registration UI | **DONE** | `index.html` and `js/login.js` provide Login / Join Camp flows. |
+| Supabase email/password authentication | **DONE / VERIFY** | `js/auth.js` implements sign-up, sign-in, sign-out, session retrieval and auth-state observation. Live email verification and redirect behavior still require production testing. |
+| Reader profile: nickname and bio | **DONE** | `js/auth.js` reads and updates `profiles`; the Settings page reports successful saves. |
+| Reader profile picture UI | **PARTIAL** | Avatar preview / remove exists; durable object storage and upload policies need verification. |
+| Reader / Author role distinction | **PARTIAL** | Author role is loaded from `profiles`; Author Mode toggle and UI gating exist. Trusted role assignment and live database enforcement still need testing. |
+| Author-only editor route guard | **DONE (client-side) / VERIFY (server-side)** | `initPage({ requireAuthor: true })` protects editor route. RLS remains the real security boundary and must be tested with Reader credentials. |
+| Campfire homepage / welcome screen | **DONE** | `home.html`, `css/home.css`, and `js/home.js` implement the campfire welcome/home experience and visual effects. |
+| Welcome background depth / parallax | **DONE** | Background and depth assets are wired into `js/parallax.js`. This is not the planned user-controlled distant-camera exploration mode. |
+| Main Bar glass effect | **DONE** | `css/mainbar.css` styles the translucent glass navigation. |
+| Main Bar top / sidebar / compact modes | **DONE** | `js/shared.js` includes persistent mode preferences and navigation rendering. |
+| Author Mode toggle and cross-page state | **DONE (UI/state) / VERIFY (permissions)** | `js/shared.js` stores Author Mode in local storage and renders author navigation/actions. Local state is not authorization; backend policies must enforce permissions. |
+| Editor's three-dot menu | **DONE** | Shared editor menu is implemented in `js/shared.js`. |
+| Mobile navigation behavior | **PARTIAL** | Responsive CSS exists; verify horizontal reachability, clipping, and touch behavior on actual mobile devices. |
+| Ten requested navigation icons | **DONE (assets)** | Icon assets exist; not all correspond to completed feature workflows. |
+| Supabase project connection | **CONFIGURED / VERIFY** | `config/supabase.js` contains project URL and publishable key. Runtime connectivity and production configuration must be tested. |
+| Supabase `profiles` table / profile persistence | **CONFIGURED / VERIFY** | Project progress confirms profile table and profile saving. Verify policies and cross-device persistence in production. |
+| Novel library page | **DONE (core workflow) / VERIFY** | `js/novels.js` now queries Supabase and renders the library; verify loading, empty/error states and published-only visibility in production. |
+| Novel detail page | **DONE (core workflow) / VERIFY** | `js/novels.js` loads novel details and chapter-management UI from Supabase. |
+| Create / edit / delete novels | **DONE in source / VERIFY** | Novel dialog and Supabase operations exist in `js/novels.js`; verify RLS and persistence with Author and Reader sessions. |
+| Novel cover upload | **PARTIAL / VERIFY** | Upload code targets the `covers` bucket with a 2 MB limit; confirm bucket and Storage policies. |
+| Chapter editor UI and word count | **DONE** | `editor.html` and `js/editor.js` implement chapter fields, body editing and word count. |
+| Save draft / publish chapter | **DONE in source / VERIFY** | `js/editor.js` implements persistence and draft/publish actions. Confirm database schema and RLS in the live project. |
+| Chapter metadata and ordering | **DONE in source / VERIFY** | Editor supports title, subtitle, chapter number and volume fields; verify ordering and database constraints. |
+| Reader chapter page | **DONE in source / VERIFY** | `read.html` and `js/read.js` load a chapter, render its content and provide chapter navigation. Draft protection depends on RLS. |
+| Chapter import from TXT / DOCX / text-based PDF | **DONE in source / VERIFY** | `js/import.js` parses supported formats (5 MB limit), presents review flow and creates draft content. Scanned PDFs/OCR are not supported. |
+| Latest Chapter section | **PARTIAL / VERIFY** | Homepage author controls/status are present, but confirm a complete reader-facing latest-published-chapter section is wired to live chapter data. |
+| Volumes / arcs and chapter list | **PARTIAL / VERIFY** | Volume metadata and chapter management exist in the editor/novel workflow; verify full grouping/reordering experience. |
+| Theories page | **NOT STARTED** | `theories.html` remains a heading and introductory placeholder. |
+| Theory posts, replies and cloud persistence | **NOT STARTED** | No complete discussion workflow is present in the supplied source. |
+| Theory categories and moderation | **NOT STARTED** | Confirmed / Likely / Speculation / Wild Theory filters and moderation are not implemented. |
+| Corners Arcade | **NOT STARTED** | `arcade.html` remains a “Coming soon” placeholder. |
+| D&D-style dice roll and games | **NOT STARTED** | No playable dice simulation or arcade game is present. |
+| Settings: profile details | **DONE (core profile) / VERIFY** | Profile form and save feedback exist. |
+| Settings: theme and language | **NOT STARTED** | No complete System / Light / Dark or English / Indonesian preference system found. |
+| Notification bell / notification center | **PARTIAL** | Bell icon exists in shared navigation; a working notification center and preferences are not implemented. |
+| Reading history and bookmarks | **NOT STARTED** | No persistent reading progress or bookmark workflow found. |
+| Help / FAQ / bug reports | **NOT STARTED** | No complete in-site support workflow found. |
+| Community social links | **NOT STARTED / VERIFY** | Not implemented as a complete Settings section in the supplied source. |
+| FireWatcher easter egg / inspectable location | **NOT STARTED** | No interactive inspection system found. |
+| Wide-angle / distant mountain camera mode | **NOT STARTED** | Current parallax is not the requested user-controlled camera mode. |
+| Cloudflare deployment | **IN PROGRESS / VERIFY** | Project progress confirms a Cloudflare Worker URL `https://hollow-night-camp.kazualtr.workers.dev/` and that it was added to Supabase Auth Redirect URLs. The supplied ZIP does not include enough deployment configuration to verify canonical domain, build/deploy settings, or live routing. |
+| Supabase database CRUD for novels / chapters | **IMPLEMENTED IN SOURCE / VERIFY** | Queries and mutations exist in `js/novels.js` and `js/editor.js`; production schema, RLS, and data persistence require live tests. |
+| Security: role-based database policies | **VERIFY** | Earlier project progress established RLS and table grants for the initial schema, but current novel/chapter policies and Storage policies must be checked against the actual tables and buckets. |
 
 ### 2.2 Existing source files
 
@@ -762,87 +763,86 @@ Each table should use stable IDs, timestamps where appropriate, and explicit rel
 
 ---
 
-## 9. Delivery Plan
+## 9. Delivery Plan and Current Progress
 
-Implement in small, verifiable stages. Preserve the current visual foundation and working authentication while adding real data workflows.
+The checkboxes below track the implementation visible in the supplied repository. “Verify” means the code exists but must still be tested against the live Supabase / Cloudflare setup.
 
 ### Phase 0 — Audit and stabilization
+- [x] Establish the repository and initial static website structure.
+- [x] Implement Supabase email/password sign-up and sign-in client flow.
+- [x] Implement profile read/update for nickname and bio.
+- [x] Implement shared navigation and Author-only editor route guard.
+- [x] Build the campfire welcome screen and parallax depth effect.
+- [x] Add glass Main Bar and top-bar / sidebar / compact navigation modes.
+- [x] Configure Supabase project URL and publishable client key in frontend.
+- [x] Create the `profiles` table and confirm profile save behavior in project progress.
+- [x] Add the Cloudflare Worker URL to Supabase Auth Redirect URLs, as confirmed in project progress.
+- [ ] Verify production sign-up, email verification / redirect, login, logout and session persistence end-to-end.
+- [ ] Test RLS and Storage policies using Reader, Author and signed-out sessions.
+- [ ] Confirm canonical production domain and repeatable deployment workflow (the README still references GitHub Pages).
 
-- [ ] Verify the current production host and deployment workflow.
-- [ ] Verify Supabase Auth, profile schema, RLS policies, and Storage configuration.
-- [ ] Test Reader and Author sessions.
-- [ ] Fix any navigation or responsive regressions.
-- [ ] Establish a clear development / production configuration process.
+**Current exit status: PARTIALLY COMPLETE.** Main frontend foundation and account/profile workflow exist; live security and deployment checks remain.
 
-**Exit criteria:** Existing login, protected navigation, profile editing, and welcome scene work reliably.
+### Phase 1 — Core story library and authoring
+- [x] Implement novel library data loading and rendering in `js/novels.js`.
+- [x] Implement novel detail and chapter-management workflow in `js/novels.js`.
+- [x] Implement novel create/edit/delete operations in source.
+- [x] Implement chapter editor with title, subtitle, chapter number, volume and word count.
+- [x] Implement save-draft and publish actions in source.
+- [x] Add reader-facing chapter page and chapter navigation.
+- [x] Add chapter import flow for TXT, DOCX and text-based PDF, with review before draft creation.
+- [ ] Verify database schema, RLS, published-only Reader visibility, Storage bucket policies and cross-session persistence.
+- [ ] Verify complete latest-published-chapter display on the Campfire homepage.
+- [ ] Verify chapter ordering, volume / arc grouping and deletion confirmation in the live workflow.
+- [ ] Test unsaved-change protection and save failure recovery.
 
-### Phase 1 — Core content foundation
-
-- [ ] Finalize database schema for novels and chapters.
-- [ ] Implement published novel listing.
-- [ ] Implement novel detail loading and chapter navigation.
-- [ ] Implement latest published chapter on Campfire.
-- [ ] Implement Author novel creation and metadata editing.
-- [ ] Implement chapter creation, editing, draft / publish states, ordering, and deletion.
-- [ ] Enforce permissions in RLS.
-
-**Exit criteria:** Author can publish a novel with chapters; Reader can only see and read published content.
+**Current exit status: IMPLEMENTED IN SOURCE, LIVE VERIFICATION REQUIRED.** This phase is substantially further along than the earlier PRD audit indicated.
 
 ### Phase 2 — Author tools and world building
+- [ ] Complete volume / arc organization and chapter reordering.
+- [ ] Add dedicated Characters management and reader pages.
+- [ ] Add Maps, map image upload and responsive named markers.
+- [ ] Add Locations management and linked lore records.
+- [ ] Verify and improve novel cover / image upload through Supabase Storage.
 
-- [ ] Add volumes / arcs.
-- [ ] Add cover and content image upload through Storage.
-- [ ] Implement Characters and Locations.
-- [ ] Implement Maps, image upload, and named markers.
-- [ ] Add import workflow for supported text / document formats.
-- [ ] Add unsaved-change warnings and robust editor save states.
-
-**Exit criteria:** Author can manage the main story library and official world-building content without editing database records manually.
+**Current exit status: NOT COMPLETE.** Chapter volume metadata and cover-upload code exist, but full world-building management is not implemented.
 
 ### Phase 3 — Community investigation
-
 - [ ] Implement theory creation and listing.
-- [ ] Implement category filters.
-- [ ] Implement theory detail and replies.
-- [ ] Add edit / delete ownership rules and reporting.
-- [ ] Add moderation policy and basic anti-spam protections.
-- [ ] Verify persistent cloud storage and RLS.
+- [ ] Implement Confirmed / Likely / Speculation / Wild Theory filters.
+- [ ] Implement theory detail pages and replies.
+- [ ] Add ownership rules, reporting, moderation and anti-spam protections.
+- [ ] Verify persistence and RLS.
 
-**Exit criteria:** Readers can safely post and discuss theories; posts persist across sessions and are categorized.
+**Current exit status: NOT STARTED.** Theories page is still a placeholder.
 
 ### Phase 4 — Settings and notifications
-
+- [x] Implement profile nickname / bio editing and save feedback.
+- [ ] Complete avatar persistence through an object-storage bucket.
 - [ ] Implement System / Light / Dark themes.
 - [ ] Implement English / Indonesian interface localization.
-- [ ] Implement notification preferences.
-- [ ] Implement notification center and read / unread states.
+- [ ] Implement notification preferences and notification center.
 - [ ] Implement reading history and bookmarks.
-- [ ] Add Help / FAQ and support feedback.
-- [ ] Add the Community social links.
+- [ ] Add Help / FAQ, support feedback and Community social links.
 
-**Exit criteria:** User preferences persist and all Settings controls have working behavior.
+**Current exit status: PARTIAL.** Profile basics work; remaining account preferences and utilities are outstanding.
 
 ### Phase 5 — Arcade
-
-- [ ] Implement animated dice rolling.
-- [ ] Add roll history.
-- [ ] Add simple arcade games.
+- [ ] Implement animated dice rolling and session roll history.
+- [ ] Add simple playable browser games.
 - [ ] Test mobile input and reduced-motion behavior.
 
-**Exit criteria:** The Arcade contains at least one complete playable dice experience and additional games as prioritized.
+**Current exit status: NOT STARTED.** Arcade remains a placeholder.
 
-### Phase 6 — Camp exploration and polish
-
+### Phase 6 — Camp exploration, deployment and polish
 - [ ] Add wide-angle / distant-camera mode.
-- [ ] Add FireWatcher inspection interaction.
-- [ ] Add further easter eggs where appropriate.
+- [ ] Add FireWatcher inspection interaction and optional easter eggs.
 - [ ] Optimize scene assets and animation performance.
-- [ ] Conduct accessibility, responsive, and regression testing.
-- [ ] Verify Cloudflare Pages deployment if selected.
+- [ ] Conduct accessibility, responsive and regression testing.
+- [ ] Verify Cloudflare Worker / Pages deployment, canonical domain, direct-page navigation and Supabase Auth redirects.
+- [ ] Update README deployment instructions to match the actual hosting setup.
 
-**Exit criteria:** The exploration mode is smooth, responsive, accessible, and does not interfere with core website use.
-
----
+**Current exit status: PARTIAL.** The existing welcome parallax is implemented, and Cloudflare Worker URL / Auth redirect setup has progressed, but the exploration mode and full deployment verification remain.
 
 ## 10. Definition of Done
 
@@ -881,24 +881,28 @@ Resolve these during implementation rather than guessing:
 
 ## 12. Source Audit Notes
 
-This document was created by reviewing the supplied ZIP's HTML, CSS, and JavaScript files. The most important implementation evidence includes:
+This update was based on the supplied `Hollow-Night-Camp-main (5).zip` and relevant implementation files:
 
-- `index.html` and `js/login.js`: login / registration flow.
-- `js/auth.js`: Supabase Auth and profile read / update functions.
-- `js/shared.js`: protected-page guard, role check, Main Bar, compact editor menu, and sign-out.
-- `home.html`, `js/home.js`, and `js/parallax.js`: welcome screen, homepage, and depth-map parallax.
-- `settings.html`: profile editor and avatar preview.
-- `novels.html` and `js/novels.js`: novel library shell with data-loading TODOs.
-- `novel.html`: novel detail and chapter-list placeholders.
-- `editor.html` and `js/editor.js`: chapter editing shell and word count with persistence TODO.
-- `theories.html`: theories placeholder.
-- `arcade.html`: arcade placeholder.
-- `css/mainbar.css`: glass Main Bar, responsive styling, and editor menu styling.
-- `assets/icons/`: the ten requested primary icon assets.
+- `index.html` and `js/login.js`: login / registration interface and form flow.
+- `js/auth.js`: Supabase Auth, session observation, profile retrieval and profile updates.
+- `js/shared.js`: page/session guard, Author role check, Author Mode state, Main Bar and editor three-dot menu.
+- `home.html`, `js/home.js`, `js/parallax.js`: welcome screen, homepage interactions and depth-map parallax.
+- `novels.html`, `novel.html`, `js/novels.js`: novel listing, novel details, author novel operations and chapter-management workflow.
+- `editor.html`, `js/editor.js`: chapter metadata, body editor, word count, draft saving and publishing.
+- `read.html`, `js/read.js`: reader-facing chapter display and chapter navigation.
+- `js/import.js`: TXT / DOCX / text-based PDF extraction, review step and draft import.
+- `settings.html`: profile editor and avatar UI.
+- `theories.html` and `arcade.html`: these remain placeholders.
+- `config/supabase.js`: Supabase project URL and publishable client key.
+- `css/mainbar.css` and `assets/icons/`: glass navigation styling and icon assets.
 
-**Important:** This is a source-code audit, not a live penetration test or confirmation of current production settings. Supabase schema, RLS, Auth settings, Storage policies, and hosting must be checked in their respective dashboards before declaring those areas complete.
+### External progress noted on 2026-10-20
 
----
+The ongoing project conversation confirms that the Cloudflare Worker URL `https://hollow-night-camp.kazualtr.workers.dev/` was added to Supabase Auth Redirect URLs. This is evidence of configuration progress, not proof that all sign-in redirects, production routes, or deployment settings have passed end-to-end tests. The repository README still contains the older GitHub Pages URL and should be reconciled with the intended canonical domain.
+
+**Security note:** A client-side Author Mode switch or route guard is not sufficient authorization. Verify that database RLS policies and Supabase Storage policies reject unauthorized writes. Do not place service-role keys or private credentials in frontend files.
+
+**Audit limitation:** This is a source-code and project-progress review, not a live penetration test. External dashboard state, production routing, deployed code parity, RLS behavior, and actual persistence must be verified separately.
 
 <div align="center">
 
