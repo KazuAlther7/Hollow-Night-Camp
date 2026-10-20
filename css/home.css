@@ -581,3 +581,8 @@ body.stage-welcome .main-bar { display: none; }
   font-size: 11px;
   line-height: 1.6;
 }
+
+
+/* THE LATEST CHAPTER cover */
+.featured-story-art.has-cover { padding: 0; overflow: hidden; border-style: solid; }
+.featured-story-cover { display: block; width: 100%; height: 100%; object-fit: cover; }
