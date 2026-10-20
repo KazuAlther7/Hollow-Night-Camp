@@ -2,7 +2,7 @@
 
 import { initPage } from './shared.js?v=7';
 import { supabase } from '../config/supabase.js';
-import { el } from './dom.js';
+import { el } from './dom.js?v=2';
 
 await initPage({ active: 'novels' });
 

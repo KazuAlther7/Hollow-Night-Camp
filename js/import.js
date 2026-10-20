@@ -2,7 +2,7 @@
 // Nothing is ever published automatically.
 
 import { supabase } from '../config/supabase.js';
-import { el } from './dom.js';
+import { el } from './dom.js?v=2';
 
 const MAX_BYTES = 5 * 1024 * 1024;
 const MAMMOTH_SRC = 'https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js';

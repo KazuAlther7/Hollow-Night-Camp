@@ -1,6 +1,7 @@
 // HOLLOW NIGHT CAMP — home.html: Welcome transition + Campfire home
 
 import { supabase } from '../config/supabase.js';
+import { readingTime } from './dom.js?v=2';
 import { initPage, ENTERED_KEY, getAuthorMode, setAuthorMode } from './shared.js?v=7';
 import { createParallax } from './parallax.js';
 
@@ -163,7 +164,7 @@ async function loadLatestChapter() {
   // RLS already hides drafts from Readers; the status filter also keeps them off the Author's homepage.
   const { data: chapters, error } = await supabase
     .from('chapters')
-    .select('id, novel_id, title, chapter_number, volume, cover_url, published_at')
+    .select('id, novel_id, title, chapter_number, volume, cover_url, published_at, word_count')
     .eq('status', 'published')
     .order('published_at', { ascending: false })
     .limit(1);
@@ -198,6 +199,12 @@ async function loadLatestChapter() {
 
   const posted = formatDate(chapter.published_at);
   document.getElementById('latestChapterText').textContent = posted ? 'Posted ' + posted + '.' : 'Fresh from the campfire.';
+
+  // same estimate as the chapter list
+  const readEl = document.getElementById('latestChapterRead');
+  const read = readingTime(chapter.word_count);
+  readEl.textContent = read || '';
+  readEl.hidden = !read;
 
   const link = document.getElementById('latestChapterLink');
   link.textContent = 'Read the Chapter →';

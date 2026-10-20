@@ -29,3 +29,14 @@ export function readingTime(words) {
   if (!words || words < 1) return null;
   return '~' + Math.max(1, Math.ceil(words / 200)) + ' min read';
 }
+
+// Status with an indicator lamp: ongoing = yellow, completed = green, hiatus = red
+export function statusChip(status) {
+  const key = ['ongoing', 'completed', 'hiatus'].includes(status) ? status : 'ongoing';
+  const label = key.charAt(0).toUpperCase() + key.slice(1);
+
+  return el('span', { class: 'status-chip' },
+    el('span', { class: 'status-lamp ' + key, 'aria-hidden': 'true' }),
+    label
+  );
+}

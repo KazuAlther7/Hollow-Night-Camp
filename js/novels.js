@@ -2,7 +2,7 @@
 
 import { initPage } from './shared.js?v=7';
 import { supabase } from '../config/supabase.js';
-import { el, formatDate, readingTime } from './dom.js';
+import { el, formatDate, readingTime, statusChip } from './dom.js?v=2';
 import { openImportDialog } from './import.js?v=1';
 
 const page = document.body.dataset.page;
@@ -90,7 +90,7 @@ function openNovelDialog({ novel = null, onSaved }) {
     el('h2', { text: isEdit ? 'Novel Settings' : 'Write New Novel' }),
     field('Novel title', titleInput),
     el('div', { class: 'hn-row' }, field('Author / byline', authorInput), field('Genre', genreInput)),
-    el('div', { class: 'hn-row' }, field('Status', statusSelect), field('Tagline', taglineInput)),
+    el('div', { class: 'hn-row' }, field('Status', el('div', { class: 'hn-select' }, statusSelect)), field('Tagline', taglineInput)),
     field('Synopsis', synopsisInput),
     el('div', { class: 'hn-field' },
       el('span', { text: 'Cover image' }),
@@ -189,12 +189,10 @@ if (page === 'novels') {
     const cover = el('div', { class: 'novel-cover', 'aria-hidden': 'true' });
     if (novel.cover_url) cover.append(el('img', { src: novel.cover_url, alt: '', loading: 'lazy' }));
 
-    const meta = [novel.genre, novel.status].filter(Boolean).join(' · ');
-
     return el('a', { class: 'novel-card', href: 'novel.html?id=' + encodeURIComponent(novel.id) },
       cover,
       el('h3', { text: novel.title }),
-      meta ? el('p', { class: 'novel-meta', text: meta }) : null,
+      el('p', { class: 'novel-meta' }, novel.genre ? novel.genre + ' · ' : null, statusChip(novel.status)),
       novel.is_published ? null : el('span', { class: 'hn-badge draft', text: 'Draft' })
     );
   };
@@ -243,6 +241,7 @@ if (page === 'novel') {
   const coverBox = document.getElementById('novelCover');
   const titleEl = document.getElementById('novelTitle');
   const metaEl = document.getElementById('novelMeta');
+  const factsEl = document.getElementById('novelFacts');
   const taglineEl = document.getElementById('novelTagline');
   const synopsisEl = document.getElementById('novelSynopsis');
   const actionsEl = document.getElementById('novelActions');
@@ -260,11 +259,15 @@ if (page === 'novel') {
     document.title = novel.title + ' — Hollow Night Camp';
     titleEl.textContent = novel.title;
 
-    const meta = [novel.author_name ? 'by ' + novel.author_name : null, novel.genre, novel.status].filter(Boolean).join(' · ');
-    metaEl.replaceChildren(meta || 'Novel');
+    metaEl.replaceChildren(novel.author_name ? 'by ' + novel.author_name : 'Novel');
     if (ctx.isAuthor && !novel.is_published) {
       metaEl.append(' ', el('span', { class: 'hn-badge draft', text: 'Draft — hidden from readers' }));
     }
+
+    factsEl.replaceChildren(
+      novel.genre ? el('span', { class: 'novel-genre', text: novel.genre }) : null,
+      statusChip(novel.status)
+    );
 
     taglineEl.hidden = !novel.tagline;
     taglineEl.textContent = novel.tagline || '';
