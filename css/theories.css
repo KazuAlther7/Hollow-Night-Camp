@@ -27,6 +27,7 @@
 .th-badge.speculation { color: #9cc3e8; }
 .th-badge.wild        { color: #ffb69b; }
 .th-badge.hidden      { color: #c9cdd9; }
+.th-badge.pinned      { color: var(--orange); background: rgba(242,163,75,.14); }
 
 .th-empty, .th-status { padding: 28px; border: 2px dashed var(--line); border-radius: var(--radius); color: var(--muted); text-align: center; }
 .th-status { margin: 16px 0 0; padding: 14px; border-style: solid; }

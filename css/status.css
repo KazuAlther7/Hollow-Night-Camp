@@ -42,6 +42,24 @@ body.stage-welcome .hn-status, body.editor-mode .hn-status { display: none; }
 .hn-online.is-unavailable .hn-lamp { background: #8a8f84; box-shadow: none; animation: none; }
 @keyframes hnLamp { 0%, 100% { opacity: .6; } 50% { opacity: 1; } }
 
+/* collapse toggle + compact mode (online readers + lamp only) */
+.hn-status-toggle {
+  flex-shrink: 0; position: relative; width: 24px; height: 24px; padding: 0; border: 0; border-radius: 50%; cursor: pointer;
+  background: rgba(243,231,201,.12);
+}
+.hn-status-toggle::after {
+  content: ""; position: absolute; inset: 0; margin: auto; width: 14px; height: 14px; background: var(--paper);
+  transform: rotate(180deg);
+  -webkit-mask: url("../assets/icons/back.png") center / contain no-repeat;
+          mask: url("../assets/icons/back.png") center / contain no-repeat;
+}
+.hn-status-toggle:hover { background: rgba(243,231,201,.26); }
+.hn-status-toggle:focus-visible { outline: 3px solid rgba(255,206,114,.7); outline-offset: 2px; }
+.hn-status.is-compact { gap: 8px; padding: 6px 8px 6px 12px; border-radius: 999px; }
+.hn-status.is-compact .hn-clock { display: none; }
+.hn-status.is-compact .hn-online { padding-left: 0; border-left: 0; }
+.hn-status.is-compact .hn-status-toggle::after { transform: none; }
+
 /* narrow screens: the Main Bar fills the top, so the widget sits just under it, smaller */
 @media (max-width: 1480px) {
   body:not(.bar-sidebar) .hn-status { top: 74px; right: 10px; padding: 5px 9px 4px; gap: 9px; }
