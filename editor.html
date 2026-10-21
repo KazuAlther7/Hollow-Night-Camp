@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="css/mainbar.css?v=9">
   <link rel="stylesheet" href="css/editor.css?v=7">
   <link rel="stylesheet" href="css/ui.css?v=4">
+  <link rel="stylesheet" href="css/volumes.css?v=1">
 </head>
 
 <body class="camp-body editor-mode" data-page="editor">
@@ -34,9 +35,11 @@
         <label>Chapter no.
           <input id="chapterNumber" type="number" min="0" step="1" inputmode="numeric">
         </label>
-        <label>Volume / Arc
-          <input id="chapterVolume" type="text" maxlength="80" placeholder="e.g. Volume 1 — The Gate">
-        </label>
+        <div class="vol-field">
+          <span id="volumeLabel">Volume / Arc</span>
+          <div class="vol-combo" id="volumeCombo"></div>
+          <p class="vol-hint" id="volumeHint" hidden></p>
+        </div>
       </div>
 
       <div class="editor-cover">
@@ -64,7 +67,7 @@
     </section>
   </main>
 
-  <script type="module" src="js/editor.js?v=7"></script>
+  <script type="module" src="js/editor.js?v=8"></script>
 
 </body>
 </html>
