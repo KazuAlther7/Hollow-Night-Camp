@@ -32,6 +32,12 @@
     .settings-save-button { margin-top:16px; background:linear-gradient(135deg,#e6a04c,#b96a3e); color:#192018; }
     #settingsProfileStatus { min-height:20px; color:var(--muted); font-size:12px; line-height:1.6; }
     @media(max-width:600px) { .settings-avatar-preview,.settings-avatar-fallback { width:70px;height:70px; } .settings-avatar-row { align-items:flex-start; } }
+      .settings-h2 { margin:0 0 14px; font-family:var(--heading); font-size:clamp(26px,4vw,36px); }
+    .settings-select { width:100%; padding:13px 14px; border:1px solid rgba(243,231,201,.25); border-radius:12px; background:rgba(10,15,25,.45); color:var(--paper); font:inherit; }
+    .settings-select option { color:#17251d; }
+    .settings-select:focus { outline:none; border-color:var(--orange); }
+    .settings-tz-status { margin-top:10px !important; font-size:13px !important; }
+    #clock { padding-top:10px; }
   </style>
 </head>
 
@@ -63,13 +69,37 @@
         <p id="settingsProfileStatus" role="status"></p>
       </form>
     </section>
+    <section class="camp-page camp-placeholder-page" id="clock">
+      <span class="settings-kicker">CAMP CLOCK</span>
+      <h2 class="settings-h2">Clock &amp; timezone</h2>
+      <p>The clock in the top-right corner follows this timezone. It is saved on this device.</p>
+      <div class="settings-profile-form">
+        <label for="settingsTimezone">TIMEZONE</label>
+        <select id="settingsTimezone" class="settings-select"></select>
+        <p id="settingsTimezoneStatus" role="status" class="settings-tz-status"></p>
+      </div>
+    </section>
   </main>
 
   <script type="module">
-    import { initPage, signOut } from './js/shared.js?v=8';
+    import { initPage, signOut } from './js/shared.js?v=10';
     import { updateReaderProfile } from './js/auth.js';
 
+    import { browserTimezone, getSavedTimezone, setSavedTimezone, activeTimezone, timeIn, timezoneList } from './js/status-widget.js?v=1';
+
     const ctx = await initPage({ active: 'settings' });
+
+    // clock timezone: '' = follow the browser
+    const tzSelect = document.getElementById('settingsTimezone');
+    const tzStatus = document.getElementById('settingsTimezoneStatus');
+    const tzOption = (value, text) => Object.assign(document.createElement('option'), { value, textContent: text });
+    tzSelect.append(tzOption('', 'Browser default (' + browserTimezone().replace(/_/g, ' ') + ')'));
+    timezoneList().forEach((zone) => tzSelect.append(tzOption(zone, zone.replace(/_/g, ' '))));
+    tzSelect.value = getSavedTimezone();
+    if (tzSelect.value !== getSavedTimezone()) tzSelect.value = '';
+    const paintTz = () => { const zone = activeTimezone(); tzStatus.textContent = 'Showing ' + timeIn(zone) + ' in ' + zone.replace(/_/g, ' ') + '.'; };
+    paintTz();
+    tzSelect.addEventListener('change', () => { setSavedTimezone(tzSelect.value); paintTz(); });
     const form = document.getElementById('settingsProfileForm');
     const nickname = document.getElementById('settingsNickname');
     const bio = document.getElementById('settingsBio');

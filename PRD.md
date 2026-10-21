@@ -986,7 +986,7 @@ The checkboxes below track the implementation visible in the supplied repository
 - [ ] Add Help / FAQ, support feedback and Community social links.
 - [ ] Add global Settings gear dropdown available in place on every applicable page, with synchronized gear rotation/dropdown animation and accessible close behavior.
 - [ ] Add independent Music and SFX enable/disable and volume controls backed by `assets/sound/` assets.
-- [ ] Add persisted timezone selection and the retro neon split-flap clock UI.
+- [x] Add persisted timezone selection and the retro neon split-flap clock UI (`js/status-widget.js`, `css/status.css`; timezone chosen in Settings, stored in localStorage `hnc_timezone`, 24-hour). Top-right placement; widget sits under the Main Bar on narrow screens.
 
 **Current exit status: PARTIAL.** Profile basics work; remaining account preferences and utilities are outstanding.
 
@@ -1003,7 +1003,7 @@ The checkboxes below track the implementation visible in the supplied repository
 - [ ] Add wide-angle / distant-camera mode.
 - [ ] Add FireWatcher inspection interaction and optional easter eggs.
 - [ ] Optimize scene assets and animation performance.
-- [ ] Implement aggregate realtime online-reader count with stale-session cleanup and privacy-safe display.
+- [x] Implement aggregate realtime online-reader count with stale-session cleanup and privacy-safe display (`js/status-widget.js`, Supabase Realtime Presence channel `camp-online`, one key per tab, count only). Live verification still required.
 - [ ] Conduct accessibility, responsive and regression testing.
 - [ ] Verify Cloudflare Worker / Pages deployment, canonical domain, direct-page navigation and Supabase Auth redirects.
 - [ ] Update README deployment instructions to match the actual hosting setup.
