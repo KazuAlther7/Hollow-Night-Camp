@@ -13,6 +13,7 @@ import { supabase } from '../config/supabase.js';
 
 const TZ_KEY = 'hnc_timezone';
 const SESSION_KEY = 'hnc_presence_key';
+const COMPACT_KEY = 'hnc_status_compact';
 const CHANNEL = 'camp-online';
 
 // ---------- timezone helpers (also used by settings.html) ----------
@@ -114,7 +115,7 @@ export function mountStatusWidget() {
 
   const css = document.createElement('link');
   css.rel = 'stylesheet';
-  css.href = new URL('../css/status.css?v=1', import.meta.url).href;
+  css.href = new URL('../css/status.css?v=2', import.meta.url).href;
   document.head.append(css);
 
   const digits = [makeDigit(), makeDigit(), makeDigit(), makeDigit()];
@@ -147,8 +148,28 @@ export function mountStatusWidget() {
   widget.id = 'hnStatus';
   widget.className = 'hn-status';
   widget.setAttribute('aria-label', 'Camp status');
-  widget.append(clock, online);
+  const toggle = document.createElement('button');
+  toggle.type = 'button';
+  toggle.className = 'hn-status-toggle';
+  toggle.setAttribute('aria-controls', 'hnStatus');
+  widget.append(clock, online, toggle);
   document.body.append(widget);
+
+  // full = clock + online readers; compact = online readers + indicator lamp only
+  let compact = false;
+  try { compact = localStorage.getItem(COMPACT_KEY) === '1'; } catch (e) {}
+  const paintCompact = () => {
+    widget.classList.toggle('is-compact', compact);
+    toggle.setAttribute('aria-expanded', String(!compact));
+    toggle.setAttribute('aria-label', compact ? 'Show clock' : 'Hide clock');
+    toggle.title = compact ? 'Show clock' : 'Hide clock';
+  };
+  paintCompact();
+  toggle.addEventListener('click', () => {
+    compact = !compact;
+    try { localStorage.setItem(COMPACT_KEY, compact ? '1' : '0'); } catch (e) {}
+    paintCompact();
+  });
 
   // ----- clock -----
   let timer = null;

@@ -51,6 +51,10 @@ function categoryBadge(category) {
   return el('span', { class: 'hn-badge th-badge ' + category, text: CATEGORIES[category] || category });
 }
 
+function pinnedBadge(theory) {
+  return theory.is_pinned ? el('span', { class: 'hn-badge th-badge pinned', text: 'Pinned' }) : null;
+}
+
 function hiddenBadge(status) {
   return status === 'hidden' ? el('span', { class: 'hn-badge th-badge hidden', text: 'Hidden' }) : null;
 }
@@ -178,7 +182,8 @@ async function renderList() {
 
     let query = supabase
       .from('theories')
-      .select('id, title, body, category, status, author_id, created_at, theory_replies(count)')
+      .select('id, title, body, category, status, is_pinned, author_id, created_at, theory_replies(count)')
+      .order('is_pinned', { ascending: false })
       .order('created_at', { ascending: false })
       .range(state.offset, state.offset + PAGE_SIZE - 1);
     if (state.category !== 'all') query = query.eq('category', state.category);
@@ -196,7 +201,7 @@ async function renderList() {
       const replies = theory.theory_replies?.[0]?.count ?? 0;
       const excerpt = theory.body.length > 170 ? theory.body.slice(0, 170).trimEnd() + '...' : theory.body;
       list.append(el('a', { class: 'th-card', href: 'theories.html?id=' + encodeURIComponent(theory.id) },
-        el('div', { class: 'th-top' }, categoryBadge(theory.category), hiddenBadge(theory.status)),
+        el('div', { class: 'th-top' }, pinnedBadge(theory), categoryBadge(theory.category), hiddenBadge(theory.status)),
         el('h3', { text: theory.title }),
         el('p', { class: 'th-excerpt', text: excerpt }),
         el('div', { class: 'th-meta' },
@@ -226,7 +231,7 @@ async function renderList() {
 async function renderDetail(id) {
   const { data: theory, error } = await supabase
     .from('theories')
-    .select('id, title, body, category, status, author_id, created_at, updated_at')
+    .select('id, title, body, category, status, is_pinned, author_id, created_at, updated_at')
     .eq('id', id)
     .maybeSingle();
 
@@ -263,6 +268,16 @@ async function renderDetail(id) {
       renderDetail(id);
     });
     actions.append(hideButton);
+
+    const pinButton = el('button', { class: 'hn-btn ghost small', type: 'button', text: theory.is_pinned ? 'Unpin' : 'Pin to top' });
+    pinButton.addEventListener('click', async () => {
+      pinButton.disabled = true;
+      const { data, error: err } = await supabase.from('theories')
+        .update({ is_pinned: !theory.is_pinned }).eq('id', id).select('id');
+      if (err || !data?.length) { pinButton.disabled = false; window.alert(err ? friendly(err) : 'Not allowed.'); return; }
+      renderDetail(id);
+    });
+    actions.append(pinButton);
   }
   if (isOwner || ctx.isAuthor) {
     const deleteButton = el('button', { class: 'hn-btn danger small', type: 'button', text: 'Delete' });
@@ -315,7 +330,7 @@ async function renderDetail(id) {
 
   root.replaceChildren(el('div', { class: 'th-detail' },
     back,
-    el('div', { class: 'th-top' }, categoryBadge(theory.category), hiddenBadge(theory.status)),
+    el('div', { class: 'th-top' }, pinnedBadge(theory), categoryBadge(theory.category), hiddenBadge(theory.status)),
     el('h1', { text: theory.title }),
     el('div', { class: 'th-meta' },
       person(profiles, theory.author_id, 'lg'),
