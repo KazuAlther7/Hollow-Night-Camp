@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#17251d">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/image/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/image/favicon-192.png">
+  <link rel="shortcut icon" href="assets/image/favicon.ico">
+  <link rel="apple-touch-icon" href="assets/image/apple-touch-icon.png">
+  <title>Clock & timezone — Hollow Night Camp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Special+Elite&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css?v=4">
+  <link rel="stylesheet" href="css/mainbar.css?v=9">
+  <link rel="stylesheet" href="css/ui.css?v=4">
+  <link rel="stylesheet" href="css/history.css?v=1">
+  <style>
+    .settings-kicker { color:var(--orange); font-size:11px; letter-spacing:2px; font-weight:700; }
+    .settings-profile-form { max-width:620px; margin-top:28px; display:grid; gap:10px; }
+    .settings-profile-form label { margin-top:12px; color:var(--paper-dark); font-size:11px; font-weight:700; letter-spacing:1.5px; }
+    .settings-profile-form input:not([type=file]), .settings-profile-form textarea { width:100%; padding:13px 14px; border:1px solid rgba(243,231,201,.25); border-radius:12px; background:rgba(10,15,25,.45); color:var(--paper); font:inherit; outline:none; }
+    .settings-profile-form input:focus, .settings-profile-form textarea:focus { border-color:var(--orange); }
+    .settings-profile-form textarea { resize:vertical; }
+    .settings-avatar-row { display:flex; align-items:center; gap:18px; margin:8px 0 12px; }
+    .settings-avatar-preview,.settings-avatar-fallback { width:88px; height:88px; border-radius:50%; object-fit:cover; border:2px solid rgba(243,231,201,.5); }
+    .settings-avatar-fallback { display:grid; place-items:center; background:rgba(242,163,75,.18); color:var(--fire); font-size:30px; font-family:var(--heading); }
+    .settings-avatar-actions { display:grid; gap:8px; }
+    .settings-upload-button,.settings-save-button { display:inline-flex; justify-content:center; align-items:center; width:max-content; padding:11px 15px; border:1px solid rgba(243,231,201,.3); border-radius:11px; background:rgba(242,163,75,.14); color:var(--paper); font-size:12px; font-weight:700; cursor:pointer; }
+    .settings-avatar-actions small { color:var(--muted); font-size:11px; }
+    .settings-remove-avatar { width:max-content; border:0; padding:4px 0; background:transparent; color:#ffb69b; font-size:11px; cursor:pointer; }
+    .settings-role { color:var(--fire); font-size:13px; font-weight:700; }
+    .settings-save-button { margin-top:16px; background:linear-gradient(135deg,#e6a04c,#b96a3e); color:#192018; }
+    #settingsProfileStatus { min-height:20px; color:var(--muted); font-size:12px; line-height:1.6; }
+    @media(max-width:600px) { .settings-avatar-preview,.settings-avatar-fallback { width:70px;height:70px; } .settings-avatar-row { align-items:flex-start; } }
+      .settings-h2 { margin:0 0 14px; font-family:var(--heading); font-size:clamp(26px,4vw,36px); }
+    .settings-select { width:100%; padding:13px 14px; border:1px solid rgba(243,231,201,.25); border-radius:12px; background:rgba(10,15,25,.45); color:var(--paper); font:inherit; }
+    .settings-select option { color:#17251d; }
+    .settings-select:focus { outline:none; border-color:var(--orange); }
+    .settings-tz-status { margin-top:10px !important; font-size:13px !important; }
+    #clock { padding-top:10px; }
+  </style>
+</head>
+
+<body class="camp-body" data-page="settings">
+
+  <main class="camp-app">
+    <section class="camp-page camp-placeholder-page" id="clock">
+      <span class="settings-kicker">CAMP CLOCK</span>
+      <h2 class="settings-h2">Clock &amp; timezone</h2>
+      <p>The clock in the top-right corner follows this timezone. It is saved on this device.</p>
+      <div class="settings-profile-form">
+        <label for="settingsTimezone">TIMEZONE</label>
+        <select id="settingsTimezone" class="settings-select"></select>
+        <p id="settingsTimezoneStatus" role="status" class="settings-tz-status"></p>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { initPage } from './js/shared.js?v=12';
+    import { browserTimezone, getSavedTimezone, setSavedTimezone, activeTimezone, timeIn, timezoneList } from './js/status-widget.js?v=2';
+
+    const ctx = await initPage({ active: 'settings' });
+
+    // clock timezone: '' = follow the browser
+    const tzSelect = document.getElementById('settingsTimezone');
+    const tzStatus = document.getElementById('settingsTimezoneStatus');
+    const tzOption = (value, text) => Object.assign(document.createElement('option'), { value, textContent: text });
+    tzSelect.append(tzOption('', 'Browser default (' + browserTimezone().replace(/_/g, ' ') + ')'));
+    timezoneList().forEach((zone) => tzSelect.append(tzOption(zone, zone.replace(/_/g, ' '))));
+    tzSelect.value = getSavedTimezone();
+    if (tzSelect.value !== getSavedTimezone()) tzSelect.value = '';
+    const paintTz = () => { const zone = activeTimezone(); tzStatus.textContent = 'Showing ' + timeIn(zone) + ' in ' + zone.replace(/_/g, ' ') + '.'; };
+    paintTz();
+    tzSelect.addEventListener('change', () => { setSavedTimezone(tzSelect.value); paintTz(); });
+  </script>
+</body>
+</html>
