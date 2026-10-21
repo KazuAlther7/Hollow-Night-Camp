@@ -18,7 +18,10 @@ const newButton = document.getElementById('newButton');
 const params = new URLSearchParams(window.location.search);
 const entryId = params.get('id');
 
-const message = (title, text) => root.replaceChildren(
+// replaceChildren() turns null / false into the literal text "null" / "false"; drop them first.
+const fill = (parent, ...kids) => parent.replaceChildren(...kids.flat().filter((kid) => kid != null && kid !== false));
+
+const message = (title, text) => fill(root,
   el('div', { class: 'empty-shelf', role: 'status' }, el('strong', { text: title }), text || '')
 );
 
@@ -120,6 +123,11 @@ function openEntryDialog({
   };
 
   const fieldNodes = fields.map((field) => {
+    if (field.kind === 'custom') {
+      const built = field.build(entry);
+      controls[field.key] = built.control;
+      return built.node;
+    }
     let control;
     if (field.kind === 'textarea') {
       control = el('textarea', { maxlength: field.maxlength || 4000 });
@@ -296,7 +304,7 @@ async function characters() {
       const { data, error } = await supabase.from('characters').select('*').order('name', { ascending: true });
       if (error) return message('Could not load characters.', error.message);
       if (!data.length) return message('No characters yet.', ctx.isAuthor ? 'Use “+ New Character” to add the first one.' : 'Nobody has shown up around the fire yet.');
-      root.replaceChildren(el('div', { class: 'novel-grid' }, ...data.map((row) => card({
+      fill(root, el('div', { class: 'novel-grid' }, ...data.map((row) => card({
         href: 'characters.html?id=' + encodeURIComponent(row.id),
         name: row.name, sub: row.role, imageUrl: row.image_url, draft: !row.is_published
       }))));
@@ -319,7 +327,7 @@ async function characters() {
     place = data;
   }
 
-  root.replaceChildren(
+  fill(root, 
     backLink('characters.html', 'All characters'),
     el('div', { class: 'wb-detail' },
       art(row.image_url, row.name),
@@ -339,26 +347,105 @@ async function characters() {
 // ---------------------------------------------------------------
 // LOCATIONS
 // ---------------------------------------------------------------
-async function markerOptions(mapId) {
-  if (!mapId) return [NONE];
-  const { data } = await supabase.from('map_markers').select('id, label').eq('map_id', mapId).order('created_at', { ascending: true });
-  return [NONE, ...(data || []).map((row) => ({ value: row.id, label: row.label }))];
+// Searchable dropdown of existing map markers. Picking one fills name, description, map and marker.
+function markerCombo({ markers, initialName, onPick }) {
+  const listId = 'markerList' + crypto.randomUUID().slice(0, 8);
+  const norm = (text) => text.trim().toLowerCase();
+  const input = el('input', {
+    type: 'text', maxlength: 160, autocomplete: 'off', role: 'combobox', value: initialName ?? '',
+    'aria-expanded': 'false', 'aria-controls': listId, 'aria-autocomplete': 'list',
+    placeholder: 'Type to search markers…'
+  });
+  const toggle = el('button', { class: 'vol-toggle', type: 'button', tabindex: '-1', 'aria-label': 'Show markers' });
+  const list = el('ul', { class: 'vol-list', id: listId, role: 'listbox', hidden: true });
+  const node = el('label', { class: 'hn-field' }, el('span', { text: 'Name' }), el('div', { class: 'vol-combo' }, input, toggle, list));
+
+  let options = [];
+  let active = -1;
+  let open = false;
+
+  const render = () => {
+    list.replaceChildren(...(options.length ? options : [null]).map((marker, index) => {
+      if (!marker) return el('li', { class: 'vol-option', text: 'No markers match. Add markers on a map first.' });
+      const item = el('li', {
+        class: 'vol-option' + (index === active ? ' active' : ''), role: 'option',
+        'aria-selected': String(index === active), text: marker.label + ' · ' + marker.mapName
+      });
+      item.addEventListener('mousedown', (event) => { event.preventDefault(); choose(marker); });
+      return item;
+    }));
+    list.children[active]?.scrollIntoView({ block: 'nearest' });
+  };
+  const openList = (filter) => {
+    const query = norm(filter || '');
+    options = markers.filter((marker) => !query || norm(marker.label).includes(query) || norm(marker.mapName).includes(query));
+    active = options.length ? 0 : -1;
+    open = true;
+    list.hidden = false;
+    input.setAttribute('aria-expanded', 'true');
+    render();
+  };
+  const closeList = () => { open = false; list.hidden = true; input.setAttribute('aria-expanded', 'false'); };
+  const choose = (marker) => { input.value = marker.label; closeList(); onPick(marker); };
+
+  input.addEventListener('input', () => openList(input.value));
+  input.addEventListener('focus', () => openList(''));
+  input.addEventListener('click', () => { if (!open) openList(''); });
+  input.addEventListener('blur', closeList);
+  input.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      if (!open) { openList(''); return; }
+      if (options.length) { active = (active + (event.key === 'ArrowDown' ? 1 : -1) + options.length) % options.length; render(); }
+    } else if (event.key === 'Enter' && open && active >= 0) {
+      event.preventDefault();
+      choose(options[active]);
+    } else if (event.key === 'Escape' && open) {
+      event.preventDefault();
+      event.stopPropagation();
+      closeList();
+    }
+  });
+  toggle.addEventListener('mousedown', (event) => event.preventDefault());
+  toggle.addEventListener('click', () => { if (open) closeList(); else { input.focus(); openList(''); } });
+
+  return { node, control: input };
 }
 
 async function openLocationDialog(entry, onSaved) {
-  const [mapOpts, markerOpts] = await Promise.all([loadOptions('maps'), markerOptions(entry?.map_id)]);
+  const [mapOpts, markerRes] = await Promise.all([
+    loadOptions('maps'),
+    supabase.from('map_markers').select('id, label, description, map_id, maps(name)').order('label', { ascending: true })
+  ]);
+  const markers = (markerRes.data || []).map((row) => ({ ...row, mapName: row.maps?.name || 'Map' }));
+  const markersOf = (mapId) => [NONE, ...markers.filter((marker) => marker.map_id === mapId).map((marker) => ({ value: marker.id, label: marker.label }))];
+  let controls = null;
+
   openEntryDialog({
     title: entry ? 'Edit Location' : 'New Location',
     table: 'locations', entry, folder: 'locations', landscape: true,
     fields: [
-      { key: 'name', label: 'Name', required: true },
+      {
+        key: 'name', label: 'Name', required: true, kind: 'custom',
+        build: (current) => markerCombo({
+          markers, initialName: current?.name,
+          onPick(marker) {
+            controls.description.value = marker.description || '';
+            controls.map_id.value = marker.map_id;
+            setOptions(controls.marker_id, markersOf(marker.map_id), marker.id);
+          }
+        })
+      },
       { key: 'description', label: 'Description', kind: 'textarea' },
       { key: 'map_id', label: 'Shown on map', kind: 'select', options: mapOpts },
-      { key: 'marker_id', label: 'Map marker', kind: 'select', options: markerOpts }
+      { key: 'marker_id', label: 'Map marker', kind: 'select', options: markersOf(entry?.map_id) }
     ],
-    afterBuild(controls) {
-      controls.map_id.addEventListener('change', async () => {
-        setOptions(controls.marker_id, await markerOptions(controls.map_id.value));
+    afterBuild(built) {
+      controls = built;
+      built.map_id.addEventListener('change', () => setOptions(built.marker_id, markersOf(built.map_id.value)));
+      built.marker_id.addEventListener('change', () => {
+        const marker = markers.find((item) => item.id === built.marker_id.value);
+        if (marker && !built.description.value.trim()) built.description.value = marker.description || '';
       });
     },
     onSaved
@@ -372,7 +459,7 @@ async function locations() {
       const { data, error } = await supabase.from('locations').select('*').order('name', { ascending: true });
       if (error) return message('Could not load locations.', error.message);
       if (!data.length) return message('No locations yet.', ctx.isAuthor ? 'Use “+ New Location” to add the first one.' : 'The trail signs are still blank.');
-      root.replaceChildren(el('div', { class: 'novel-grid' }, ...data.map((row) => card({
+      fill(root, el('div', { class: 'novel-grid' }, ...data.map((row) => card({
         href: 'locations.html?id=' + encodeURIComponent(row.id),
         name: row.name, imageUrl: row.image_url, draft: !row.is_published, landscape: true
       }))));
@@ -398,7 +485,7 @@ async function locations() {
 
   const mapHref = map ? 'maps.html?id=' + encodeURIComponent(map.id) + (row.marker_id ? '&marker=' + encodeURIComponent(row.marker_id) : '') : null;
 
-  root.replaceChildren(
+  fill(root, 
     backLink('locations.html', 'All locations'),
     el('div', { class: 'wb-detail wb-wide' },
       el('div', {},
@@ -465,7 +552,12 @@ async function mapDetail() {
   const img = el('img', { src: map.image_url || '', alt: map.name, draggable: 'false' });
   const pinLayer = el('div', {});
   const canvas = el('div', { class: 'map-canvas' }, img, pinLayer);
-  const stage = el('div', { class: 'map-stage' }, map.image_url ? canvas : el('div', { class: 'empty-shelf' }, 'No map image yet.'));
+  const zoomLabel = el('span', { class: 'map-zoom-label', text: '100%' });
+  const zoomIn = el('button', { class: 'map-zoom-btn', type: 'button', text: '+', 'aria-label': 'Zoom in' });
+  const zoomOut = el('button', { class: 'map-zoom-btn', type: 'button', text: '−', 'aria-label': 'Zoom out' });
+  const zoomReset = el('button', { class: 'map-zoom-btn', type: 'button', text: 'Reset', 'aria-label': 'Reset zoom' });
+  const controlsBox = el('div', { class: 'map-controls' }, zoomOut, zoomLabel, zoomIn, zoomReset);
+  const stage = el('div', { class: 'map-stage' }, map.image_url ? [canvas, controlsBox] : el('div', { class: 'empty-shelf' }, 'No map image yet.'));
   const hint = el('p', { class: 'map-hint', hidden: true, role: 'status' });
   const panel = el('div', { class: 'map-panel', 'aria-live': 'polite' });
   const list = el('ul', { class: 'map-marker-list' });
@@ -489,11 +581,97 @@ async function mapDetail() {
 
   const select = (id) => { selectedId = id; draw(); };
 
+  // ---- zoom / pan: wheel or buttons to zoom, drag to pan, two fingers to pinch ----
+  const MAX_ZOOM = 8;
+  const view = { s: 1, x: 0, y: 0 };
+  const pointers = new Map();
+  let drag = null;
+  let pinch = null;
+  let dragged = false;
+
+  function applyView() {
+    view.x = Math.min(0, Math.max(view.x, stage.clientWidth * (1 - view.s)));
+    view.y = Math.min(0, Math.max(view.y, stage.clientHeight - canvas.offsetHeight * view.s));
+    canvas.style.transform = 'translate(' + view.x + 'px,' + view.y + 'px) scale(' + view.s + ')';
+    canvas.style.setProperty('--inv', String(1 / view.s));
+    stage.classList.toggle('zoomed', view.s > 1);
+    zoomLabel.textContent = Math.round(view.s * 100) + '%';
+  }
+  function zoomAt(factor, cx, cy) {
+    const next = Math.min(MAX_ZOOM, Math.max(1, view.s * factor));
+    const k = next / view.s;
+    view.x = cx - (cx - view.x) * k;
+    view.y = cy - (cy - view.y) * k;
+    view.s = next;
+    applyView();
+  }
+  const stagePoint = (clientX, clientY) => {
+    const rect = stage.getBoundingClientRect();
+    return { x: clientX - rect.left, y: clientY - rect.top };
+  };
+  const pinchState = () => {
+    const [a, b] = [...pointers.values()];
+    const mid = stagePoint((a.x + b.x) / 2, (a.y + b.y) / 2);
+    return { dist: Math.hypot(a.x - b.x, a.y - b.y) || 1, cx: mid.x, cy: mid.y };
+  };
+  const startDrag = (point) => { drag = { sx: point.x, sy: point.y, vx: view.x, vy: view.y }; };
+
+  zoomIn.addEventListener('click', () => zoomAt(1.5, stage.clientWidth / 2, stage.clientHeight / 2));
+  zoomOut.addEventListener('click', () => zoomAt(1 / 1.5, stage.clientWidth / 2, stage.clientHeight / 2));
+  zoomReset.addEventListener('click', () => { view.s = 1; view.x = 0; view.y = 0; applyView(); });
+  window.addEventListener('resize', applyView);
+
+  stage.addEventListener('wheel', (event) => {
+    event.preventDefault();
+    const point = stagePoint(event.clientX, event.clientY);
+    zoomAt(event.deltaY < 0 ? 1.2 : 1 / 1.2, point.x, point.y);
+  }, { passive: false });
+
+  stage.addEventListener('pointerdown', (event) => {
+    if (event.target.closest('.map-controls')) return;
+    pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    dragged = false;
+    if (pointers.size === 1) startDrag({ x: event.clientX, y: event.clientY });
+    else if (pointers.size === 2) { pinch = pinchState(); drag = null; }
+  });
+  stage.addEventListener('pointermove', (event) => {
+    if (!pointers.has(event.pointerId)) return;
+    pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+
+    if (pointers.size === 2 && pinch) {
+      const now = pinchState();
+      zoomAt(now.dist / pinch.dist, now.cx, now.cy);
+      view.x += now.cx - pinch.cx;
+      view.y += now.cy - pinch.cy;
+      applyView();
+      pinch = now;
+      dragged = true;
+    } else if (drag && pointers.size === 1) {
+      const dx = event.clientX - drag.sx;
+      const dy = event.clientY - drag.sy;
+      if (!dragged && Math.hypot(dx, dy) < 6) return;
+      if (!dragged) { try { stage.setPointerCapture(event.pointerId); } catch (e) {} }
+      dragged = true;
+      view.x = drag.vx + dx;
+      view.y = drag.vy + dy;
+      applyView();
+    }
+  });
+  const endPointer = (event) => {
+    pointers.delete(event.pointerId);
+    pinch = null;
+    drag = null;
+    if (pointers.size === 1) { startDrag([...pointers.values()][0]); }
+    setTimeout(() => { dragged = false; }, 0);
+  };
+  stage.addEventListener('pointerup', endPointer);
+  stage.addEventListener('pointercancel', endPointer);
+
   function draw() {
     pinLayer.replaceChildren(...markers.map((marker) => el('button', {
       class: 'map-pin' + (marker.id === selectedId ? ' selected' : ''),
       type: 'button', 'aria-label': marker.label, style: 'left:' + marker.x + '%;top:' + marker.y + '%',
-      onclick: (event) => { event.stopPropagation(); if (!mode) select(marker.id); }
+      onclick: (event) => { event.stopPropagation(); if (!mode && !dragged) select(marker.id); }
     }, el('span', { class: 'map-pin-label', text: marker.label }))));
 
     list.replaceChildren(...markers.map((marker) => el('li', {},
@@ -504,12 +682,12 @@ async function mapDetail() {
 
     const marker = markers.find((item) => item.id === selectedId);
     if (!marker) {
-      panel.replaceChildren(el('p', { text: markers.length ? 'Select a marker to read about it.' : (ctx.isAuthor ? 'No markers yet. Use “Add marker”, then click the map.' : 'No markers on this map yet.') }));
+      fill(panel, el('p', { text: markers.length ? 'Select a marker to read about it.' : (ctx.isAuthor ? 'No markers yet. Use “Add marker”, then click the map.' : 'No markers on this map yet.') }));
       return;
     }
 
     const places = linkedLocations.filter((place) => place.marker_id === marker.id);
-    panel.replaceChildren(
+    fill(panel, 
       el('h3', { text: marker.label }),
       marker.description ? el('p', { text: marker.description }) : null,
       places.length ? el('ul', { class: 'wb-links', style: 'margin-top:10px' }, ...places.map((place) =>
@@ -532,7 +710,7 @@ async function mapDetail() {
   }
 
   canvas.addEventListener('click', async (event) => {
-    if (!mode) return;
+    if (!mode || dragged) return;
     const rect = img.getBoundingClientRect();
     const x = clampPct((event.clientX - rect.left) / rect.width * 100);
     const y = clampPct((event.clientY - rect.top) / rect.height * 100);
@@ -552,7 +730,7 @@ async function mapDetail() {
 
   addButton.addEventListener('click', () => setMode(mode ? null : 'add'));
 
-  root.replaceChildren(
+  fill(root, 
     backLink('maps.html', 'All maps'),
     el('h2', { class: 'wb-title', text: map.name, style: 'margin:0 0 6px;font-family:var(--heading);font-size:clamp(28px,4.4vw,44px)' }),
     map.description ? el('p', { class: 'wb-text', text: map.description }) : null,
@@ -560,6 +738,7 @@ async function mapDetail() {
     ctx.isAuthor && map.image_url ? el('div', { class: 'wb-actions' }, addButton) : null,
     hint,
     el('div', { style: 'margin-top:16px' }, stage),
+    el('p', { class: 'map-help', text: 'Scroll or pinch to zoom, drag to pan.' }),
     panel,
     list
   );
@@ -574,7 +753,7 @@ async function maps() {
     const { data, error } = await supabase.from('maps').select('*').order('name', { ascending: true });
     if (error) return message('Could not load maps.', error.message);
     if (!data.length) return message('No maps yet.', ctx.isAuthor ? 'Use “+ New Map” to add the first one.' : 'The cartographer is still out in the woods.');
-    root.replaceChildren(el('div', { class: 'novel-grid' }, ...data.map((row) => card({
+    fill(root, el('div', { class: 'novel-grid' }, ...data.map((row) => card({
       href: 'maps.html?id=' + encodeURIComponent(row.id),
       name: row.name, imageUrl: row.image_url, draft: !row.is_published, landscape: true
     }))));
