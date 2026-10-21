@@ -167,7 +167,7 @@ body.stage-welcome .main-bar { display: none; }
 .nav-card-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  grid-template-areas: "novels novels theories arcade" "novels novels settings settings";
+  grid-template-areas: "novels novels world theories" "novels novels arcade settings";
   gap: 18px;
   margin: 8px 0 44px;
 }
@@ -197,9 +197,10 @@ body.stage-welcome .main-bar { display: none; }
   pointer-events: none;
 }
 .nav-card:nth-child(1) { grid-area: novels; transform: rotate(-.8deg); }
-.nav-card:nth-child(2) { grid-area: theories; transform: rotate(.7deg); background: #e6d6ae; }
-.nav-card:nth-child(3) { grid-area: arcade; transform: rotate(-.5deg); background: #efc98f; }
-.nav-card:nth-child(4) { grid-area: settings; transform: rotate(.4deg); background: #c9d3b4; min-height: 120px; }
+.nav-card:nth-child(2) { grid-area: world; transform: rotate(.5deg); background: #d8cba6; }
+.nav-card:nth-child(3) { grid-area: theories; transform: rotate(.7deg); background: #e6d6ae; }
+.nav-card:nth-child(4) { grid-area: arcade; transform: rotate(-.5deg); background: #efc98f; }
+.nav-card:nth-child(5) { grid-area: settings; transform: rotate(.4deg); background: #c9d3b4; }
 .nav-card:hover { transform: rotate(0) translateY(-5px); box-shadow: 0 20px 38px rgba(0,0,0,.45); }
 .nav-card .nav-card-icon { line-height: 1; margin-bottom: auto; }
 .nav-card .nav-card-icon .icon { width: 44px; height: 44px; vertical-align: top; }
@@ -312,7 +313,7 @@ body.stage-welcome .main-bar { display: none; }
 @media (max-width: 820px) {
   .nav-card-grid {
     grid-template-columns: 1fr 1fr;
-    grid-template-areas: "novels novels" "theories arcade" "settings settings";
+    grid-template-areas: "novels novels" "world theories" "arcade settings";
   }
   .featured-story-card { grid-template-columns: 1fr; }
   .featured-story-art { aspect-ratio: 16 / 7; font-size: 54px; }
