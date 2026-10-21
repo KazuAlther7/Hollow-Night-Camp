@@ -18,6 +18,23 @@ const NAV = [
   { id: 'settings', href: 'settings.html', icon: 'settings', label: 'Settings' }
 ];
 
+// Novels sub-navigation: the Novels area and its world-building sections (shown under each page's headline)
+const NOVELS_SUBNAV = [
+  { id: 'novels',    href: 'novels.html',    label: 'Novels' },
+  { id: 'characters', href: 'characters.html', label: 'Characters' },
+  { id: 'maps',      href: 'maps.html',      label: 'Maps' },
+  { id: 'locations', href: 'locations.html', label: 'Locations' }
+];
+
+// Fills <nav id="subNav" data-active="..."> if the page has one.
+function mountSubNav() {
+  const nav = document.getElementById('subNav');
+  if (!nav) return;
+  const active = nav.dataset.active;
+  nav.innerHTML = NOVELS_SUBNAV.map((tab) => `
+    <a class="sub-nav-item${tab.id === active ? ' active' : ''}" href="${tab.href}"${tab.id === active ? ' aria-current="page"' : ''}>${tab.label}</a>`).join('');
+}
+
 // Icons are single-colour PNGs in assets/icons/, tinted with CSS mask (see mainbar.css)
 function icon(name) {
   return `<span class="icon icon-${name}" aria-hidden="true"></span>`;
@@ -289,6 +306,8 @@ export async function initPage(options = {}) {
   } else {
     mountMainBar({ active, isAuthor, onAuthorToggle, profile, user: session.user });
   }
+
+  mountSubNav();
 
   observeAuthState((event) => {
     if (event === 'SIGNED_OUT' && !signingOut) {
