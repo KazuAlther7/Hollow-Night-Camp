@@ -75,13 +75,20 @@ Statuses reflect source code in the supplied ZIP plus deployment/setup progress 
 | Save draft / publish chapter | **DONE in source / VERIFY** | `js/editor.js` implements persistence and draft/publish actions. Confirm database schema and RLS in the live project. |
 | Chapter metadata and ordering | **DONE in source / VERIFY** | Editor supports title, subtitle, chapter number and volume fields; verify ordering and database constraints. |
 | Reader chapter page | **DONE in source / VERIFY** | `read.html` and `js/read.js` load a chapter, render its content and provide chapter navigation. Draft protection depends on RLS. |
+| Chapter Ratings (five d20 icons, one vote per reader per chapter) | **NOT STARTED** | New requirement: persist individual ratings, use five outlined d20 icons with proportional interior fill, enforce one rating per authenticated user per chapter, and display realtime average/count. |
+| Novel Ratings (aggregate of all chapter votes) | **NOT STARTED** | New requirement: compute a weighted average from all individual ratings across all published chapters in the novel, plus total vote count; update in realtime. |
 | Chapter import from TXT / DOCX / text-based PDF | **DONE in source / VERIFY** | `js/import.js` parses supported formats (5 MB limit), presents review flow and creates draft content. Scanned PDFs/OCR are not supported. |
 | Latest Chapter section | **PARTIAL / VERIFY** | Homepage author controls/status are present, but confirm a complete reader-facing latest-published-chapter section is wired to live chapter data. |
+| Global branded loading animation | **NOT STARTED** | New requirement: logo-led branded loading experience with a distinctive, polished animation used consistently across navigation/data-loading states. |
+| Background music and sound effects controls | **NOT STARTED** | New requirement: separate Music and SFX enable/disable and volume controls in Settings; audio assets will live under `assets/sound/`. |
+| Realtime online readers count | **NOT STARTED** | New requirement: show a live count of active reader sessions, preferably using Supabase Realtime Presence with stale-session cleanup. |
+| Realtime flip-style digital clock | **NOT STARTED** | New requirement: retro folding desk-clock layout, neon digital styling and animated flipping minute cards, with selectable timezone. |
+| Global Settings gear dropdown | **PARTIAL / VERIFY** | Settings currently has a dedicated page; new requirement is a global dropdown trigger that opens in place on every page, with animated gear and links to dedicated settings destinations. |
 | Volumes / arcs and chapter list | **PARTIAL / VERIFY** | Volume metadata and chapter management exist in the editor/novel workflow; verify full grouping/reordering experience. |
 | Theories page | **NOT STARTED** | `theories.html` remains a heading and introductory placeholder. |
 | Theory posts, replies and cloud persistence | **NOT STARTED** | No complete discussion workflow is present in the supplied source. |
 | Theory categories and moderation | **NOT STARTED** | Confirmed / Likely / Speculation / Wild Theory filters and moderation are not implemented. |
-| Corners Arcade | **NOT STARTED** | `arcade.html` remains a “Coming soon” placeholder. |
+| Corners Arcade | **NOT STARTED** | `arcade.html` remains a “Coming soon” placeholder; arcade scores, small save-game state, and player profiles should use Supabase-backed tables with RLS. |
 | D&D-style dice roll and games | **NOT STARTED** | No playable dice simulation or arcade game is present. |
 | Settings: profile details | **DONE (core profile) / VERIFY** | Profile form and save feedback exist. |
 | Settings: theme and language | **NOT STARTED** | No complete System / Light / Dark or English / Indonesian preference system found. |
@@ -202,7 +209,7 @@ The primary navigation should contain:
 2. **Novels** — story library and world-building content.
 3. **Theories** — community investigation board.
 4. **Corners Arcade** — games and dice simulation.
-5. **Settings** — user preferences and support.
+5. **Settings** — a global gear-button dropdown that can be opened from any page without navigating away; its submenu links lead to dedicated settings pages/sections.
 6. **Author Studio** — visible only to Author accounts.
 7. **Notifications** — bell icon and notification center.
 8. **Account / Profile** — profile shortcut and sign-out action.
@@ -427,7 +434,59 @@ Author-only actions:
 - Track reading progress and bookmarks after the History feature is implemented.
 - Do not expose drafts to Readers.
 
-### 5.8 Import chapters from PDF / DOC / DOCX
+### 5.8 Chapter and Novel Ratings (five-star review system)
+
+**Priority: P1**
+
+Implement a five-level rating system for published chapters, with a per-chapter summary and a novel-wide aggregate. Replace star artwork everywhere in this rating UI with **five d20 die icons** (icosahedron / twenty-sided die silhouette), not star glyphs. With zero ratings, show five d20 icons as outline strokes only, with no interior fill. Once ratings exist, fill the interior of each d20 icon to represent the aggregate average; use clipping or an equivalent mask so fractional values (for example, 4.5) fill proportionally and cleanly inside the die outline. Keep the outline visible over the fill for legibility. Ratings remain numeric values from 1 to 5. Do not round the underlying calculation; show one decimal place by default.
+
+#### Rating UI and reader interaction
+- Add a **Chapter Ratings** section on each published chapter reading page.
+- Show five interactive d20 icons, the chapter's average rating (e.g. `4.5 / 5`), and the total number of submitted ratings.
+- When no ratings exist, show `0.0 / 5`, `0 ratings`, and five outline-only d20 icons with no interior fill.
+- A signed-in Reader can submit one integer rating from 1 to 5 for each chapter. Selecting a d20 icon previews/selects that value; provide a clear submit/save interaction or an explicitly documented immediate-save interaction with feedback.
+- Enforce one rating per user per chapter. Repeated clicks or requests must not create duplicate votes. If rating changes are allowed, the same existing vote is updated rather than inserted as a second vote; otherwise the UI must clearly state that a submitted vote cannot be changed. **Default product behavior: allow the reader to update their own rating**, while still keeping exactly one current rating per user/chapter.
+- Guests may view aggregate ratings but must sign in before submitting a rating.
+- Prevent ratings on unpublished drafts and enforce this on the backend, not only in the UI.
+- Provide loading, saved, error, and no-ratings states. Make the star control keyboard accessible and label each choice (for example, “Rate this chapter 4 out of 5”).
+
+#### Chapter Ratings calculation
+- Store each reader's current rating as one integer in the range 1–5, linked to both the user/profile and chapter.
+- `chapter_rating_count` is the number of unique current votes for that chapter.
+- `chapter_average_rating` is the sum of all current chapter vote values divided by `chapter_rating_count`.
+- Example: 10 readers vote on one chapter; five give 4 stars and five give 5 stars. The chapter average is `(5 × 4 + 5 × 5) / 10 = 4.5`, with 10 ratings.
+- The d20 interior fill must visually represent the average, including fractional averages such as 4.5, while retaining a crisp visible outline.
+
+#### Novel Ratings calculation
+- Add a **Novel Ratings** summary on the novel detail page and, where useful, the novel header/library card.
+- The novel rating is the **weighted average of all individual current chapter votes across every published chapter belonging to that novel**. Sum every vote value from those chapters and divide by the total number of votes across those chapters. Do not simply average chapter averages, because chapters may have different numbers of votes.
+- `novel_rating_count` is the total number of current individual chapter ratings across all published chapters in the novel. A user's rating of two different chapters counts as two chapter votes, because the rating is per chapter.
+- If a novel has no chapter votes, show `0.0 / 5`, `0 ratings`, and five empty stars.
+- Example: Chapter A has 10 votes averaging 4.5; Chapter B has 2 votes averaging 3.0. Novel average is `(10 × 4.5 + 2 × 3.0) / (10 + 2) = 4.25`, displayed as `4.3 / 5` to one decimal place, with 12 ratings.
+- Adding, changing, or removing a valid vote must update both the affected Chapter Ratings and the parent Novel Ratings consistently.
+
+#### Realtime behavior and data integrity
+- Aggregate counts and averages must update in realtime for other connected readers without requiring a manual page refresh. Use Supabase Realtime or a secure database-backed refresh strategy appropriate to the final schema.
+- The database must be the source of truth for rating records and aggregates. Do not trust client-supplied averages or counts.
+- Recommended table: `chapter_ratings` with a stable ID, `chapter_id`, `user_id` (or profile ID consistent with the existing schema), integer `rating`, and timestamps.
+- Add a unique constraint on `(chapter_id, user_id)` and a database check constraint that `rating BETWEEN 1 AND 5`.
+- Enable RLS. Readers may read published chapter / novel aggregates and insert or update only their own rating, only for a published chapter. Never allow a Reader to change another user's vote. Avoid exposing voter identities in the public UI.
+- Calculate aggregates using database views, safe RPCs, or equivalent queries. If aggregate values are cached/materialized, ensure rating changes update them atomically and reliably. Index `chapter_id`, `user_id`, and the relevant novel/chapter relationship for lookup and aggregation.
+- Unpublishing or deleting a chapter must not leak its ratings into public Novel Ratings. Define deletion behavior consistently (prefer cascading deletion of chapter ratings when the chapter is permanently deleted).
+- Handle simultaneous submissions, reconnects, duplicate events, and stale realtime subscriptions without double-counting votes. Unsubscribe when leaving the chapter page.
+
+**Acceptance criteria**
+- [ ] A chapter with no votes shows five empty stars and `0.0 / 5` with `0 ratings`.
+- [ ] A signed-in Reader can submit one 1–5 rating per chapter and can update their own vote without creating a duplicate.
+- [ ] The 5 × 4-star plus 5 × 5-star example produces an average of exactly 4.5 and count 10.
+- [ ] The d20 icons use outline-only strokes when there are no ratings, and their interior fills accurately depict fractional averages while preserving the outlines.
+- [ ] Chapter average and count update live across active clients after a vote is saved or changed.
+- [ ] Novel average is computed from all individual chapter votes using a weighted average, and its count equals the total number of current votes across the novel's published chapters.
+- [ ] Novel aggregates update live when a vote on any of its chapters changes.
+- [ ] A Reader cannot rate a draft, impersonate another voter, or submit duplicate votes by bypassing the UI.
+- [ ] RLS, unique constraints, invalid rating rejection, responsive layout, keyboard operation, and realtime unsubscribe behavior are tested.
+
+### 5.9 Import chapters from PDF / DOC / DOCX
 
 **Priority: P2**
 
@@ -443,7 +502,7 @@ Requirements:
 
 **Important implementation note:** PDF and Word files do not always contain clean, structured chapter data. Importing should create editable draft content first. OCR for scanned PDFs is a separate, optional enhancement.
 
-### 5.9 World building: characters, maps, and locations
+### 5.10 World building: characters, maps, and locations
 
 **Priority: P1 / P2**
 
@@ -471,7 +530,7 @@ Requirements:
 - Use stable record IDs and explicit relations between world-building entries.
 - Public Readers should only see published content.
 
-### 5.10 Theories and investigation board
+### 5.11 Theories and investigation board
 
 **Priority: P1 / P2**
 
@@ -509,11 +568,24 @@ These categories are labels for community interpretation, not automatic truth ve
 - Provide rate limiting / anti-spam measures where practical.
 - Establish a moderation and reporting workflow before opening the board widely.
 
-### 5.11 Corners Arcade
+### 5.12 Corners Arcade
 
 **Priority: P2**
 
-The Arcade page should contain playable games rather than a “Coming soon” placeholder.
+The Arcade page should contain playable games rather than a “Coming soon” placeholder. Use Supabase as the durable source of truth for player identity and any game data that should follow a user across devices. Keep short-lived animation state and purely temporary session state client-side where appropriate.
+
+#### Player profile and persistence
+- Provide a tidy player profile linked to the authenticated Supabase user / `profiles` record. Reuse the existing profile rather than creating a second identity system.
+- Store persistent high scores / leaderboard entries, small save-game state, and player-specific arcade statistics in Supabase tables, rather than relying only on browser storage.
+- Suggested tables: `arcade_scores` (game key, user ID, score, achieved timestamp, optional metadata), `arcade_saves` (user ID, game key, versioned compact save payload, updated timestamp), and optionally `arcade_player_stats` if stats cannot be derived efficiently from score records. Final schema may consolidate these where appropriate.
+- A save payload must be small, versioned, validated, and limited to the data required to resume a game. Do not store secrets, executable code, or untrusted HTML in save payloads.
+- Use stable game identifiers and database constraints/indexes for leaderboard sorting and per-user lookups. Define whether each leaderboard is global, per-game, or seasonal before implementation.
+- Show a clear save/load state and handle loading, empty, offline, permission, and save-failure states. Avoid claiming a save succeeded until Supabase confirms it.
+- Permit guests to play games that do not need persistence. Require sign-in to submit persistent scores or sync a save across devices; explain this at the point of use.
+- Enforce RLS so users can read public leaderboard data but can only create/update their own saves and profile-linked records. Do not trust client-submitted user IDs, score values, or metadata. Validate score submissions server-side or through trusted database functions where cheating risk matters; never expose a service-role key in the frontend.
+- Do not store every frame or transient input in the database. Persist only meaningful score submissions, checkpoints, and compact save-state changes; debounce or explicitly trigger save operations to avoid excessive writes.
+
+#### D&D-style dice simulation
 
 #### D&D-style dice simulation
 - Support common dice types such as d4, d6, d8, d10, d12, d20, and d100.
@@ -528,7 +600,7 @@ The Arcade page should contain playable games rather than a “Coming soon” pl
 - Avoid requiring an account for simple single-player games unless saving scores becomes a feature.
 - Keep game code isolated so additional games can be added later.
 
-### 5.12 Settings
+### 5.13 Settings
 
 **Priority: P2**
 
@@ -588,7 +660,7 @@ Use recognizable platform icons while respecting their trademarks and each platf
 - Privacy information
 - Terms / community guidelines as the project matures
 
-### 5.13 Notifications center
+### 5.14 Notifications center
 
 **Priority: P2**
 
@@ -601,7 +673,7 @@ Use recognizable platform icons while respecting their trademarks and each platf
 - Do not show a permanent unread indicator when there are no unread notifications.
 - Notification delivery method and whether email notifications are included must be decided separately; the initial requirement is an in-site notification center.
 
-### 5.14 Language and localization
+### 5.15 Language and localization
 
 **Priority: P2**
 
@@ -611,13 +683,89 @@ Use recognizable platform icons while respecting their trademarks and each platf
 - Use the selected language consistently across navigation, settings, error messages, and core workflows.
 - Novel content remains in the language chosen by the Author; changing interface language should not automatically translate story content.
 
-### 5.15 Latest Chapter
+### 5.16 Latest Chapter
 
 **Priority: P1**
 
 - Show the latest **published** chapter on the homepage.
 - Include chapter title, parent novel, publication/update date, and a link to read.
 - Determine “latest” from a reliable publication timestamp or chapter ordering rule.
+
+### 5.17 Global branded loading animation
+
+**Priority: P1**
+
+Create a custom loading experience that uses the official Hollow Night Camp logo (`assets/image/hollow-night-logo.png`) as its visual anchor. It must feel original to the site's mysterious campsite identity, polished, and memorable rather than using a generic spinner.
+
+- Design a distinctive logo-led animation that can combine subtle logo movement/glow, a campfire or ember motif, and restrained atmospheric details. Treat these as art-direction guidance; the final animation should remain coherent and not visually cluttered.
+- Use the same loading language for initial app/page transitions and meaningful asynchronous states (for example, novel/chapter data loads). Avoid covering the whole page for tiny operations that can use inline feedback.
+- Show loading text or an accessible status label where appropriate; keep the logo's alternative text meaningful.
+- The loader must not trap interaction indefinitely. Always remove it on success, empty results, or errors, and provide a usable error/retry state when necessary.
+- Keep animation performant on mobile and low-powered devices. Respect `prefers-reduced-motion` with a calm static/fade alternative.
+- Avoid replaying a long full-screen intro on every small navigation action. Use a short transition for subsequent loads and reserve the full treatment for initial entry or genuinely blocking loads.
+- Do not make sound a prerequisite for the loader; loading visuals must work when audio is disabled or blocked by the browser.
+
+### 5.18 Music and sound effects
+
+**Priority: P2**
+
+Add independent background Music and Sound Effects (SFX) controls to Settings. Audio assets will be supplied by the maintainer and stored under `assets/sound/`; do not invent filenames before the assets are provided.
+
+- Provide separate enable/disable toggles for Music and SFX. Disabling one must not disable or alter the other.
+- Provide an independent volume slider for each category, with an understandable numeric or percentage indication.
+- Suggested preference keys: `musicEnabled`, `musicVolume`, `sfxEnabled`, and `sfxVolume`. Persist preferences across pages and sessions; use account-backed preferences when available, with a local preference fallback for signed-out visitors.
+- Apply volume changes immediately. A volume of zero must be silent even if the category is enabled.
+- Background music must not autoplay with audible sound before a user gesture. Start or resume playback only after an allowed user interaction, handle browser autoplay restrictions gracefully, and provide clear state feedback.
+- Music should avoid restarting on every page transition where technically feasible. Prevent duplicate overlapping tracks and stop/release audio resources when no longer needed.
+- SFX should be short, purposeful, and not play on every pointer movement. Respect the SFX toggle and volume for every effect.
+- If a requested audio file is missing or fails to load, the site must remain usable and must not throw an uncaught error. Log useful diagnostics in development without exposing sensitive information to readers.
+- Keep a documented asset convention under `assets/sound/` (for example, separate music and sfx subfolders if useful), and update this PRD when actual filenames/formats are selected.
+- Respect reduced-motion settings as applicable, and provide an obvious way to mute audio. Audio should never be required to understand the interface.
+
+### 5.19 Realtime online readers count
+
+**Priority: P2**
+
+Display a live count of currently active readers/sessions in an appropriate shared site location. The count must represent active sessions rather than cumulative visits or registered accounts.
+
+- Prefer Supabase Realtime Presence or an equivalent server-backed mechanism that supports joining/leaving and expiry of stale sessions.
+- Define “online” as a session that has an active presence heartbeat/connection within a documented timeout window. Remove disconnected or stale sessions automatically; do not let closed tabs inflate the count indefinitely.
+- Count unique active sessions or users consistently and document which interpretation is used. Avoid counting the same session multiple times due to reconnects.
+- Update the display when sessions join or leave without requiring a page refresh. Show a small loading/unknown state while connecting, and a graceful fallback if realtime is unavailable.
+- Do not expose reader identities, emails, IP addresses, or other personal details. The UI should display only the aggregate count.
+- Avoid storing long-term behavioral tracking just to show the aggregate. Apply database/channel access controls and validate the design against Supabase Realtime limits.
+- Test multiple tabs, reconnects, network loss, signed-out visitors, mobile backgrounding, and cleanup of stale sessions. Document whether bots and the current visitor are included in the count.
+
+### 5.20 Realtime retro neon flip clock
+
+**Priority: P2**
+
+Create a real-time digital clock styled like a retro split-flap/folding desk clock, reimagined with a digital neon finish that fits Hollow Night Camp's visual identity.
+
+- Display the current hour and minute and update automatically in real time. The default format should be 24-hour, with a 12/24-hour preference only if the wider settings design supports it cleanly.
+- Use a desk-clock silhouette with separate upper/lower digit panels. When a digit changes, animate the front card flipping forward/down to reveal the next digit, like a vintage flip clock. The animation should be convincingly card-like rather than a generic number fade.
+- Add restrained neon glow, contrast, shadows, and retro detailing so digits remain readable on desktop and mobile. Avoid excessive glow that reduces legibility or causes performance issues.
+- Include a timezone selector in Settings. Offer a sensible default based on the browser's detected timezone, allow a manual IANA timezone selection (for example, `Asia/Jakarta`), and persist the selected value across sessions. Clearly label the selected timezone near the clock or in its settings.
+- Use timezone-aware date formatting; do not manually add fixed offsets, because daylight-saving changes vary by timezone.
+- Update the time without repeated network polling; the clock should use the client clock and timezone APIs. Handle invalid saved timezone values by falling back safely to the browser timezone.
+- Respect `prefers-reduced-motion`: reduce or replace the flip animation with a subtle transition while still updating the time. Ensure screen readers receive a useful time label without announcing every visual frame.
+- Test minute/hour/day rollovers, 12 AM/PM boundaries if 12-hour mode is supported, timezone changes, mobile sizing, and reduced-motion behavior.
+
+### 5.21 Global Settings gear dropdown
+
+**Priority: P1**
+
+The Settings gear must act as a global in-place dropdown trigger available from every applicable page. Clicking the gear must not navigate away from the current page. The existing Settings content remains organized into the sections specified in §5.12; dropdown entries act as shortcuts to their corresponding dedicated settings page or destination.
+
+- Opening the menu reveals a dropdown anchored to the gear button, regardless of which site page the reader is currently viewing.
+- Animate the gear rotation in sync with the dropdown opening/closing. The dropdown should unfold/slide down with a polished, coordinated transition; clicking the gear again reverses the motion and closes the menu.
+- Clicking a submenu item navigates to the correct dedicated settings destination. Opening or closing the dropdown alone must preserve the current route and page state.
+- Include the existing planned settings destinations: Profile, Display, Notifications, History, Support & Feedback, Community, and Information. Add the new Audio controls and Clock / timezone preferences to suitable settings sections.
+- Close the dropdown after a destination is selected, when the user clicks outside it, or presses Escape. Keep keyboard focus predictable and return focus to the trigger when Escape closes it.
+- Use correct button semantics, `aria-expanded`, `aria-controls`, and accessible names. Do not rely on gear rotation alone to communicate open state.
+- Ensure it fits inside the viewport on small screens, does not get clipped by parent containers, and layers above page content without blocking unrelated controls when closed.
+- Respect `prefers-reduced-motion` by shortening or disabling the rotation/dropdown animation.
+- Avoid duplicate dropdown instances or event listeners when navigating between pages. Keep shared behavior in the shared navigation layer where possible.
 - Do not show drafts.
 - Show a designed empty state if no published chapters exist.
 
@@ -656,6 +804,7 @@ Use recognizable platform icons while respecting their trademarks and each platf
 - Supabase JavaScript client v2 loaded from `esm.sh`
 - Supabase Auth and profile queries
 - CSS / JavaScript parallax effect using a background image and depth map
+- Planned shared loader animation, browser audio controls for `assets/sound/`, Supabase Realtime Presence for online-session counts, timezone-aware client clock, and shared Settings dropdown.
 
 ### Proposed responsibilities
 
@@ -697,6 +846,10 @@ The exact final schema should be designed and migrated deliberately. Suggested e
 - `profiles`
 - `novels`
 - `chapters`
+- `chapter_ratings` (one current rating per user per chapter; unique `(chapter_id, user_id)`; rating constrained to 1–5)
+- `arcade_scores` (persistent score submissions / leaderboard records, linked to a Supabase user and stable game key)
+- `arcade_saves` (compact, versioned save-game payloads linked to a Supabase user and game key)
+- `arcade_player_stats` (optional derived or cached arcade profile statistics; avoid storing data that can be safely derived from scores)
 - `characters`
 - `maps`
 - `map_markers`
@@ -708,6 +861,8 @@ The exact final schema should be designed and migrated deliberately. Suggested e
 - `reading_progress`
 - `bookmarks`
 - `support_reports` (if reports are stored in the application)
+- `user_preferences` or equivalent fields for audio settings, timezone, display preferences, and other per-user settings (avoid duplicating preferences already represented in `profiles`).
+- Realtime Presence channel/configuration for aggregate online sessions; this may not require a persistent table if Supabase Presence is used.
 
 Each table should use stable IDs, timestamps where appropriate, and explicit relationships. Add indexes for common list queries, sorting, and foreign keys.
 
@@ -777,6 +932,7 @@ The checkboxes below track the implementation visible in the supplied repository
 - [x] Configure Supabase project URL and publishable client key in frontend.
 - [x] Create the `profiles` table and confirm profile save behavior in project progress.
 - [x] Add the Cloudflare Worker URL to Supabase Auth Redirect URLs, as confirmed in project progress.
+- [ ] Implement shared logo-led loading animation with error/reduced-motion states.
 - [ ] Verify production sign-up, email verification / redirect, login, logout and session persistence end-to-end.
 - [ ] Test RLS and Storage policies using Reader, Author and signed-out sessions.
 - [ ] Confirm canonical production domain and repeatable deployment workflow (the README still references GitHub Pages).
@@ -790,6 +946,8 @@ The checkboxes below track the implementation visible in the supplied repository
 - [x] Implement chapter editor with title, subtitle, chapter number, volume and word count.
 - [x] Implement save-draft and publish actions in source.
 - [x] Add reader-facing chapter page and chapter navigation.
+- [ ] Implement Chapter Ratings with five d20 icons (outline-only when unrated, proportionally filled interiors after ratings), one current vote per Reader per chapter, fractional fill, and realtime chapter average/count.
+- [ ] Implement weighted Novel Ratings aggregated from all individual votes across published chapters, with realtime count/average updates and database-enforced uniqueness/RLS; use the same d20 rating visual system.
 - [x] Add chapter import flow for TXT, DOCX and text-based PDF, with review before draft creation.
 - [ ] Verify database schema, RLS, published-only Reader visibility, Storage bucket policies and cross-session persistence.
 - [ ] Verify complete latest-published-chapter display on the Campfire homepage.
@@ -824,20 +982,26 @@ The checkboxes below track the implementation visible in the supplied repository
 - [ ] Implement notification preferences and notification center.
 - [ ] Implement reading history and bookmarks.
 - [ ] Add Help / FAQ, support feedback and Community social links.
+- [ ] Add global Settings gear dropdown available in place on every applicable page, with synchronized gear rotation/dropdown animation and accessible close behavior.
+- [ ] Add independent Music and SFX enable/disable and volume controls backed by `assets/sound/` assets.
+- [ ] Add persisted timezone selection and the retro neon split-flap clock UI.
 
 **Current exit status: PARTIAL.** Profile basics work; remaining account preferences and utilities are outstanding.
 
 ### Phase 5 — Arcade
+- [ ] Implement Supabase-backed arcade score submissions and leaderboards with RLS and validated score writes.
+- [ ] Implement compact, versioned Supabase save-game records and player-linked stats/profile display; retain guest play for games that do not require persistence.
 - [ ] Implement animated dice rolling and session roll history.
 - [ ] Add simple playable browser games.
 - [ ] Test mobile input and reduced-motion behavior.
 
-**Current exit status: NOT STARTED.** Arcade remains a placeholder.
+**Current exit status: NOT STARTED.** Arcade remains a placeholder. Supabase-backed leaderboards, compact cross-device game saves, and player-linked arcade stats are requirements for persistent arcade features; simple guest play can remain local-only.
 
 ### Phase 6 — Camp exploration, deployment and polish
 - [ ] Add wide-angle / distant-camera mode.
 - [ ] Add FireWatcher inspection interaction and optional easter eggs.
 - [ ] Optimize scene assets and animation performance.
+- [ ] Implement aggregate realtime online-reader count with stale-session cleanup and privacy-safe display.
 - [ ] Conduct accessibility, responsive and regression testing.
 - [ ] Verify Cloudflare Worker / Pages deployment, canonical domain, direct-page navigation and Supabase Auth redirects.
 - [ ] Update README deployment instructions to match the actual hosting setup.
@@ -876,6 +1040,10 @@ Resolve these during implementation rather than guessing:
 8. **Community accounts:** Should theory posting require a verified email address?
 9. **Reading history:** Should reading progress sync across devices, and should users be able to delete it?
 10. **Localization:** Which language should be selected by default for new visitors?
+11. **Audio assets:** What are the final filenames, formats, and intended looping behavior for music and SFX under `assets/sound/`?
+12. **Online readers:** Should the count represent unique users or active browser sessions, and should the current visitor be included? Default proposal: active sessions, including the current visitor, with no identities exposed.
+13. **Clock placement:** Where should the clock and online count appear across the shared site layout (for example, Main Bar utility area or a homepage status panel)?
+14. **Clock format:** Should 24-hour time be mandatory or should users be able to choose 12/24-hour format? Default proposal: 24-hour.
 
 ---
 
@@ -910,3 +1078,8 @@ The ongoing project conversation confirms that the Cloudflare Worker URL `https:
 *The fire is still burning. The woods are watching.*
 
 </div>
+
+
+### New feature requirements recorded on 2026-10-20
+
+The following are **planned requirements only** and are not claimed to be implemented in the supplied ZIP: (1) custom logo-led loading animation, (2) separate Music and SFX controls with independent volumes and assets under `assets/sound/`, (3) aggregate realtime online-reader count, (4) timezone-configurable retro neon split-flap clock, and (5) a global in-place Settings gear dropdown with synchronized gear/dropdown animation. Detailed acceptance criteria are defined in §5.16–§5.20. Update the status table and phase checkboxes only after implementation is present in the repository; verify runtime behavior separately.
