@@ -1,0 +1,30 @@
+/* HOLLOW NIGHT CAMP — volume picker (editor) + volume headers (novel page) */
+
+.vol-field { min-width: 0; display: grid; gap: 6px; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--orange); font-weight: 700; }
+.vol-combo { position: relative; }
+.vol-combo input { padding-right: 44px; }
+.vol-toggle {
+  position: absolute; top: 50%; right: 8px; width: 30px; height: 30px; transform: translateY(-50%);
+  border: 0; border-radius: 8px; background: transparent; cursor: pointer;
+}
+.vol-toggle::after {
+  content: ""; position: absolute; inset: 0; margin: auto; width: 16px; height: 16px; background: var(--paper);
+  transform: rotate(-90deg);
+  -webkit-mask: url("../assets/icons/back.png") center / contain no-repeat;
+          mask: url("../assets/icons/back.png") center / contain no-repeat;
+}
+.vol-toggle:hover { background: rgba(243,231,201,.1); }
+.vol-list {
+  position: absolute; z-index: 30; top: calc(100% + 6px); left: 0; right: 0; max-height: 240px; margin: 0; padding: 6px;
+  overflow-y: auto; list-style: none; border: 1.5px solid var(--line); border-radius: 14px;
+  background: var(--night); box-shadow: 0 18px 40px rgba(0,0,0,.55);
+  text-transform: none; letter-spacing: 0; font-weight: 500;
+}
+.vol-list[hidden] { display: none; }
+.vol-option { padding: 10px 12px; border-radius: 10px; font-size: 15px; color: var(--paper); cursor: pointer; overflow-wrap: anywhere; }
+.vol-option.active, .vol-option:hover { background: rgba(242,163,75,.2); }
+.vol-option.is-new { color: var(--fire); font-weight: 700; }
+.vol-hint { margin: 0; text-transform: none; letter-spacing: 0; font-weight: 500; font-size: 13px; color: var(--muted); }
+
+.chapter-list li.chapter-volume { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
+.volume-tools { display: flex; flex-wrap: wrap; gap: 6px; font-family: var(--body); }
