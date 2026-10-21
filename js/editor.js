@@ -2,6 +2,8 @@
 
 import { initPage } from './shared.js?v=8';
 import { supabase } from '../config/supabase.js';
+import { loadVolumes, createVolume } from './volumes.js?v=1';
+import { createVolumeCombobox } from './volume-combobox.js?v=1';
 
 await initPage({ active: 'novels', editor: true, requireAuthor: true });
 
@@ -12,7 +14,6 @@ let novelId = params.get('novel');
 const titleInput = document.getElementById('chapterTitle');
 const subtitleInput = document.getElementById('chapterSubtitle');
 const numberInput = document.getElementById('chapterNumber');
-const volumeInput = document.getElementById('chapterVolume');
 const chapterBody = document.getElementById('chapterBody');
 const wordCount = document.getElementById('wordCount');
 const saveState = document.getElementById('saveState');
@@ -72,7 +73,15 @@ removeCoverButton.addEventListener('click', () => {
   markDirty();
 });
 
-const fields = [titleInput, subtitleInput, numberInput, volumeInput, chapterBody];
+let volumes = [];
+const volumeCombo = createVolumeCombobox(document.getElementById('volumeCombo'), {
+  getVolumes: () => volumes,
+  labelledBy: 'volumeLabel',
+  hint: document.getElementById('volumeHint'),
+  onChange: () => markDirty()
+});
+
+const fields = [titleInput, subtitleInput, numberInput, chapterBody];
 
 let status = 'draft';      // status stored in the database for this chapter
 let position = null;       // only set for brand-new chapters
@@ -155,12 +164,31 @@ async function save(nextStatus) {
     return;
   }
 
+  // volume: use the chosen one, or create the typed one (the database keeps one per name per novel)
+  let volumeId = null;
+  const chosen = volumeCombo.getValue();
+  if (chosen.newName) {
+    try {
+      const volume = await createVolume(novelId, chosen.newName, volumes);
+      if (!volumes.some((item) => item.id === volume.id)) volumes.push(volume);
+      volumeId = volume.id;
+      volumeCombo.setValue(volume.id);
+    } catch (error) {
+      setSaveState('Could not create the volume: ' + (error?.message || 'unknown error') + ' Your text is still here.', true);
+      saving = false;
+      renderButtons();
+      return;
+    }
+  } else {
+    volumeId = chosen.id;
+  }
+
   const row = {
     cover_url: finalCover,
     title,
     subtitle: subtitleInput.value.trim() || null,
     chapter_number: parseNumber(numberInput.value),
-    volume: volumeInput.value.trim() || null,
+    volume_id: volumeId,
     body: chapterBody.value,
     status: nextStatus
   };
@@ -210,6 +238,8 @@ window.addEventListener('keydown', (event) => {
   }
 });
 
+let initialVolumeId = null;
+
 async function init() {
   if (chapterId) {
     const { data, error } = await supabase.from('chapters').select('*').eq('id', chapterId).maybeSingle();
@@ -226,7 +256,7 @@ async function init() {
     titleInput.value = data.title || '';
     subtitleInput.value = data.subtitle || '';
     numberInput.value = data.chapter_number ?? '';
-    volumeInput.value = data.volume || '';
+    initialVolumeId = data.volume_id || null;
     chapterBody.value = data.body || '';
     coverUrl = data.cover_url || null;
     renderCover(coverUrl);
@@ -243,6 +273,13 @@ async function init() {
     renderButtons();
     return;
   }
+
+  try {
+    volumes = await loadVolumes(novelId);
+  } catch (error) {
+    setSaveState('Could not load volumes: ' + (error?.message || 'unknown error'), true);
+  }
+  volumeCombo.setValue(initialVolumeId);
 
   backLink.href = 'novel.html?id=' + encodeURIComponent(novelId);
   backLink.querySelector('.back-label').textContent = 'Back to novel';

@@ -164,7 +164,7 @@ async function loadLatestChapter() {
   // RLS already hides drafts from Readers; the status filter also keeps them off the Author's homepage.
   const { data: chapters, error } = await supabase
     .from('chapters')
-    .select('id, novel_id, title, chapter_number, volume, cover_url, published_at, word_count')
+    .select('id, novel_id, title, chapter_number, volume_id, volumes(name), cover_url, published_at, word_count')
     .eq('status', 'published')
     .order('published_at', { ascending: false })
     .limit(1);
@@ -192,7 +192,7 @@ async function loadLatestChapter() {
   const tagParts = [];
   if (novelTitle) tagParts.push(novelTitle);
   if (number != null) tagParts.push('Chapter ' + number);
-  if (chapter.volume) tagParts.push(chapter.volume);
+  if (chapter.volumes?.name) tagParts.push(chapter.volumes.name);
   document.getElementById('latestChapterTag').textContent = (tagParts.join(' · ') || 'Latest chapter').toUpperCase();
 
   document.getElementById('latestChapterTitle').textContent = chapter.title || 'Untitled chapter';

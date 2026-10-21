@@ -4,6 +4,7 @@ import { initPage } from './shared.js?v=8';
 import { supabase } from '../config/supabase.js';
 import { el } from './dom.js?v=2';
 import { mountChapterRating } from './rating.js?v=1';
+import { loadVolumes, sortChapters } from './volumes.js?v=1';
 
 const ctx = await initPage({ active: 'novels' });
 
@@ -57,16 +58,19 @@ if (!chapterId) {
 
     const [{ data: novel }, { data: siblings }] = await Promise.all([
       supabase.from('novels').select('id, title').eq('id', chapter.novel_id).maybeSingle(),
-      supabase.from('chapters').select('id, title').eq('novel_id', chapter.novel_id)
-        .eq('status', 'published').order('position', { ascending: true }).order('created_at', { ascending: true })
+      supabase.from('chapters').select('id, title, position, volume_id, created_at').eq('novel_id', chapter.novel_id)
+        .eq('status', 'published')
     ]);
+
+    let volumeRows = [];
+    try { volumeRows = await loadVolumes(chapter.novel_id); } catch (volumeError) { console.error('Unable to load volumes:', volumeError); }
 
     if (novel) {
       novelEl.replaceChildren(el('a', { href: 'novel.html?id=' + encodeURIComponent(novel.id), text: novel.title }));
       novelEl.firstChild.style.color = 'inherit';
     }
 
-    const list = siblings || [];
+    const list = sortChapters(siblings || [], volumeRows);
     const index = list.findIndex((item) => item.id === chapter.id);
     const prev = index > 0 ? list[index - 1] : null;
     const next = index >= 0 && index < list.length - 1 ? list[index + 1] : null;

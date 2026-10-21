@@ -5,6 +5,7 @@ import { supabase } from '../config/supabase.js';
 import { el, formatDate, readingTime, statusChip } from './dom.js?v=2';
 import { openImportDialog } from './import.js?v=1';
 import { mountNovelRating, fetchNovelStatsMap, compactRating } from './rating.js?v=1';
+import { loadVolumes, sortChapters } from './volumes.js?v=1';
 
 const page = document.body.dataset.page;
 const ctx = await initPage({ active: 'novels' });
@@ -257,6 +258,7 @@ if (page === 'novel') {
 
   let novel = null;
   let chapters = [];
+  let volumes = [];
 
   const listMessage = (text) => chapterList.replaceChildren(el('li', { text }));
 
@@ -301,15 +303,15 @@ if (page === 'novel') {
     await loadChapters();
   }
 
-  // Reorder inside the same volume / arc: swap with the neighbour, then renumber positions 1..n
-  async function moveChapter(index, direction) {
-    const list = [...chapters];
+  // Reorder inside the same volume / arc: swap with the neighbour, then renumber that volume's positions 1..n
+  async function moveChapter(group, index, direction) {
+    const items = [...group.items];
     const target = index + direction;
-    if (target < 0 || target >= list.length) return;
-    [list[index], list[target]] = [list[target], list[index]];
+    if (target < 0 || target >= items.length) return;
+    [items[index], items[target]] = [items[target], items[index]];
 
     const updates = [];
-    list.forEach((chapter, i) => {
+    items.forEach((chapter, i) => {
       if (chapter.position !== i + 1) {
         updates.push(supabase.from('chapters').update({ position: i + 1 }).eq('id', chapter.id));
       }
@@ -324,7 +326,61 @@ if (page === 'novel') {
     await loadChapters();
   }
 
-  function renderChapter(chapter, index) {
+  async function renameVolume(volume) {
+    const input = window.prompt('Rename volume', volume.name);
+    if (input == null) return;
+    const name = input.trim();
+    if (!name || name === volume.name) return;
+    if (name.length > 80) { window.alert('The name can be at most 80 characters.'); return; }
+    const { data, error } = await supabase.from('volumes').update({ name }).eq('id', volume.id).select('id');
+    if (error) {
+      window.alert(error.code === '23505' ? 'A volume with that name already exists.' : 'Could not rename: ' + error.message);
+      return;
+    }
+    if (!data?.length) { window.alert('You are not allowed to rename this volume.'); return; }
+    await loadChapters();
+  }
+
+  async function moveVolume(volume, direction) {
+    const list = [...volumes];
+    const index = list.findIndex((item) => item.id === volume.id);
+    const target = index + direction;
+    if (index < 0 || target < 0 || target >= list.length) return;
+    [list[index], list[target]] = [list[target], list[index]];
+
+    const results = await Promise.all(list
+      .map((item, i) => (item.position !== i + 1 ? supabase.from('volumes').update({ position: i + 1 }).eq('id', item.id) : null))
+      .filter(Boolean));
+    const failed = results.find((result) => result.error);
+    if (failed) window.alert('Could not reorder volumes: ' + failed.error.message);
+    await loadChapters();
+  }
+
+  async function deleteVolume(volume, count) {
+    const note = count ? ' Its ' + count + (count === 1 ? ' chapter stays' : ' chapters stay') + ' in the novel, without a volume.' : '';
+    if (!window.confirm('Delete volume "' + volume.name + '"?' + note)) return;
+    const { error } = await supabase.from('volumes').delete().eq('id', volume.id);
+    if (error) { window.alert('Could not delete the volume: ' + error.message); return; }
+    await loadChapters();
+  }
+
+  function renderVolumeHeader(group) {
+    const { volume, items } = group;
+    const index = volumes.findIndex((item) => item.id === volume.id);
+    const header = el('li', { class: 'chapter-volume' }, el('span', { class: 'volume-name', text: volume.name }));
+
+    if (ctx.isAuthor) {
+      header.append(el('div', { class: 'volume-tools' },
+        el('button', { class: 'hn-btn ghost small', type: 'button', text: '↑', 'aria-label': 'Move volume up', title: 'Move volume up', disabled: index <= 0, onclick: () => moveVolume(volume, -1) }),
+        el('button', { class: 'hn-btn ghost small', type: 'button', text: '↓', 'aria-label': 'Move volume down', title: 'Move volume down', disabled: index >= volumes.length - 1, onclick: () => moveVolume(volume, 1) }),
+        el('button', { class: 'hn-btn ghost small', type: 'button', text: 'Rename', onclick: () => renameVolume(volume) }),
+        el('button', { class: 'hn-btn danger small', type: 'button', text: 'Delete', onclick: () => deleteVolume(volume, items.length) })
+      ));
+    }
+    return header;
+  }
+
+  function renderChapter(chapter, group, index) {
     const label = chapter.chapter_number != null ? 'Chapter ' + chapter.chapter_number : null;
     const sub = [label, chapter.subtitle, readingTime(chapter.word_count), chapter.status === 'published' && chapter.published_at ? formatDate(chapter.published_at) : null]
       .filter(Boolean).join(' · ');
@@ -336,13 +392,9 @@ if (page === 'novel') {
     const tools = el('div', { class: 'chapter-tools' });
 
     if (ctx.isAuthor) {
-      const prev = chapters[index - 1];
-      const next = chapters[index + 1];
-      const sameVolume = (other) => other && (other.volume || null) === (chapter.volume || null);
-
       tools.append(
-        el('button', { class: 'hn-btn ghost small', type: 'button', text: '↑', 'aria-label': 'Move chapter up', title: 'Move up', disabled: !sameVolume(prev), onclick: () => moveChapter(index, -1) }),
-        el('button', { class: 'hn-btn ghost small', type: 'button', text: '↓', 'aria-label': 'Move chapter down', title: 'Move down', disabled: !sameVolume(next), onclick: () => moveChapter(index, 1) }),
+        el('button', { class: 'hn-btn ghost small', type: 'button', text: '↑', 'aria-label': 'Move chapter up', title: 'Move up', disabled: index === 0, onclick: () => moveChapter(group, index, -1) }),
+        el('button', { class: 'hn-btn ghost small', type: 'button', text: '↓', 'aria-label': 'Move chapter down', title: 'Move down', disabled: index === group.items.length - 1, onclick: () => moveChapter(group, index, 1) }),
         el('span', { class: 'hn-badge ' + (chapter.status === 'published' ? 'live' : 'draft'), text: chapter.status === 'published' ? 'Published' : 'Draft' }),
         el('a', { class: 'hn-btn ghost small', href: 'editor.html?chapter=' + encodeURIComponent(chapter.id), text: 'Edit' }),
         el('button', {
@@ -361,34 +413,48 @@ if (page === 'novel') {
   }
 
   async function loadChapters() {
+    let volumeRows = [];
+    try {
+      volumeRows = await loadVolumes(novelId);
+    } catch (error) {
+      listMessage('Could not load volumes: ' + error.message);
+      return;
+    }
+
     const { data, error } = await supabase
       .from('chapters')
-      .select('id, title, subtitle, chapter_number, volume, position, status, published_at, word_count')
-      .eq('novel_id', novelId)
-      .order('position', { ascending: true })
-      .order('created_at', { ascending: true });
+      .select('id, title, subtitle, chapter_number, volume_id, position, status, published_at, word_count, created_at')
+      .eq('novel_id', novelId);
 
     if (error) {
       listMessage('Could not load chapters: ' + error.message);
       return;
     }
 
-    if (!data.length) {
+    if (!data.length && !volumeRows.length) {
       listMessage(ctx.isAuthor ? 'No chapters yet. Use “+ New Chapter” to write the first one.' : 'No chapters yet.');
       return;
     }
 
-    chapters = data;
+    volumes = volumeRows;
+    chapters = sortChapters(data, volumes);
 
-    const items = [];
-    let lastVolume;
-    data.forEach((chapter, index) => {
-      const volume = chapter.volume || null;
-      if (volume && volume !== lastVolume) items.push(el('li', { class: 'chapter-volume', text: volume }));
-      lastVolume = volume;
-      items.push(renderChapter(chapter, index));
+    // one group per volume id, so the same volume can never show up twice
+    const known = new Set(volumes.map((volume) => volume.id));
+    const groups = [];
+    const loose = chapters.filter((chapter) => !chapter.volume_id || !known.has(chapter.volume_id));
+    if (loose.length) groups.push({ volume: null, items: loose });
+    volumes.forEach((volume) => {
+      const items = chapters.filter((chapter) => chapter.volume_id === volume.id);
+      if (items.length || ctx.isAuthor) groups.push({ volume, items });
     });
-    chapterList.replaceChildren(...items);
+
+    const rows = [];
+    groups.forEach((group) => {
+      if (group.volume) rows.push(renderVolumeHeader(group));
+      group.items.forEach((chapter, index) => rows.push(renderChapter(chapter, group, index)));
+    });
+    chapterList.replaceChildren(...rows);
   }
 
   if (!novelId) {
