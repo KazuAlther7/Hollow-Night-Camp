@@ -85,9 +85,9 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
       <div class="bar-primary-links" id="barPrimaryLinks">${navLinks(active, NAV.filter((page) => page.id !== 'settings'))}</div>
       <div class="bar-utility-links">
         ${authorEntry(isAuthor)}
-        <a class="bar-icon-button bar-util-link${active === 'settings' ? ' active' : ''}" href="settings.html" aria-label="Settings" title="Settings"${active === 'settings' ? ' aria-current="page"' : ''}>
+        <button class="bar-icon-button bar-util-link settings-trigger${active === 'settings' ? ' active' : ''}" id="settingsMenuButton" type="button" aria-label="Settings" title="Settings" aria-haspopup="true" aria-expanded="false" aria-controls="settingsMenu">
           ${icon('settings')}<span class="bar-util-label">Settings</span>
-        </a>
+        </button>
         <button class="bar-icon-button" id="notificationButton" type="button" aria-label="Notifications" title="Notifications">
           ${icon('notification')}<span class="bar-util-label">Notification</span><span class="notification-dot"></span>
         </button>
@@ -173,6 +173,8 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
     if (event.target === bar) bar.classList.remove(introClass);
   }, { once: true });
 
+  mountSettingsMenu();
+
   const authorToggle = document.getElementById('authorStudioToggle');
   if (authorToggle) {
     const paint = (on) => {
@@ -211,6 +213,61 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
     button.textContent = 'Signing out...';
     try { await signOut(); } catch (error) { button.disabled = false; button.textContent = 'Sign out of camp'; }
   });
+}
+
+// Settings gear: opens a dropdown in place (no navigation until an item is chosen).
+const SETTINGS_MENU = [
+  { href: 'settings.html#profile', label: 'Profile' },
+  { href: 'settings.html#history', label: 'History & Bookmarks' },
+  { href: 'settings.html#clock',   label: 'Clock & timezone' }
+];
+
+function mountSettingsMenu() {
+  const button = document.getElementById('settingsMenuButton');
+  if (!button || document.getElementById('settingsMenu')) return;
+
+  const css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = new URL('../css/settings-menu.css?v=1', import.meta.url).href;
+  document.head.append(css);
+
+  // lives on <body>: the Main Bar's blur / scroll container would clip or re-anchor a fixed child
+  document.body.insertAdjacentHTML('beforeend', `
+    <nav class="settings-menu" id="settingsMenu" aria-label="Settings sections">
+      <p class="settings-menu-title">Settings</p>
+      ${SETTINGS_MENU.map((item) => `<a href="${item.href}">${item.label}</a>`).join('')}
+    </nav>`);
+  const menu = document.getElementById('settingsMenu');
+
+  const place = () => {
+    const rect = button.getBoundingClientRect();
+    const width = menu.offsetWidth || 236;
+    if (document.body.classList.contains('bar-sidebar')) {
+      menu.style.left = Math.max(8, Math.min(rect.right + 10, window.innerWidth - width - 8)) + 'px';
+      menu.style.top = Math.max(8, Math.min(rect.top, window.innerHeight - menu.offsetHeight - 8)) + 'px';
+    } else {
+      menu.style.left = Math.max(8, Math.min(rect.right - width, window.innerWidth - width - 8)) + 'px';
+      menu.style.top = (rect.bottom + 12) + 'px';
+    }
+  };
+  const setOpen = (open, returnFocus = false) => {
+    if (open) place();
+    menu.classList.toggle('open', open);
+    button.setAttribute('aria-expanded', String(open));
+    if (!open && returnFocus) button.focus();
+  };
+
+  button.addEventListener('click', () => setOpen(!menu.classList.contains('open')));
+  menu.addEventListener('click', (event) => { if (event.target.closest('a')) setOpen(false); });
+  document.addEventListener('click', (event) => {
+    if (menu.classList.contains('open') && !menu.contains(event.target) && !button.contains(event.target)) setOpen(false);
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && menu.classList.contains('open')) setOpen(false, true);
+  });
+  window.addEventListener('resize', () => setOpen(false));
+  // Main Bar switched between top / sidebar / compact: close so it never points at a moved button
+  new MutationObserver(() => setOpen(false)).observe(document.body, { attributes: true, attributeFilter: ['class'] });
 }
 
 function escapeHtml(value) {

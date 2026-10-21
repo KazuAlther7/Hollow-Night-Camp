@@ -1,9 +1,10 @@
 // HOLLOW NIGHT CAMP — read.html (chapter reader). Drafts are hidden from Readers by RLS.
 
-import { initPage } from './shared.js?v=10';
+import { initPage } from './shared.js?v=11';
 import { supabase } from '../config/supabase.js';
 import { el } from './dom.js?v=2';
 import { mountChapterRating } from './rating.js?v=1';
+import { mountReadingTools } from './reading.js?v=1';
 import { loadVolumes, sortChapters } from './volumes.js?v=1';
 
 const ctx = await initPage({ active: 'novels' });
@@ -54,6 +55,10 @@ if (!chapterId) {
 
     if (chapter.status === 'published') {
       mountChapterRating(document.getElementById('readerRating'), chapter.id, ctx.user.id);
+      mountReadingTools({
+        chapter, userId: ctx.user.id, body: bodyEl, tools: document.getElementById('readerTools'),
+        resume: new URLSearchParams(window.location.search).get('resume') === '1'
+      });
     }
 
     const [{ data: novel }, { data: siblings }] = await Promise.all([

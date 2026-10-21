@@ -1,11 +1,12 @@
 // HOLLOW NIGHT CAMP — novels.html (library) and novel.html (detail + chapter management)
 
-import { initPage } from './shared.js?v=10';
+import { initPage } from './shared.js?v=11';
 import { supabase } from '../config/supabase.js';
 import { el, formatDate, readingTime, statusChip } from './dom.js?v=2';
 import { openImportDialog } from './import.js?v=1';
 import { mountNovelRating, fetchNovelStatsMap, compactRating } from './rating.js?v=1';
 import { loadVolumes, sortChapters } from './volumes.js?v=1';
+import { mountContinueReading } from './reading.js?v=1';
 
 const page = document.body.dataset.page;
 const ctx = await initPage({ active: 'novels' });
@@ -488,6 +489,7 @@ if (page === 'novel') {
         }));
       }
 
+      mountContinueReading(document.getElementById('novelContinue'), novel.id);
       await loadChapters();
     }
   }
