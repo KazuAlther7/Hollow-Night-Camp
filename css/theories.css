@@ -53,3 +53,11 @@
 .th-reply-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
 .th-count { font-size: 13px; color: var(--muted); }
 .th-note { margin: 12px 0 0; font-size: 14px; color: var(--muted); }
+
+/* avatar + nickname */
+.th-person { display: inline-flex; align-items: center; gap: 8px; min-width: 0; color: var(--paper); font-weight: 600; }
+.th-avatar { flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; object-fit: cover; background: var(--forest); box-shadow: 0 0 0 1.5px rgba(243,231,201,.35); }
+.th-avatar-fallback { display: inline-flex; align-items: center; justify-content: center; background: var(--orange); color: var(--ink); font: 700 14px var(--heading); }
+.th-person.lg .th-avatar { width: 36px; height: 36px; }
+.th-person.lg .th-avatar-fallback { font-size: 17px; }
+.th-name { overflow-wrap: anywhere; }
