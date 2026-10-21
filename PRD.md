@@ -958,9 +958,11 @@ The checkboxes below track the implementation visible in the supplied repository
 
 ### Phase 2 — Author tools and world building
 - [ ] Complete volume / arc organization and chapter reordering.
-- [ ] Add dedicated Characters management and reader pages.
-- [ ] Add Maps, map image upload and responsive named markers.
-- [ ] Add Locations management and linked lore records.
+- [x] Add dedicated Characters management and reader pages (`characters.html`, `js/world.js`; Author-only editing, Readers view published).
+- [x] Add Maps, map image upload and responsive named markers (`maps.html`; markers stored as % of image, Author add / edit / move / delete).
+- [x] Add Locations management and linked lore records (`locations.html`; links to a map + marker and to characters based there). Links to chapters still open.
+- [x] Add Novels sub-navigation (Novels / Characters / Maps / Locations) under each page headline, above the Author toolbar.
+- [ ] Run `supabase/world-building.sql` in Supabase, then verify RLS and the `worldbuilding` Storage bucket with Reader, Author and signed-out sessions.
 - [ ] Verify and improve novel cover / image upload through Supabase Storage.
 
 **Current exit status: NOT COMPLETE.** Chapter volume metadata and cover-upload code exist, but full world-building management is not implemented.
