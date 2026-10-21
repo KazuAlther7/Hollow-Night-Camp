@@ -309,6 +309,9 @@ export async function initPage(options = {}) {
 
   mountSubNav();
 
+  // top-right status widget (flip clock + online readers); never allowed to break the page
+  import('./status-widget.js?v=1').then((module) => module.mountStatusWidget()).catch((error) => console.warn('Status widget unavailable:', error));
+
   observeAuthState((event) => {
     if (event === 'SIGNED_OUT' && !signingOut) {
       window.location.replace('index.html');
