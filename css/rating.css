@@ -1,0 +1,42 @@
+/* HOLLOW NIGHT CAMP — d20 rating system */
+
+.d20 { --size: 28px; position: relative; display: inline-block; flex-shrink: 0; width: var(--size); height: var(--size); color: var(--orange); }
+.d20 svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.d20-fill polygon { fill: currentColor; }
+.d20-fill { clip-path: inset(0 calc(100% - var(--fill, 0%)) 0 0); }
+.d20-line polygon, .d20-line path { fill: none; stroke: var(--paper); stroke-width: 3.5; stroke-linejoin: round; stroke-linecap: round; }
+.d20-line path { stroke-width: 2.4; opacity: .85; }
+
+.d20-row { display: inline-flex; gap: 4px; }
+
+.rating-card, .novel-rating { color: var(--paper); }
+.rating-card {
+  display: grid; gap: 14px; margin: 24px 0 0; padding: 18px 20px;
+  border: 1.5px solid var(--line); border-radius: 18px; background: rgba(14,20,36,.55);
+}
+.rating-title { margin: 0; font-family: var(--heading); font-size: 22px; }
+.rating-line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.rating-label { min-width: 88px; font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--orange); }
+.rating-num { font-size: 14px; color: var(--muted); }
+.rating-card .hn-form-status { margin: 0; }
+
+.d20-input { display: inline-flex; }
+.d20-btn {
+  display: inline-flex; padding: 6px; border: 0; border-radius: 10px; background: transparent; cursor: pointer;
+  transition: transform .15s ease, background .15s ease;
+}
+.d20-btn .d20 { --size: 34px; }
+.d20-btn:hover { background: rgba(243,231,201,.08); transform: translateY(-2px) rotate(-6deg); }
+.d20-btn:focus-visible { outline: 3px solid rgba(255,206,114,.7); outline-offset: 1px; }
+.d20-btn[aria-pressed="true"] .d20-line polygon { stroke: var(--fire); }
+
+.novel-rating { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0 0 14px; }
+.novel-rating .d20 { --size: 24px; }
+
+.rating-compact { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #52604f; }
+.rating-compact .d20 { --size: 16px; color: #d9822b; }
+.rating-compact .d20-line polygon, .rating-compact .d20-line path { stroke: #27352a; }
+.rating-compact.empty { opacity: .8; }
+
+@media (prefers-reduced-motion: reduce) { .d20-btn { transition: none; } .d20-btn:hover { transform: none; } }
+@media (max-width: 520px) { .rating-label { min-width: 100%; } }
