@@ -25,14 +25,27 @@ function friendly(error) {
   return 'Something went wrong. Try again.';
 }
 
-async function loadNicknames(ids) {
+async function loadProfiles(ids) {
   const unique = [...new Set(ids)].filter(Boolean);
   if (!unique.length) return {};
-  const { data } = await supabase.from('public_profiles').select('id, nickname').in('id', unique);
-  return Object.fromEntries((data || []).map((row) => [row.id, row.nickname]));
+  const { data } = await supabase.from('public_profiles').select('id, nickname, avatar_url').in('id', unique);
+  return Object.fromEntries((data || []).map((row) => [row.id, row]));
 }
 
-const nameOf = (names, id) => names[id] || 'Camper';
+// avatar + nickname, e.g. [photo] Kazu Alther
+function person(profiles, id, className = '') {
+  const profile = profiles[id] || {};
+  const name = profile.nickname || 'Camper';
+  const fallback = () => el('span', { class: 'th-avatar th-avatar-fallback', 'aria-hidden': 'true', text: name.trim().charAt(0).toUpperCase() || 'C' });
+  let avatar;
+  if (profile.avatar_url) {
+    avatar = el('img', { class: 'th-avatar', src: profile.avatar_url, alt: '', loading: 'lazy', referrerpolicy: 'no-referrer' });
+    avatar.addEventListener('error', () => avatar.replaceWith(fallback()), { once: true });
+  } else {
+    avatar = fallback();
+  }
+  return el('span', { class: ('th-person ' + className).trim() }, avatar, el('span', { class: 'th-name', text: name }));
+}
 
 function categoryBadge(category) {
   return el('span', { class: 'hn-badge th-badge ' + category, text: CATEGORIES[category] || category });
@@ -178,7 +191,7 @@ async function renderList() {
       return;
     }
 
-    const names = await loadNicknames(data.map((t) => t.author_id));
+    const profiles = await loadProfiles(data.map((t) => t.author_id));
     data.forEach((theory) => {
       const replies = theory.theory_replies?.[0]?.count ?? 0;
       const excerpt = theory.body.length > 170 ? theory.body.slice(0, 170).trimEnd() + '...' : theory.body;
@@ -187,7 +200,7 @@ async function renderList() {
         el('h3', { text: theory.title }),
         el('p', { class: 'th-excerpt', text: excerpt }),
         el('div', { class: 'th-meta' },
-          el('span', { text: 'by ' + nameOf(names, theory.author_id) }),
+          person(profiles, theory.author_id),
           el('span', { text: formatDate(theory.created_at) }),
           el('span', { text: replies + (replies === 1 ? ' reply' : ' replies') })
         )
@@ -231,7 +244,7 @@ async function renderDetail(id) {
     .eq('theory_id', id)
     .order('created_at', { ascending: true });
 
-  const names = await loadNicknames([theory.author_id, ...(replies || []).map((r) => r.author_id)]);
+  const profiles = await loadProfiles([theory.author_id, ...(replies || []).map((r) => r.author_id)]);
   const isOwner = theory.author_id === ctx.user.id;
   const canEdit = ctx.isAuthor || (isOwner && theory.category !== 'confirmed');
 
@@ -268,7 +281,7 @@ async function renderDetail(id) {
   }
 
   const replyList = el('ul', { class: 'th-replies' });
-  (replies || []).forEach((reply) => replyList.append(buildReply(reply, names, id)));
+  (replies || []).forEach((reply) => replyList.append(buildReply(reply, profiles, id)));
   if (!replyList.children.length) {
     replyList.append(el('li', { class: 'th-empty', text: 'No replies yet. Add your own clue.' }));
   }
@@ -305,7 +318,7 @@ async function renderDetail(id) {
     el('div', { class: 'th-top' }, categoryBadge(theory.category), hiddenBadge(theory.status)),
     el('h1', { text: theory.title }),
     el('div', { class: 'th-meta' },
-      el('span', { text: 'by ' + nameOf(names, theory.author_id) }),
+      person(profiles, theory.author_id, 'lg'),
       el('span', { text: formatDate(theory.created_at) })
     ),
     el('div', { class: 'th-body', text: theory.body }),
@@ -317,7 +330,7 @@ async function renderDetail(id) {
   ));
 }
 
-function buildReply(reply, names, theoryId) {
+function buildReply(reply, profiles, theoryId) {
   const isOwner = reply.author_id === ctx.user.id;
   const tools = el('div', { class: 'th-reply-tools' });
 
@@ -349,7 +362,7 @@ function buildReply(reply, names, theoryId) {
 
   return el('li', { class: 'th-reply' + (reply.status === 'hidden' ? ' is-hidden' : '') },
     el('div', { class: 'th-meta' },
-      el('strong', { text: nameOf(names, reply.author_id) }),
+      person(profiles, reply.author_id),
       el('span', { text: formatDate(reply.created_at) }),
       hiddenBadge(reply.status)
     ),
