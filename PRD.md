@@ -3,7 +3,7 @@
 > **Document type:** Product Requirements Document (PRD)  
 > **Product:** Hollow Night Camp  
 > **Document status:** Working specification  
-> **Audit basis:** `Hollow-Night-Camp-main (5).zip` supplied on 2026-10-20, cross-checked against the current project conversation  
+> **Audit basis:** `Hollow-Night-Camp-main (10).zip` supplied on 2026-10-21, cross-checked against the current project conversation  
 > **Primary maintainer:** Kazu Alther  
 > **Repository:** https://github.com/KazuAlther7/Hollow-Night-Camp  
 > **Deployment reference:** Cloudflare Worker URL `https://hollow-night-camp.kazualtr.workers.dev/` (configured in Supabase Auth Redirect URLs per project progress). The repository README still references GitHub Pages; canonical production domain and final deployment routing should be verified.
@@ -75,8 +75,8 @@ Statuses reflect source code in the supplied ZIP plus deployment/setup progress 
 | Save draft / publish chapter | **DONE in source / VERIFY** | `js/editor.js` implements persistence and draft/publish actions. Confirm database schema and RLS in the live project. |
 | Chapter metadata and ordering | **DONE in source / VERIFY** | Editor supports title, subtitle, chapter number and volume fields; verify ordering and database constraints. |
 | Reader chapter page | **DONE in source / VERIFY** | `read.html` and `js/read.js` load a chapter, render its content and provide chapter navigation. Draft protection depends on RLS. |
-| Chapter Ratings (five d20 icons, one vote per reader per chapter) | **NOT STARTED** | New requirement: persist individual ratings, use five outlined d20 icons with proportional interior fill, enforce one rating per authenticated user per chapter, and display realtime average/count. |
-| Novel Ratings (aggregate of all chapter votes) | **NOT STARTED** | New requirement: compute a weighted average from all individual ratings across all published chapters in the novel, plus total vote count; update in realtime. |
+| Chapter Ratings (five d20 icons, one vote per reader per chapter) | **IMPLEMENTED IN SOURCE / VERIFY** | `js/rating.js`, `css/rating.css`, and `js/read.js` implement d20-based chapter ratings and shared rating UI. Verify live schema, one-vote enforcement, average/count, realtime updates, and RLS. |
+| Novel Ratings (aggregate of all chapter votes) | **IMPLEMENTED IN SOURCE / VERIFY** | `js/rating.js` and `js/novels.js` include novel rating mounting and statistics helpers. Verify aggregation semantics, published-chapter scope, realtime behavior, and database views/functions in production. |
 | Chapter import from TXT / DOCX / text-based PDF | **DONE in source / VERIFY** | `js/import.js` parses supported formats (5 MB limit), presents review flow and creates draft content. Scanned PDFs/OCR are not supported. |
 | Latest Chapter section | **PARTIAL / VERIFY** | Homepage author controls/status are present, but confirm a complete reader-facing latest-published-chapter section is wired to live chapter data. |
 | Global branded loading animation | **NOT STARTED** | New requirement: logo-led branded loading experience with a distinctive, polished animation used consistently across navigation/data-loading states. |
@@ -85,11 +85,18 @@ Statuses reflect source code in the supplied ZIP plus deployment/setup progress 
 | Realtime flip-style digital clock | **NOT STARTED** | New requirement: retro folding desk-clock layout, neon digital styling and animated flipping minute cards, with selectable timezone. |
 | Global Settings gear dropdown | **PARTIAL / VERIFY** | Settings currently has a dedicated page; new requirement is a global dropdown trigger that opens in place on every page, with animated gear and links to dedicated settings destinations. |
 | Volumes / arcs and chapter list | **PARTIAL / VERIFY** | Volume metadata and chapter management exist in the editor/novel workflow; verify full grouping/reordering experience. |
-| Theories page | **NOT STARTED** | `theories.html` remains a heading and introductory placeholder. |
-| Theory posts, replies and cloud persistence | **NOT STARTED** | No complete discussion workflow is present in the supplied source. |
-| Theory categories and moderation | **NOT STARTED** | Confirmed / Likely / Speculation / Wild Theory filters and moderation are not implemented. |
+| Theories page | **IMPLEMENTED IN SOURCE / VERIFY** | `theories.html` and `js/theories.js` implement a theory list/detail workflow, categories, posting and replies. Verify schema, moderation rules, email-verification enforcement, and RLS in the live project. |
+| Theory posts, replies and cloud persistence | **IMPLEMENTED IN SOURCE / VERIFY** | `js/theories.js` queries and mutates theory/reply data through Supabase. Verify rate limits, persistence, and policies using Reader and Author accounts. |
+| Theory categories and moderation | **PARTIAL / VERIFY** | Categories Confirmed / Likely / Speculation / Wild Theory are defined in `js/theories.js`; full moderation permissions and workflow need production verification. |
 | Corners Arcade | **NOT STARTED** | `arcade.html` remains a “Coming soon” placeholder; arcade scores, small save-game state, and player profiles should use Supabase-backed tables with RLS. |
 | D&D-style dice roll and games | **NOT STARTED** | No playable dice simulation or arcade game is present. |
+| Camp Rank, EXP and levels | **NOT STARTED** | Planned progression system. No rank/EXP/streak implementation found in this ZIP. |
+| Reading streak and Night Owl badge | **NOT STARTED** | Three consecutive reading days should award the Night Owl badge; requires reliable daily reading activity records and duplicate-safe award logic. |
+| Daily Campfire check-in and Ember wallet | **NOT STARTED** | Check-in currency and balance/ledger system are planned; no Ember implementation found. |
+| Camp Challenge author menu | **NOT STARTED** | Author-created challenges with Ember rewards require challenge CRUD, eligibility, completion validation, and reward ledger. |
+| Category leaderboards and monthly reset | **NOT STARTED** | Top Theorist, Top Reader, and Top Arcade Player, monthly periods, author-controlled reset, badge and Ember rewards are planned. |
+| Author Analytics Dashboard | **NOT STARTED** | Chapter reads, average ratings, popular reading hours, and all available content insights need event aggregation and an author-only dashboard. |
+| Badge assets | **NOT STARTED** | Future badge artwork should be stored in `assets/badges/`; that directory is not present in this ZIP. |
 | Settings: profile details | **DONE (core profile) / VERIFY** | Profile form and save feedback exist. |
 | Settings: theme and language | **NOT STARTED** | No complete System / Light / Dark or English / Indonesian preference system found. |
 | Notification bell / notification center | **PARTIAL** | Bell icon exists in shared navigation; a working notification center and preferences are not implemented. |
@@ -771,6 +778,192 @@ The Settings gear must act as a global in-place dropdown trigger available from 
 
 ---
 
+### 5.22 Camp Rank, EXP, levels, and achievements
+
+**Priority: P2 — planned; not implemented in the supplied ZIP**
+
+Hollow Night Camp will use a progression system called **Camp Rank** to reward meaningful reading and community participation. The system should encourage exploration without turning reading into a grind or making the community hostile.
+
+#### Rank thresholds
+
+The number is the minimum level required for each named rank. Levels between named thresholds retain the previous rank until the next threshold is reached.
+
+| Level | Camp Rank |
+| ---: | --- |
+| 1 | Wanderer |
+| 5 | Camper |
+| 10 | Story Seeker |
+| 20 | Clue Hunter |
+| 30 | Night Reader |
+| 40 | Theorist |
+| 50 | Hollow Investigator |
+| 60 | Fire Watcher |
+| 70 | Hollow Watcher |
+| 80 | Hollow Flame |
+| 90 | The UnderReader |
+| 100 | Hollow Legend |
+
+#### EXP rules
+
+- Define a central, documented EXP event catalogue before implementation.
+- Award EXP only for server-verifiable or otherwise abuse-resistant actions, such as completing a published chapter or approved challenge.
+- Do not award EXP repeatedly for refreshing a page, reopening the same chapter, or replaying a client request.
+- Keep EXP transactions auditable and idempotent; users must not be able to set their own EXP or level through client-side data.
+- Calculate level and Camp Rank from the canonical EXP total rather than trusting values submitted by the browser.
+- Display current EXP, next rank, progress to next rank, and earned achievements in the reader profile.
+- The exact EXP amounts per activity remain an implementation decision and must be documented before release.
+
+#### Reading streak and Night Owl badge
+
+- A reading day counts when a signed-in reader completes a meaningful reading activity on a published chapter; define a minimum threshold and persist the event server-side.
+- A streak advances at most once per user per calendar day, using one explicitly chosen timezone policy.
+- Three consecutive qualifying days award the **Night Owl** badge once.
+- Missing a calendar day resets the active streak; the longest streak may remain as a profile statistic.
+- Prevent duplicate awards during retries, parallel requests, and timezone/day-boundary changes.
+
+#### Daily Campfire check-in and Ember
+
+- Provide a daily check-in action in the Campfire area.
+- A successful check-in grants Ember, the platform's planned reward currency.
+- A reader may claim no more than once per defined calendar day; duplicate clicks and retries must not create extra currency.
+- Show the claim result, current balance, and next eligible check-in.
+- Ember is intended to unlock future items or experiences; redemption catalog and prices are intentionally deferred.
+- Treat Ember as a non-cash, in-platform reward currency with no real-world monetary value or cash-out feature.
+
+#### Badge assets
+
+- Custom badge art will be authored later and stored under `assets/badges/`.
+- The interface must tolerate missing badge images gracefully during development.
+- Badge awards should reference stable badge IDs/keys rather than hard-coded image paths.
+- Badge definitions, award records, and assets are separate concerns; an image existing in the repository must not itself grant a badge.
+
+### 5.23 Camp Challenge
+
+**Priority: P2 — planned; not implemented in the supplied ZIP**
+
+Add a dedicated **Camp Challenge** destination reachable from the main navigation or a clearly discoverable community menu.
+
+Author capabilities:
+- Create, edit, publish, unpublish, schedule, and archive a challenge.
+- Define title, description, instructions, start/end time, eligibility, completion criteria, and Ember reward.
+- Review challenge participation and completion records.
+- Cancel a challenge with a clear reason and a policy for already-issued rewards.
+- Manage challenge availability without changing unrelated reader progression data.
+
+Reader capabilities:
+- Browse active, upcoming, and completed challenges.
+- View requirements, time remaining, reward, and progress.
+- Submit or trigger completion through a validated workflow.
+- See completion history and Ember rewards.
+
+System requirements:
+- Completion criteria must be validated server-side; do not trust a client-supplied `completed=true`.
+- Each user may receive a challenge reward only once per challenge unless the challenge is explicitly configured as repeatable.
+- Award Ember through the same auditable ledger used by daily check-in and other reward sources.
+- Enforce author permissions and RLS on challenge creation, edits, moderation, participation, and rewards.
+- Provide loading, empty, success, and error states.
+
+Acceptance criteria:
+- An Author can publish a challenge and see it appear to Readers.
+- A Reader can complete an eligible challenge and receive the configured Ember reward once.
+- Repeated requests, refreshes, or concurrent submissions cannot duplicate rewards.
+- Unpublished and future challenges are not exposed as active challenges to ordinary Readers.
+
+### 5.24 Community leaderboards and monthly rewards
+
+**Priority: P2 — planned; not implemented in the supplied ZIP**
+
+Create a dedicated **Leaderboards** menu/page with separate categories rather than one all-purpose score ranking.
+
+Categories:
+1. **Top Theorist** — rank by likes received on eligible theories.
+2. **Top Reader** — rank by published chapters completed.
+3. **Top Arcade Player** — rank by validated total score across eligible arcade games.
+
+Rules and safeguards:
+- Leaderboards are grouped into calendar months using a single documented timezone, with the current month clearly labeled.
+- Define tie-break rules before launch. Recommended tie-breakers: earliest achievement of the tied score, then stable display-name ordering.
+- Only count eligible, non-deleted content and valid activity. Exclude self-likes, duplicate likes, test records, and invalid or suspicious score submissions.
+- Avoid exposing private account details; display only public nickname/avatar and the relevant metric.
+- Make the experience community-focused: no public shaming, negative rankings, or “worst user” lists.
+- The monthly board should preserve past-period results as an archive rather than deleting history when a new month starts.
+
+#### Monthly rewards and Author controls
+
+- At the end of each month, eligible winners can receive a configured badge and Ember reward.
+- Add an Author-only leaderboard management area to preview the month, inspect eligible results, trigger/finalize the monthly settlement, and issue or correct rewards through an audited workflow.
+- Support an explicit reset/close action for the active period, but do not allow a reset to silently erase historical results or reward records.
+- Prefer automated period boundaries plus an Author-controlled finalization step over destructive manual clearing.
+- Require confirmation for finalization/reset actions and record actor, timestamp, period, and reason.
+- Make reward settlement idempotent so repeated finalization cannot award duplicate badges or Ember.
+
+Acceptance criteria:
+- Each category has its own metric and ranking.
+- The displayed month and metric definition are visible to users.
+- Only authorized Authors can manage/finalize monthly boards.
+- A monthly settlement is reproducible from stored activity records and cannot pay rewards twice.
+
+### 5.25 Author Analytics Dashboard
+
+**Priority: P2 — planned; not implemented in the supplied ZIP**
+
+Provide an Author-only **Analytics** menu within Author Studio. It should surface all insights supported by reliable data, clearly distinguishing observed metrics from estimates.
+
+Initial analytics:
+- **Chapter reads:** total and unique reads per chapter, with date range and trend where data supports it.
+- **Most-read chapters:** ranked chapter list and period comparison.
+- **Average ratings:** chapter and novel rating averages, vote counts, and changes over time where historical snapshots exist.
+- **Favorite reading hours:** aggregated distribution of qualifying reading activity by hour; disclose the timezone used.
+- **Reading completion:** completed chapters and completion rates where completion events are instrumented.
+- **Reader engagement:** daily/weekly active readers and returning-reader trends only when privacy-safe activity records support them.
+- **Community insights:** theory counts, likes, and replies where relevant and available.
+- **Challenge / reward insights:** participation, completion, and Ember rewards after Camp Challenge ships.
+- **Arcade insights:** plays and validated scores after arcade tracking ships.
+- **Data coverage:** clearly indicate which metrics are unavailable because instrumentation has not yet shipped.
+
+Privacy and correctness:
+- Analytics are available only to authorized Authors and should not expose private reading histories tied to identifiable users unless a separately approved moderation purpose requires it.
+- Use aggregated data by default and apply reasonable minimum group sizes where appropriate.
+- Define “read,” “unique read,” “completed chapter,” and “favorite hour” explicitly before reporting metrics.
+- Avoid counting every page refresh as a meaningful read; use deduplication windows or qualifying reading events.
+- Use timezone-aware aggregation and state the timezone in the dashboard.
+- Do not fabricate historical data for events that were not tracked.
+- Ensure expensive reports are paginated, indexed, cached, or pre-aggregated as needed.
+
+Acceptance criteria:
+- An Author can select a date range and inspect chapter-level read counts and rating summaries.
+- Favorite reading hours are derived from recorded qualifying events with a visible timezone.
+- The dashboard labels missing or incomplete instrumentation rather than displaying misleading zeros.
+- Readers cannot access author analytics through direct routes or direct database requests.
+
+### 5.26 Shared economy, activity ledger, and data model
+
+**Priority: P0 for secure implementation of the above systems**
+
+The progression, check-in, challenge, and leaderboard systems share rewards and must use one consistent source of truth.
+
+Recommended logical entities (exact physical schema may vary):
+- `reader_activity_events`: validated events such as chapter completion, challenge completion, and eligible theory interactions.
+- `reader_progress`: canonical EXP total, level/rank derivation, current streak, longest streak, and last qualifying reading date.
+- `badge_definitions`: stable badge key, title, description, and optional asset path.
+- `user_badges`: user/badge award record, source event, and award timestamp.
+- `ember_ledger`: append-only credit/debit transactions, source type/ID, amount, timestamp, and idempotency key.
+- `daily_checkins`: one record per user per eligible day.
+- `camp_challenges`: author-managed challenge definitions and publication schedule.
+- `challenge_participation`: user status, progress, completion time, and reward settlement status.
+- `leaderboard_periods`: month, category, state, and finalization metadata.
+- `leaderboard_snapshots` or equivalent aggregate records: reproducible period results and rank metrics.
+- `analytics_events` or pre-aggregated analytics tables: qualifying reads, completion events, and timestamps needed for dashboard reports.
+
+Security requirements:
+- Enable RLS on exposed tables and write policies for the exact Reader/Author access model.
+- Use database constraints, unique indexes, and trusted server-side logic/RPCs for one-per-day check-ins, unique badge awards, and idempotent reward settlement.
+- Never trust browser-submitted EXP, Ember balance, leaderboard totals, challenge completion, or winner status.
+- Do not expose service-role credentials in frontend code.
+- Keep a transaction trail for corrections; do not silently overwrite or delete economy history.
+- Test unauthorized reads/writes and concurrent duplicate submissions before release.
+
+
 ## 6. Visual and Interaction Design
 
 ### Art direction
@@ -990,6 +1183,19 @@ The checkboxes below track the implementation visible in the supplied repository
 
 **Current exit status: PARTIAL.** Profile basics work; remaining account preferences and utilities are outstanding.
 
+### Phase 4B — Camp Rank, rewards, challenges, leaderboards, and analytics
+- [ ] Define EXP events, rank calculation, streak day boundary, and Night Owl award rules.
+- [ ] Add Camp Rank profile display and server-validated activity tracking.
+- [ ] Implement daily Campfire check-in and the append-only Ember ledger.
+- [ ] Add `assets/badges/` and badge definition / user award records.
+- [ ] Build Author-managed Camp Challenge creation, publishing, completion validation, and Ember rewards.
+- [ ] Build category leaderboards: Top Theorist, Top Reader, Top Arcade Player.
+- [ ] Add monthly archive, Author-controlled finalization/reset, and idempotent badge/Ember rewards.
+- [ ] Build Author Analytics Dashboard for chapter reads, ratings, reading-hour trends, and all instrumented insights.
+- [ ] Add RLS, abuse prevention, idempotency, privacy review, and concurrency tests for every reward/ranking flow.
+
+**Current exit status: NOT STARTED.** The supplied ZIP contains no implementation for Camp Rank, streaks, Ember, Camp Challenge, monthly leaderboards, or Author Analytics.
+
 ### Phase 5 — Arcade
 - [ ] Implement Supabase-backed arcade score submissions and leaderboards with RLS and validated score writes.
 - [ ] Implement compact, versioned Supabase save-game records and player-linked stats/profile display; retain guest play for games that do not require persistence.
@@ -1046,12 +1252,19 @@ Resolve these during implementation rather than guessing:
 12. **Online readers:** Should the count represent unique users or active browser sessions, and should the current visitor be included? Default proposal: active sessions, including the current visitor, with no identities exposed.
 13. **Clock placement:** Where should the clock and online count appear across the shared site layout (for example, Main Bar utility area or a homepage status panel)?
 14. **Clock format:** Should 24-hour time be mandatory or should users be able to choose 12/24-hour format? Default proposal: 24-hour.
+15. **EXP schedule:** How much EXP should each qualifying action award, and which actions are eligible?
+16. **Streak timezone:** Should streaks follow the reader's selected timezone or one platform-wide timezone? Prevent retroactive timezone changes from granting extra streak days.
+17. **Ember economy:** What will Ember unlock, what are the costs, and should any rewards expire? Keep this undecided until the first reward catalog is designed.
+18. **Challenge verification:** Which challenge types can be automatically validated, and which require Author review?
+19. **Monthly leaderboard settlement:** What exact monthly timezone, tie-breakers, and reward amounts should apply to each category?
+20. **Analytics privacy:** What minimum aggregation threshold and retention period should apply to reading-hour and reader-engagement analytics?
+21. **Reading completion definition:** What qualifies a chapter as completed for Top Reader and streak eligibility?
 
 ---
 
 ## 12. Source Audit Notes
 
-This update was based on the supplied `Hollow-Night-Camp-main (5).zip` and relevant implementation files:
+This update was based on the supplied `Hollow-Night-Camp-main (10).zip` and relevant implementation files:
 
 - `index.html` and `js/login.js`: login / registration interface and form flow.
 - `js/auth.js`: Supabase Auth, session observation, profile retrieval and profile updates.
@@ -1061,8 +1274,10 @@ This update was based on the supplied `Hollow-Night-Camp-main (5).zip` and relev
 - `editor.html`, `js/editor.js`: chapter metadata, body editor, word count, draft saving and publishing.
 - `read.html`, `js/read.js`: reader-facing chapter display and chapter navigation.
 - `js/import.js`: TXT / DOCX / text-based PDF extraction, review step and draft import.
+- `js/rating.js`, `css/rating.css`: d20 rating visuals and chapter/novel rating helpers.
+- `js/status-widget.js`: timezone-aware retro flip clock and Supabase Realtime Presence online-reader count.
 - `settings.html`: profile editor and avatar UI.
-- `theories.html` and `arcade.html`: these remain placeholders.
+- `theories.html` and `js/theories.js`: theory list/detail, category, post, and reply workflows are present in source; `arcade.html` remains a placeholder.
 - `config/supabase.js`: Supabase project URL and publishable client key.
 - `css/mainbar.css` and `assets/icons/`: glass navigation styling and icon assets.
 
@@ -1082,6 +1297,11 @@ The ongoing project conversation confirms that the Cloudflare Worker URL `https:
 </div>
 
 
-### New feature requirements recorded on 2026-10-20
+### Feature requirements recorded on 2026-10-21
 
 The following are **planned requirements only** and are not claimed to be implemented in the supplied ZIP: (1) custom logo-led loading animation, (2) separate Music and SFX controls with independent volumes and assets under `assets/sound/`, (3) aggregate realtime online-reader count, (4) timezone-configurable retro neon split-flap clock, and (5) a global in-place Settings gear dropdown with synchronized gear/dropdown animation. Detailed acceptance criteria are defined in §5.16–§5.20. Update the status table and phase checkboxes only after implementation is present in the repository; verify runtime behavior separately.
+
+
+### New requirements recorded on 2026-10-21
+
+The following Camp Rank features are **planned requirements only** and are not implemented in the supplied ZIP: Camp Rank levels and EXP, the three-day Night Owl streak badge, daily Campfire check-in and Ember currency, Author-managed Camp Challenge, monthly category leaderboards with badge/Ember rewards and Author controls, and an Author Analytics Dashboard. Custom badge art is planned for `assets/badges/`, which does not exist in the supplied ZIP. Detailed requirements, security controls, acceptance criteria, and suggested data entities are defined in §5.22–§5.26. Do not mark these features complete until the implementation and backend policies have been verified.
