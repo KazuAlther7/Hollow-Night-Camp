@@ -128,7 +128,7 @@ export function mountStatusWidget() {
   const tzLabel = Object.assign(document.createElement('span'), { className: 'hn-clock-tz' });
   const clock = document.createElement('a');
   clock.className = 'hn-clock';
-  clock.href = 'settings.html#clock';
+  clock.href = 'settings-clock.html';
   clock.setAttribute('role', 'img');
   clock.title = 'Change timezone in Settings';
   clock.append(row, tzLabel);

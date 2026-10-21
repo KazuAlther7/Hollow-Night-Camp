@@ -15,7 +15,7 @@ const NAV = [
   { id: 'novels',   href: 'novels.html',   icon: 'novels', label: 'Novels' },
   { id: 'theories', href: 'theories.html', icon: 'theories', label: 'Theories' },
   { id: 'arcade',   href: 'arcade.html',   icon: 'arcade', label: 'Arcade' },
-  { id: 'settings', href: 'settings.html', icon: 'settings', label: 'Settings' }
+  { id: 'settings', href: 'settings-profile.html', icon: 'settings', label: 'Settings' }
 ];
 
 // Novels sub-navigation: the Novels area and its world-building sections (shown under each page's headline)
@@ -103,7 +103,7 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
           <strong>${escapeHtml(profile?.nickname || 'Camper')}</strong>
           <small>${escapeHtml(user?.email || '')}</small>
         </div>
-        <a href="settings.html#profile">My Profile</a>
+        <a href="settings-profile.html">My Profile</a>
         <button type="button" id="barSignOutButton">Sign out of camp</button>
       </div>
     </nav>`);
@@ -217,9 +217,9 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
 
 // Settings gear: opens a dropdown in place (no navigation until an item is chosen).
 const SETTINGS_MENU = [
-  { href: 'settings.html#profile', label: 'Profile' },
-  { href: 'settings.html#history', label: 'History & Bookmarks' },
-  { href: 'settings.html#clock',   label: 'Clock & timezone' }
+  { href: 'settings-profile.html', label: 'Profile' },
+  { href: 'settings-history.html', label: 'History & Bookmarks' },
+  { href: 'settings-clock.html',   label: 'Clock & timezone' }
 ];
 
 function mountSettingsMenu() {
@@ -367,7 +367,7 @@ export async function initPage(options = {}) {
   mountSubNav();
 
   // top-right status widget (flip clock + online readers); never allowed to break the page
-  import('./status-widget.js?v=1').then((module) => module.mountStatusWidget()).catch((error) => console.warn('Status widget unavailable:', error));
+  import('./status-widget.js?v=2').then((module) => module.mountStatusWidget()).catch((error) => console.warn('Status widget unavailable:', error));
 
   observeAuthState((event) => {
     if (event === 'SIGNED_OUT' && !signingOut) {
