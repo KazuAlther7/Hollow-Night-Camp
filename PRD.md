@@ -982,9 +982,9 @@ The checkboxes below track the implementation visible in the supplied repository
 - [ ] Implement System / Light / Dark themes.
 - [ ] Implement English / Indonesian interface localization.
 - [ ] Implement notification preferences and notification center.
-- [ ] Implement reading history and bookmarks.
+- [x] Implement reading history and bookmarks (`js/reading.js`, `js/history.js`, tables `bookmarks` + `reading_progress` in `supabase/bookmarks-history.sql`; Bookmark / Resume on `read.html`, Continue reading on `novel.html`, History section in Settings with clear-history). Live verification still required.
 - [ ] Add Help / FAQ, support feedback and Community social links.
-- [ ] Add global Settings gear dropdown available in place on every applicable page, with synchronized gear rotation/dropdown animation and accessible close behavior.
+- [x] Add global Settings gear dropdown available in place on every applicable page, with synchronized gear rotation/dropdown animation and accessible close behavior (`shared.js`, `css/settings-menu.css`). Entries so far: Profile, History & Bookmarks, Clock & timezone; add Display / Notifications / Support / Community / Information as those sections are built.
 - [ ] Add independent Music and SFX enable/disable and volume controls backed by `assets/sound/` assets.
 - [x] Add persisted timezone selection and the retro neon split-flap clock UI (`js/status-widget.js`, `css/status.css`; timezone chosen in Settings, stored in localStorage `hnc_timezone`, 24-hour). Top-right placement; widget sits under the Main Bar on narrow screens.
 

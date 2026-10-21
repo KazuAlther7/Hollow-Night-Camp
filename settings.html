@@ -13,7 +13,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Special+Elite&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/base.css?v=4">
-  <link rel="stylesheet" href="css/mainbar.css?v=7">
+  <link rel="stylesheet" href="css/mainbar.css?v=9">
+  <link rel="stylesheet" href="css/ui.css?v=4">
+  <link rel="stylesheet" href="css/history.css?v=1">
   <style>
     .settings-kicker { color:var(--orange); font-size:11px; letter-spacing:2px; font-weight:700; }
     .settings-profile-form { max-width:620px; margin-top:28px; display:grid; gap:10px; }
@@ -69,6 +71,13 @@
         <p id="settingsProfileStatus" role="status"></p>
       </form>
     </section>
+    <section class="camp-page camp-placeholder-page" id="history">
+      <span class="settings-kicker">READING</span>
+      <h2 class="settings-h2">History &amp; bookmarks</h2>
+      <p>Your reading progress and saved chapters. Only you can see them.</p>
+      <div id="historyRoot"></div>
+    </section>
+
     <section class="camp-page camp-placeholder-page" id="clock">
       <span class="settings-kicker">CAMP CLOCK</span>
       <h2 class="settings-h2">Clock &amp; timezone</h2>
@@ -82,12 +91,15 @@
   </main>
 
   <script type="module">
-    import { initPage, signOut } from './js/shared.js?v=10';
+    import { initPage, signOut } from './js/shared.js?v=11';
     import { updateReaderProfile } from './js/auth.js';
 
+    import { mountHistory } from './js/history.js?v=1';
     import { browserTimezone, getSavedTimezone, setSavedTimezone, activeTimezone, timeIn, timezoneList } from './js/status-widget.js?v=1';
 
     const ctx = await initPage({ active: 'settings' });
+
+    mountHistory(document.getElementById('historyRoot'), ctx.user.id);
 
     // clock timezone: '' = follow the browser
     const tzSelect = document.getElementById('settingsTimezone');
