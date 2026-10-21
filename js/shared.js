@@ -244,7 +244,7 @@ function mountSettingsMenu() {
 
   const css = document.createElement('link');
   css.rel = 'stylesheet';
-  css.href = new URL('../css/settings-menu.css?v=2', import.meta.url).href;
+  css.href = new URL('../css/settings-menu.css?v=3', import.meta.url).href;
   document.head.append(css);
 
   // lives on <body>: the Main Bar's blur / scroll container would clip or re-anchor a fixed child
@@ -254,6 +254,15 @@ function mountSettingsMenu() {
       ${SETTINGS_MENU.map((item) => `<a href="${item.href}">${icon(item.icon)}<span>${item.label}</span></a>`).join('')}
     </nav>`);
   const menu = document.getElementById('settingsMenu');
+
+  // stylesheet loads async: keep the menu out of layout until it is ready, else its unstyled links flash (blue text, bottom-left)
+  menu.style.display = 'none';
+  const reveal = () => { menu.style.display = ''; };
+  if (css.sheet) reveal();
+  else {
+    css.addEventListener('load', reveal, { once: true });
+    css.addEventListener('error', reveal, { once: true });
+  }
 
   const place = () => {
     const rect = button.getBoundingClientRect();
