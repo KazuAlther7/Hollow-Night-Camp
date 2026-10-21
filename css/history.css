@@ -1,0 +1,28 @@
+/* HOLLOW NIGHT CAMP — reader tools (bookmark / resume), Continue reading, Settings > History */
+
+section[id] { scroll-margin-top: 100px; }
+
+.reader-tools { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+.reader-tools[hidden] { display: none; }
+
+.novel-continue { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin: 18px 0 0; }
+.novel-continue[hidden] { display: none; }
+.continue-note { color: var(--muted); font-size: 14px; }
+
+#history { max-width: 760px; }
+.hist-block { margin: 22px 0 0; }
+.hist-block h3 { margin: 0 0 4px; font-family: var(--heading); font-size: 22px; }
+.hist-note, .hist-empty { margin: 0 0 10px; font-size: 14px !important; color: var(--muted); }
+.hist-empty { padding: 14px 16px; border: 1.5px dashed rgba(243,231,201,.25); border-radius: 12px; }
+.hist-list { margin: 10px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.hist-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border: 1.5px solid var(--line); border-radius: 14px; background: rgba(243,231,201,.05); }
+.hist-link { flex: 1; min-width: 0; color: inherit; text-decoration: none; }
+a.hist-link:hover strong { color: var(--fire); }
+.hist-text { display: grid; gap: 2px; min-width: 0; }
+.hist-text strong { font-size: 15px; color: var(--paper); }
+.hist-text span { font-size: 14px; color: var(--muted); overflow-wrap: anywhere; }
+.hist-text small { font-size: 12px; color: var(--muted); opacity: .85; }
+.hist-bar { height: 5px; margin-top: 6px; border-radius: 99px; background: rgba(243,231,201,.15); overflow: hidden; }
+.hist-bar span { display: block; height: 100%; border-radius: inherit; background: var(--orange); }
+.hist-actions { margin: 12px 0 0; }
+@media (max-width: 520px) { .hist-row { flex-wrap: wrap; } }
