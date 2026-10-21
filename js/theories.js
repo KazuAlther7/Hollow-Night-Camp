@@ -5,7 +5,7 @@
 
 import { supabase } from '../config/supabase.js';
 import { el, formatDate } from './dom.js?v=2';
-import { initPage } from './shared.js?v=12';
+import { initPage } from './shared.js?v=13';
 
 const ctx = await initPage({ active: 'theories' });
 const root = document.getElementById('theoriesRoot');

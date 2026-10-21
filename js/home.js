@@ -2,7 +2,7 @@
 
 import { supabase } from '../config/supabase.js';
 import { readingTime } from './dom.js?v=2';
-import { initPage, ENTERED_KEY, getAuthorMode, setAuthorMode } from './shared.js?v=12';
+import { initPage, ENTERED_KEY, getAuthorMode, setAuthorMode } from './shared.js?v=13';
 import { createParallax } from './parallax.js';
 
 const welcomeScreen = document.getElementById('welcomeScreen');
@@ -135,7 +135,8 @@ document.querySelectorAll('[data-author-action]').forEach((button) => {
     const destinations = {
       'new-novel': 'novels.html?new=1',
       'manage-novels': 'novels.html',
-      'manage-chapters': 'novels.html'
+      'manage-chapters': 'novels.html',
+      'world-building': 'world-building.html'
     };
 
     if (destinations[action]) {
@@ -143,9 +144,7 @@ document.querySelectorAll('[data-author-action]').forEach((button) => {
       return;
     }
 
-    const messages = {
-      'world-building': 'World Building tools are coming next.'
-    };
+    const messages = {};
 
     authorHomeStatus.textContent = messages[action] || 'This feature is coming soon.';
     authorHomeStatus.hidden = false;

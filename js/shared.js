@@ -18,9 +18,8 @@ const NAV = [
   { id: 'settings', href: 'settings-profile.html', icon: 'settings', label: 'Settings' }
 ];
 
-// Novels sub-navigation: the Novels area and its world-building sections (shown under each page's headline)
-const NOVELS_SUBNAV = [
-  { id: 'novels',    href: 'novels.html',    label: 'Novels' },
+// Novels sub-navigation: Novels + World Building (the arrow unfolds Characters, Maps, Locations in the same row)
+const WORLD_SUBNAV = [
   { id: 'characters', href: 'characters.html', label: 'Characters' },
   { id: 'maps',      href: 'maps.html',      label: 'Maps' },
   { id: 'locations', href: 'locations.html', label: 'Locations' }
@@ -31,8 +30,24 @@ function mountSubNav() {
   const nav = document.getElementById('subNav');
   if (!nav) return;
   const active = nav.dataset.active;
-  nav.innerHTML = NOVELS_SUBNAV.map((tab) => `
-    <a class="sub-nav-item${tab.id === active ? ' active' : ''}" href="${tab.href}"${tab.id === active ? ' aria-current="page"' : ''}>${tab.label}</a>`).join('');
+  const inWorld = active === 'world' || WORLD_SUBNAV.some((tab) => tab.id === active);
+  const current = (id) => (id === active ? ' aria-current="page"' : '');
+  nav.innerHTML = `
+    <a class="sub-nav-item${active === 'novels' ? ' active' : ''}" href="novels.html"${current('novels')}>Novels</a>
+    <span class="sub-nav-item sub-nav-world${active === 'world' ? ' active' : ''}${inWorld ? ' open' : ''}" id="subNavWorld">
+      <a href="world-building.html"${current('world')}>World Building</a>
+      <button class="sub-nav-toggle" id="subNavToggle" type="button" aria-expanded="${inWorld}" aria-controls="subNavChildren" aria-label="Show Characters, Maps and Locations" title="Characters, Maps, Locations"><span class="icon icon-back" aria-hidden="true"></span></button>
+    </span>
+    <span class="sub-nav-children" id="subNavChildren">
+      ${WORLD_SUBNAV.map((tab) => `<a class="sub-nav-item${tab.id === active ? ' active' : ''}" href="${tab.href}"${current(tab.id)}>${tab.label}</a>`).join('')}
+    </span>`;
+  const world = document.getElementById('subNavWorld');
+  const toggle = document.getElementById('subNavToggle');
+  toggle.addEventListener('click', () => {
+    const open = !world.classList.contains('open');
+    world.classList.toggle('open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+  });
 }
 
 // Icons are single-colour PNGs in assets/icons/, tinted with CSS mask (see mainbar.css)
@@ -103,8 +118,8 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
           <strong>${escapeHtml(profile?.nickname || 'Camper')}</strong>
           <small>${escapeHtml(user?.email || '')}</small>
         </div>
-        <a href="settings-profile.html">My Profile</a>
-        <button type="button" id="barSignOutButton">Sign out of camp</button>
+        <a href="settings-profile.html">${icon('profile')}<span>My Profile</span></a>
+        <button type="button" id="barSignOutButton">${icon('sign-out')}<span>Sign out of camp</span></button>
       </div>
     </nav>`);
 
@@ -209,17 +224,18 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
   });
   document.getElementById('barSignOutButton').addEventListener('click', async (event) => {
     const button = event.currentTarget;
+    const label = button.querySelector('span:last-child');
     button.disabled = true;
-    button.textContent = 'Signing out...';
-    try { await signOut(); } catch (error) { button.disabled = false; button.textContent = 'Sign out of camp'; }
+    label.textContent = 'Signing out...';
+    try { await signOut(); } catch (error) { button.disabled = false; label.textContent = 'Sign out of camp'; }
   });
 }
 
 // Settings gear: opens a dropdown in place (no navigation until an item is chosen).
 const SETTINGS_MENU = [
-  { href: 'settings-profile.html', label: 'Profile' },
-  { href: 'settings-history.html', label: 'History & Bookmarks' },
-  { href: 'settings-clock.html',   label: 'Clock & timezone' }
+  { href: 'settings-profile.html', label: 'Profile', icon: 'profile' },
+  { href: 'settings-history.html', label: 'History & Bookmarks', icon: 'bookmark' },
+  { href: 'settings-clock.html',   label: 'Clock & timezone', icon: 'clock' }
 ];
 
 function mountSettingsMenu() {
@@ -228,14 +244,14 @@ function mountSettingsMenu() {
 
   const css = document.createElement('link');
   css.rel = 'stylesheet';
-  css.href = new URL('../css/settings-menu.css?v=1', import.meta.url).href;
+  css.href = new URL('../css/settings-menu.css?v=2', import.meta.url).href;
   document.head.append(css);
 
   // lives on <body>: the Main Bar's blur / scroll container would clip or re-anchor a fixed child
   document.body.insertAdjacentHTML('beforeend', `
     <nav class="settings-menu" id="settingsMenu" aria-label="Settings sections">
       <p class="settings-menu-title">Settings</p>
-      ${SETTINGS_MENU.map((item) => `<a href="${item.href}">${item.label}</a>`).join('')}
+      ${SETTINGS_MENU.map((item) => `<a href="${item.href}">${icon(item.icon)}<span>${item.label}</span></a>`).join('')}
     </nav>`);
   const menu = document.getElementById('settingsMenu');
 
