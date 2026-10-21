@@ -3,8 +3,9 @@
 import { initPage } from './shared.js?v=8';
 import { supabase } from '../config/supabase.js';
 import { el } from './dom.js?v=2';
+import { mountChapterRating } from './rating.js?v=1';
 
-await initPage({ active: 'novels' });
+const ctx = await initPage({ active: 'novels' });
 
 const chapterId = new URLSearchParams(window.location.search).get('id');
 
@@ -49,6 +50,10 @@ if (!chapterId) {
         ? body.split(/\n{2,}/).map((paragraph) => el('p', { text: paragraph.trim() }))
         : [el('p', { class: 'reader-empty', text: 'This chapter is empty.' })])
     );
+
+    if (chapter.status === 'published') {
+      mountChapterRating(document.getElementById('readerRating'), chapter.id, ctx.user.id);
+    }
 
     const [{ data: novel }, { data: siblings }] = await Promise.all([
       supabase.from('novels').select('id, title').eq('id', chapter.novel_id).maybeSingle(),

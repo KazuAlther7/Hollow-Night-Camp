@@ -4,6 +4,7 @@ import { initPage } from './shared.js?v=8';
 import { supabase } from '../config/supabase.js';
 import { el, formatDate, readingTime, statusChip } from './dom.js?v=2';
 import { openImportDialog } from './import.js?v=1';
+import { mountNovelRating, fetchNovelStatsMap, compactRating } from './rating.js?v=1';
 
 const page = document.body.dataset.page;
 const ctx = await initPage({ active: 'novels' });
@@ -185,6 +186,8 @@ if (page === 'novels') {
     emptyShelf.hidden = false;
   };
 
+  let ratingStats = {};
+
   const renderCard = (novel) => {
     const cover = el('div', { class: 'novel-cover', 'aria-hidden': 'true' });
     if (novel.cover_url) cover.append(el('img', { src: novel.cover_url, alt: '', loading: 'lazy' }));
@@ -193,6 +196,7 @@ if (page === 'novels') {
       cover,
       el('h3', { text: novel.title }),
       el('p', { class: 'novel-meta' }, novel.genre ? novel.genre + ' · ' : null, statusChip(novel.status)),
+      novel.is_published ? compactRating(ratingStats[novel.id]) : null,
       novel.is_published ? null : el('span', { class: 'hn-badge draft', text: 'Draft' })
     );
   };
@@ -216,6 +220,7 @@ if (page === 'novels') {
       return;
     }
 
+    ratingStats = await fetchNovelStatsMap(data.filter((novel) => novel.is_published).map((novel) => novel.id));
     emptyShelf.hidden = true;
     grid.replaceChildren(...data.map(renderCard));
   }
@@ -400,6 +405,12 @@ if (page === 'novel') {
     } else {
       novel = data;
       renderNovel();
+
+      if (novel.is_published) {
+        const ratingBox = document.getElementById('novelRating');
+        ratingBox.hidden = false;
+        mountNovelRating(ratingBox, novel.id);
+      }
 
       if (ctx.isAuthor) {
         actionsEl.hidden = false;
