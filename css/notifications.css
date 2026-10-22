@@ -1,0 +1,54 @@
+/* HOLLOW NIGHT CAMP — notification bell panel (injected by notifications.js). The panel is always dark glass, so it uses fixed colours. */
+
+#notificationButton .icon { transform-origin: 50% 10%; }
+#notificationButton .icon.bell-ring { animation: bellRing .65s ease-in-out; }
+@keyframes bellRing {
+  0% { transform: rotate(0); } 10% { transform: rotate(-18deg); } 25% { transform: rotate(16deg); }
+  40% { transform: rotate(-13deg); } 55% { transform: rotate(10deg); } 70% { transform: rotate(-6deg); }
+  85% { transform: rotate(3deg); } 100% { transform: rotate(0); }
+}
+
+.notif-panel {
+  position: fixed; z-index: 40; width: 340px; max-width: calc(100vw - 16px); max-height: min(70vh, 520px);
+  display: flex; flex-direction: column; overflow: hidden; color: #f3e7c9;
+  border: 1px solid rgba(243,231,201,.24); border-radius: 17px;
+  background: rgba(15,20,36,.94); backdrop-filter: blur(24px) saturate(145%);
+  box-shadow: 0 22px 60px rgba(0,0,0,.55);
+  opacity: 0; visibility: hidden; transform: translateY(-10px) scale(.97); transform-origin: top right;
+  transition: opacity .22s ease, transform .3s var(--ease), visibility 0s linear .3s;
+}
+.notif-panel.open { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
+
+.notif-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 16px 10px; }
+.notif-head h2 { margin: 0; font: 600 18px var(--heading); }
+.notif-actions { display: flex; gap: 12px; }
+.notif-link { padding: 4px 0; border: 0; background: none; color: #ffce72; font: 600 12px var(--body); cursor: pointer; }
+.notif-link.danger { color: #ffb69b; }
+.notif-link:disabled { opacity: .4; cursor: default; }
+.notif-link:hover:not(:disabled) { text-decoration: underline; }
+
+.notif-banner { margin: 0 12px 8px; padding: 9px 12px; border-radius: 10px; background: rgba(242,163,75,.14); color: #ffce72; font-size: 12px; line-height: 1.5; }
+.notif-banner[hidden] { display: none; }
+
+.notif-list { margin: 0; padding: 0 8px 8px; list-style: none; overflow-y: auto; display: grid; gap: 4px; }
+.notif-empty { padding: 26px 12px; text-align: center; color: #c3c8b1; font-size: 14px; }
+.notif-item { display: flex; align-items: stretch; border-radius: 12px; }
+.notif-item.unread { background: rgba(242,163,75,.1); }
+.notif-item:hover { background: rgba(255,255,255,.07); }
+.notif-main { flex: 1; min-width: 0; display: flex; gap: 10px; align-items: flex-start; padding: 10px 6px 10px 10px; border: 0; background: none; color: inherit; text-align: left; cursor: pointer; border-radius: 12px; }
+.notif-main:focus-visible, .notif-delete:focus-visible, .notif-link:focus-visible, .notif-foot:focus-visible { outline: 3px solid rgba(255,206,114,.7); outline-offset: -2px; border-radius: 10px; }
+.notif-mark { flex-shrink: 0; width: 9px; height: 9px; margin-top: 6px; border-radius: 50%; background: transparent; }
+.notif-item.unread .notif-mark { background: #ff6a4d; box-shadow: 0 0 8px rgba(255,106,77,.8); }
+.notif-text { display: grid; gap: 2px; min-width: 0; }
+.notif-text strong { font-size: 14px; color: #f3e7c9; }
+.notif-text span { font-size: 13px; color: #c3c8b1; overflow-wrap: anywhere; }
+.notif-text small { font-size: 11px; color: #9aa08f; }
+.notif-delete { flex-shrink: 0; width: 34px; border: 0; background: none; color: #c3c8b1; font-size: 20px; line-height: 1; cursor: pointer; border-radius: 12px; }
+.notif-delete:hover { color: #ffb69b; background: rgba(217,110,69,.15); }
+.notif-foot { display: block; padding: 12px 16px; text-align: center; border-top: 1px solid rgba(243,231,201,.15); color: #ffce72; font-size: 13px; font-weight: 600; text-decoration: none; }
+.notif-foot:hover { background: rgba(255,255,255,.06); }
+
+@media (prefers-reduced-motion: reduce) {
+  #notificationButton .icon.bell-ring { animation: none; }
+  .notif-panel { transition: none; }
+}
