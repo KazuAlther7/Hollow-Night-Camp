@@ -14,8 +14,8 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Special+Elite&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/loader.css?v=1">
   <script src="js/loader.js?v=1"></script>
-  <link rel="stylesheet" href="css/base.css?v=4">
-  <link rel="stylesheet" href="css/mainbar.css?v=10">
+  <link rel="stylesheet" href="css/base.css?v=5">
+  <link rel="stylesheet" href="css/mainbar.css?v=11">
   <link rel="stylesheet" href="css/ui.css?v=4">
   <link rel="stylesheet" href="css/history.css?v=1">
   <style>
@@ -41,6 +41,21 @@
     .settings-select option { color:#17251d; }
     .settings-select:focus { outline:none; border-color:var(--orange); }
     .settings-tz-status { margin-top:10px !important; font-size:13px !important; }
+
+    .display-settings { margin:28px 0 34px; padding:22px; border:1px solid rgba(243,231,201,.2); border-radius:18px; background:rgba(10,15,25,.28); }
+    .display-settings-description { margin:0 0 18px !important; font-size:13px !important; line-height:1.6; }
+    .display-setting-row { display:grid; gap:10px; margin-top:18px; }
+    .display-setting-heading { display:flex; align-items:center; gap:10px; }
+    .display-setting-heading img { width:26px; height:26px; object-fit:contain; }
+    .display-setting-heading label { margin:0; color:var(--paper-dark); font-size:12px; font-weight:700; letter-spacing:1.2px; }
+    .display-settings-status { min-height:18px; margin:12px 0 0 !important; font-size:12px !important; color:var(--muted); }
+    [data-theme-resolved="light"] .display-settings { background:rgba(255,255,255,.55); border-color:rgba(39,53,42,.18); }
+    [data-theme-resolved="light"] .settings-profile-form input:not([type=file]),
+    [data-theme-resolved="light"] .settings-profile-form textarea,
+    [data-theme-resolved="light"] .settings-select { background:#fffdf6; color:#27352a; border-color:rgba(39,53,42,.25); }
+    [data-theme-resolved="light"] .settings-upload-button,
+    [data-theme-resolved="light"] .settings-remove-avatar { color:#354533; }
+
     #clock { padding-top:10px; }
   </style>
 </head>
@@ -52,6 +67,32 @@
       <span class="settings-kicker">CAMP ACCOUNT</span>
       <h1>Your Profile</h1>
       <p>Update your camp identity. Your profile belongs to your account.</p>
+      <section class="display-settings" aria-labelledby="displaySettingsTitle">
+        <h2 class="settings-h2" id="displaySettingsTitle">Display</h2>
+        <p class="display-settings-description">Choose how Hollow Night Camp looks and which language it uses.</p>
+        <div class="display-setting-row">
+          <div class="display-setting-heading">
+            <img src="assets/icons/theme.png" alt="" width="28" height="28">
+            <label for="themePreference">Theme</label>
+          </div>
+          <select class="settings-select" id="themePreference" name="theme">
+            <option value="system">System</option>
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </div>
+        <div class="display-setting-row">
+          <div class="display-setting-heading">
+            <img src="assets/icons/language.png" alt="" width="28" height="28">
+            <label for="languagePreference">Language</label>
+          </div>
+          <select class="settings-select" id="languagePreference" name="language">
+            <option value="en">English</option>
+            <option value="id">Indonesian</option>
+          </select>
+        </div>
+        <p class="display-settings-status" id="displaySettingsStatus" role="status" aria-live="polite"></p>
+      </section>
       <form id="settingsProfileForm" class="settings-profile-form">
         <div class="settings-avatar-row">
           <img id="settingsAvatarPreview" class="settings-avatar-preview" alt="Profile picture preview" hidden>
@@ -76,10 +117,32 @@
   </main>
 
   <script type="module">
-    import { initPage } from './js/shared.js?v=14';
+    import { initPage } from './js/shared.js?v=15';
     import { updateReaderProfile } from './js/auth.js';
+    import { getTheme, getLanguage, applyTheme, applyLanguage, THEME_KEY, LANGUAGE_KEY } from './js/preferences.js?v=1';
 
     const ctx = await initPage({ active: 'settings' });
+
+    const themePreference = document.getElementById('themePreference');
+    const languagePreference = document.getElementById('languagePreference');
+    const displaySettingsStatus = document.getElementById('displaySettingsStatus');
+    themePreference.value = getTheme();
+    languagePreference.value = getLanguage();
+
+    themePreference.addEventListener('change', () => {
+      try { localStorage.setItem(THEME_KEY, themePreference.value); } catch (error) {}
+      applyTheme(themePreference.value);
+      displaySettingsStatus.textContent = languagePreference.value === 'id'
+        ? 'Preferensi tema berhasil disimpan.'
+        : 'Theme preference saved.';
+    });
+    languagePreference.addEventListener('change', () => {
+      try { localStorage.setItem(LANGUAGE_KEY, languagePreference.value); } catch (error) {}
+      applyLanguage(languagePreference.value);
+      displaySettingsStatus.textContent = languagePreference.value === 'id'
+        ? 'Preferensi bahasa berhasil disimpan.'
+        : 'Language preference saved.';
+    });
 
     const form = document.getElementById('settingsProfileForm');
     const nickname = document.getElementById('settingsNickname');
