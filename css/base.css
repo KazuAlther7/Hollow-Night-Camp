@@ -125,3 +125,27 @@ button:disabled {
     transition-duration: .01ms !important;
   }
 }
+
+
+/* Display preferences — light theme token overrides. */
+:root[data-theme-resolved="light"] {
+  color-scheme: light;
+  --night: #f1ead8;
+  --night-deep: #e5dcc6;
+  --forest: #dce4d1;
+  --forest-light: #c7d5b8;
+  --moss: #667d56;
+  --paper: #26352a;
+  --paper-dark: #485744;
+  --ink: #f6f0e2;
+  --orange: #b96a2f;
+  --fire: #a95625;
+  --red: #b94f38;
+  --muted: #596455;
+  --line: rgba(39,53,42,.22);
+}
+:root[data-theme-resolved="light"] body { background-color: #f1ead8; color: #26352a; }
+:root[data-theme-resolved="light"] body.camp-body {
+  background: radial-gradient(ellipse 70% 38% at 50% -6%, rgba(242,163,75,.18), transparent 70%), linear-gradient(180deg,#f7f0df 0%,#e9e4d3 55%,#dfe5d5 100%);
+  background-attachment: fixed;
+}
