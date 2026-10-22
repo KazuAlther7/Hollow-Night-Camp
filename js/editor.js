@@ -1,6 +1,6 @@
 // HOLLOW NIGHT CAMP — editor.html (Author only): write, save draft, publish chapters
 
-import { initPage } from './shared.js?v=14';
+import { initPage } from './shared.js?v=16';
 import { supabase } from '../config/supabase.js';
 import { loadVolumes, createVolume } from './volumes.js?v=1';
 import { createVolumeCombobox } from './volume-combobox.js?v=1';

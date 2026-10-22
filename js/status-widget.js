@@ -115,7 +115,7 @@ export function mountStatusWidget() {
 
   const css = document.createElement('link');
   css.rel = 'stylesheet';
-  css.href = new URL('../css/status.css?v=2', import.meta.url).href;
+  css.href = new URL('../css/status.css?v=3', import.meta.url).href;
   document.head.append(css);
 
   const digits = [makeDigit(), makeDigit(), makeDigit(), makeDigit()];

@@ -1,7 +1,7 @@
 // HOLLOW NIGHT CAMP — shared by every page after login:
 // session guard, role check, Main Bar / ⋮ menu rendering, sign out.
 
-import { initPreferences, t } from './preferences.js';
+import { initPreferences, t } from './preferences.js?v=2';
 
 import {
   getCurrentSession,
@@ -243,6 +243,7 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
 // Settings gear: opens a dropdown in place (no navigation until an item is chosen).
 const SETTINGS_MENU = [
   { href: 'settings-profile.html', label: t('Profile'), icon: 'profile' },
+  { href: 'settings-display.html', label: t('Display'), icon: 'theme' },
   { href: 'settings-history.html', label: t('History & Bookmarks'), icon: 'bookmark' },
   { href: 'settings-clock.html',   label: t('Clock & timezone'), icon: 'clock' }
 ];
@@ -253,7 +254,7 @@ function mountSettingsMenu() {
 
   const css = document.createElement('link');
   css.rel = 'stylesheet';
-  css.href = new URL('../css/settings-menu.css?v=3', import.meta.url).href;
+  css.href = new URL('../css/settings-menu.css?v=4', import.meta.url).href;
   document.head.append(css);
 
   // lives on <body>: the Main Bar's blur / scroll container would clip or re-anchor a fixed child
@@ -401,7 +402,7 @@ export async function initPage(options = {}) {
   mountSubNav();
 
   // top-right status widget (flip clock + online readers); never allowed to break the page
-  import('./status-widget.js?v=2').then((module) => module.mountStatusWidget()).catch((error) => console.warn('Status widget unavailable:', error));
+  import('./status-widget.js?v=3').then((module) => module.mountStatusWidget()).catch((error) => console.warn('Status widget unavailable:', error));
 
   observeAuthState((event) => {
     if (event === 'SIGNED_OUT' && !signingOut) {

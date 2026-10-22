@@ -18,7 +18,12 @@ const translations = {
     'ACCOUNT ROLE':'ACCOUNT ROLE', 'Upload profile picture':'Upload profile picture',
     'Remove picture':'Remove picture', 'SAVE PROFILE':'SAVE PROFILE',
     'Tell the camp a little about yourself...':'Tell the camp a little about yourself...',
-    'Welcome to the Camp,':'Welcome to the Camp,'
+    'Welcome to the Camp,':'Welcome to the Camp,',
+    'DISPLAY':'DISPLAY', 'How the camp looks':'How the camp looks', 'Match your device':'Match your device',
+    'Warm paper tones':'Warm paper tones', 'The classic night camp':'The classic night camp',
+    'Language of menus and labels':'Language of menus and labels',
+    'Saved on this device. Changes apply right away.':'Saved on this device. Changes apply right away.',
+    'Theme saved.':'Theme saved.', 'Language saved.':'Language saved.'
   },
   id: {
     'Campfire':'Api Unggun', 'Novels':'Novel', 'Theories':'Teori', 'Arcade':'Arkade',
@@ -34,7 +39,12 @@ const translations = {
     'ACCOUNT ROLE':'PERAN AKUN', 'Upload profile picture':'Unggah foto profil',
     'Remove picture':'Hapus foto', 'SAVE PROFILE':'SIMPAN PROFIL',
     'Tell the camp a little about yourself...':'Ceritakan sedikit tentang dirimu kepada camp...',
-    'Welcome to the Camp,':'Selamat datang di Camp,'
+    'Welcome to the Camp,':'Selamat datang di Camp,',
+    'DISPLAY':'TAMPILAN', 'How the camp looks':'Tampilan camp', 'Match your device':'Ikuti pengaturan perangkat',
+    'Warm paper tones':'Nuansa kertas hangat', 'The classic night camp':'Camp malam yang klasik',
+    'Language of menus and labels':'Bahasa untuk menu dan label',
+    'Saved on this device. Changes apply right away.':'Tersimpan di perangkat ini. Perubahan langsung berlaku.',
+    'Theme saved.':'Tema disimpan.', 'Language saved.':'Bahasa disimpan.'
   }
 };
 
@@ -75,6 +85,7 @@ export function applyLanguage(language = getLanguage()) {
     const original = node.nodeValue;
     const trimmed = original.trim();
     if (!trimmed) continue;
+    if (node.parentElement && node.parentElement.closest('[data-no-translate]')) continue;
     const key = Object.prototype.hasOwnProperty.call(dict, trimmed) ? trimmed : reverse[trimmed];
     const translated = key ? (dict[key] || key) : null;
     if (translated && translated !== trimmed) {

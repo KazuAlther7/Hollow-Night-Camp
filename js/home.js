@@ -2,7 +2,7 @@
 
 import { supabase } from '../config/supabase.js';
 import { readingTime } from './dom.js?v=2';
-import { initPage, ENTERED_KEY, getAuthorMode, setAuthorMode } from './shared.js?v=14';
+import { initPage, ENTERED_KEY, getAuthorMode, setAuthorMode } from './shared.js?v=16';
 import { createParallax } from './parallax.js';
 
 const welcomeScreen = document.getElementById('welcomeScreen');
