@@ -1,4 +1,5 @@
 /* HOLLOW NIGHT CAMP — top-right status widget: neon flip clock + online readers */
+/* The widget panel is always dark, so its text uses fixed colours (theme variables flip in the Light theme). */
 
 .hn-status {
   position: fixed; top: 14px; right: 14px; z-index: 14;
@@ -15,7 +16,7 @@ body.stage-welcome .hn-status, body.editor-mode .hn-status { display: none; }
 .hn-flip-row { display: flex; align-items: center; gap: 3px; }
 .hn-colon { padding: 0 1px 3px; font: 700 22px var(--body); color: #ffcf8a; text-shadow: 0 0 8px rgba(255,160,60,.75); animation: hnColon 2s steps(1) infinite; }
 @keyframes hnColon { 50% { opacity: .25; } }
-.hn-clock-tz { max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 700 9px var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.hn-clock-tz { max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 700 9px var(--body); letter-spacing: .12em; text-transform: uppercase; color: #c3c8b1; }
 
 .fd { position: relative; width: 24px; height: 36px; perspective: 160px; font: 700 26px/1 var(--typewriter); }
 .fd-half {
@@ -35,8 +36,8 @@ body.stage-welcome .hn-status, body.editor-mode .hn-status { display: none; }
 @keyframes fdFlipBottom { from { transform: rotateX(90deg); } to { transform: rotateX(0); } }
 
 /* online readers */
-.hn-online { display: flex; align-items: center; gap: 7px; padding-left: 12px; border-left: 1px solid rgba(243,231,201,.2); font: 600 13px var(--body); color: var(--muted); white-space: nowrap; }
-.hn-online-count { color: var(--paper); font: 700 16px var(--body); min-width: 1ch; }
+.hn-online { display: flex; align-items: center; gap: 7px; padding-left: 12px; border-left: 1px solid rgba(243,231,201,.2); font: 600 13px var(--body); color: #c3c8b1; white-space: nowrap; }
+.hn-online-count { color: #f3e7c9; font: 700 16px var(--body); min-width: 1ch; }
 .hn-lamp { flex-shrink: 0; width: 9px; height: 9px; border-radius: 50%; background: #6fd16f; box-shadow: 0 0 8px rgba(111,209,111,.9); animation: hnLamp 2.4s ease-in-out infinite; }
 .hn-online.is-loading .hn-lamp { background: #ffd24a; box-shadow: 0 0 8px rgba(255,210,74,.9); }
 .hn-online.is-unavailable .hn-lamp { background: #8a8f84; box-shadow: none; animation: none; }
@@ -48,7 +49,7 @@ body.stage-welcome .hn-status, body.editor-mode .hn-status { display: none; }
   background: rgba(243,231,201,.12);
 }
 .hn-status-toggle::after {
-  content: ""; position: absolute; inset: 0; margin: auto; width: 14px; height: 14px; background: var(--paper);
+  content: ""; position: absolute; inset: 0; margin: auto; width: 14px; height: 14px; background: #f3e7c9;
   transform: rotate(180deg);
   -webkit-mask: url("../assets/icons/back.png") center / contain no-repeat;
           mask: url("../assets/icons/back.png") center / contain no-repeat;

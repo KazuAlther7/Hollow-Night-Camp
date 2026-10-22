@@ -1,0 +1,81 @@
+/* HOLLOW NIGHT CAMP — Settings > Display (theme + language pickers). Uses theme variables, so it works in dark and light. */
+
+.display-page { max-width: 720px; }
+.display-page .settings-kicker { color: var(--orange); font-size: 11px; letter-spacing: 2px; font-weight: 700; }
+
+.pref-card {
+  margin: 26px 0 0; padding: 22px; border-radius: 20px;
+  border: 1.5px solid var(--line);
+  background: rgba(127,127,127,.08);
+  background: color-mix(in srgb, var(--paper) 6%, transparent);
+}
+.pref-head { display: flex; align-items: center; gap: 14px; margin: 0 0 18px; }
+.pref-icon {
+  display: grid; place-items: center; flex-shrink: 0; width: 46px; height: 46px; border-radius: 14px;
+  background: rgba(242,163,75,.16); border: 1.5px solid rgba(242,163,75,.4);
+}
+.pref-glyph {
+  width: 26px; height: 26px; background: var(--orange);
+  -webkit-mask: var(--g) center / contain no-repeat; mask: var(--g) center / contain no-repeat;
+}
+.pref-head h2 { margin: 0; font-family: var(--heading); font-size: 22px; line-height: 1.2; }
+.pref-head p { margin: 2px 0 0 !important; font-size: 13px !important; color: var(--muted); }
+
+.pref-options { display: grid; gap: 12px; }
+.pref-options-3 { grid-template-columns: repeat(3, 1fr); }
+.pref-options-2 { grid-template-columns: repeat(2, 1fr); }
+
+.pref-option { position: relative; display: block; cursor: pointer; }
+.pref-option input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.pref-body {
+  position: relative; display: grid; gap: 4px; height: 100%; padding: 14px; border-radius: 16px;
+  border: 2px solid var(--line); background: rgba(127,127,127,.06);
+  transition: border-color .2s ease, background .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+.pref-body strong { font-size: 15px; color: var(--paper); }
+.pref-body small { font-size: 12px; line-height: 1.4; color: var(--muted); }
+.pref-option:hover .pref-body { transform: translateY(-2px); border-color: var(--orange); }
+.pref-option input:focus-visible + .pref-body { outline: 3px solid rgba(255,206,114,.8); outline-offset: 2px; }
+.pref-option input:checked + .pref-body {
+  border-color: var(--orange); background: rgba(242,163,75,.14);
+  box-shadow: 0 8px 24px rgba(0,0,0,.18);
+}
+/* check mark: the selected state is a shape, not only a colour */
+.pref-option input:checked + .pref-body::after {
+  content: "✓"; position: absolute; top: 10px; right: 10px; display: grid; place-items: center;
+  width: 22px; height: 22px; border-radius: 50%; background: var(--orange); color: var(--ink); font: 700 13px/1 var(--body);
+}
+
+/* theme preview: a tiny "page" with an accent bar and text lines */
+.theme-swatch {
+  --sw-a: #f2a34b; --sw-t: rgba(255,255,255,.45);
+  display: grid; align-content: center; gap: 6px; height: 74px; margin-bottom: 8px; padding: 12px; border-radius: 10px;
+  border: 1px solid rgba(127,127,127,.4);
+}
+.theme-swatch i { display: block; height: 7px; border-radius: 99px; background: var(--sw-t); }
+.theme-swatch i:nth-child(1) { width: 52%; height: 9px; background: var(--sw-a); }
+.theme-swatch i:nth-child(2) { width: 86%; }
+.theme-swatch i:nth-child(3) { width: 64%; }
+.swatch-dark   { background: #17251d; }
+.swatch-light  { --sw-a: #b96a2f; --sw-t: rgba(39,54,42,.4); background: #f2ecdc; }
+.swatch-system { --sw-t: rgba(127,127,127,.7); background: linear-gradient(135deg, #f2ecdc 50%, #17251d 50%); }
+
+/* language */
+.pref-body-row { grid-auto-flow: column; justify-content: start; align-items: center; gap: 12px; }
+.lang-badge {
+  display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px;
+  background: rgba(242,163,75,.16); border: 1.5px solid rgba(242,163,75,.45);
+  color: var(--orange); font: 700 14px var(--body); letter-spacing: .06em;
+}
+
+.pref-note { margin: 18px 0 0 !important; font-size: 13px !important; color: var(--muted); }
+.pref-status { min-height: 20px; margin: 6px 0 0 !important; font-size: 13px !important; font-weight: 600; color: var(--fire); }
+
+@media (max-width: 560px) {
+  .pref-options-3 { grid-template-columns: 1fr; }
+  .pref-options-3 .pref-body { grid-template-columns: 96px 1fr; align-items: center; column-gap: 14px; }
+  .pref-options-3 .theme-swatch { grid-row: span 2; margin: 0; height: 64px; }
+  .pref-options-2 { grid-template-columns: 1fr; }
+  .pref-card { padding: 18px; }
+}
+@media (prefers-reduced-motion: reduce) { .pref-body { transition: none; } .pref-option:hover .pref-body { transform: none; } }
