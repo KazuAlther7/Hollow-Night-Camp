@@ -14,7 +14,7 @@
   display: grid; place-items: center; flex-shrink: 0; width: 46px; height: 46px; border-radius: 14px;
   background: rgba(242,163,75,.16); border: 1.5px solid rgba(242,163,75,.4);
 }
-.glyph-display  { --g: url("../assets/icons/display.png"); }
+.glyph-theme    { --g: url("../assets/icons/theme.png"); }
 .glyph-language { --g: url("../assets/icons/language.png"); }
 .pref-glyph {
   width: 26px; height: 26px; background: var(--orange);
