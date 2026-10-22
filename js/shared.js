@@ -1,12 +1,16 @@
 // HOLLOW NIGHT CAMP — shared by every page after login:
 // session guard, role check, Main Bar / ⋮ menu rendering, sign out.
 
+import { initPreferences, t } from './preferences.js';
+
 import {
   getCurrentSession,
   getReaderProfile,
   logoutReader,
   observeAuthState
 } from './auth.js';
+
+initPreferences();
 
 export const ENTERED_KEY = 'hnc_entered';
 
@@ -16,11 +20,11 @@ export function trackLoad(promise, label) {
 }
 
 const NAV = [
-  { id: 'campfire', href: 'home.html',     icon: 'campfire', label: 'Campfire' },
-  { id: 'novels',   href: 'novels.html',   icon: 'novels', label: 'Novels' },
-  { id: 'theories', href: 'theories.html', icon: 'theories', label: 'Theories' },
-  { id: 'arcade',   href: 'arcade.html',   icon: 'arcade', label: 'Arcade' },
-  { id: 'settings', href: 'settings-profile.html', icon: 'settings', label: 'Settings' }
+  { id: 'campfire', href: 'home.html',     icon: 'campfire', label: t('Campfire') },
+  { id: 'novels',   href: 'novels.html',   icon: 'novels', label: t('Novels') },
+  { id: 'theories', href: 'theories.html', icon: 'theories', label: t('Theories') },
+  { id: 'arcade',   href: 'arcade.html',   icon: 'arcade', label: t('Arcade') },
+  { id: 'settings', href: 'settings-profile.html', icon: 'settings', label: t('Settings') }
 ];
 
 // Novels sub-navigation: Novels + World Building (the arrow unfolds Characters, Maps, Locations in the same row)
@@ -238,9 +242,9 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
 
 // Settings gear: opens a dropdown in place (no navigation until an item is chosen).
 const SETTINGS_MENU = [
-  { href: 'settings-profile.html', label: 'Profile', icon: 'profile' },
-  { href: 'settings-history.html', label: 'History & Bookmarks', icon: 'bookmark' },
-  { href: 'settings-clock.html',   label: 'Clock & timezone', icon: 'clock' }
+  { href: 'settings-profile.html', label: t('Profile'), icon: 'profile' },
+  { href: 'settings-history.html', label: t('History & Bookmarks'), icon: 'bookmark' },
+  { href: 'settings-clock.html',   label: t('Clock & timezone'), icon: 'clock' }
 ];
 
 function mountSettingsMenu() {
