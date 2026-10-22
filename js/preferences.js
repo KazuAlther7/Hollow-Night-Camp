@@ -37,7 +37,13 @@ export function getLanguage() {
   try { return localStorage.getItem(LANGUAGE_KEY) === 'id' ? 'id' : 'en'; }
   catch { return 'en'; }
 }
-export function t(value) { return translations[getLanguage()]?.[value] || value; }
+export function t(value) {
+  const language = getLanguage();
+  if (translations[language]?.[value]) return translations[language][value];
+  const other = language === 'id' ? 'en' : 'id';
+  const englishKey = Object.keys(translations[other]).find((key) => translations[other][key] === value);
+  return englishKey ? (translations[language]?.[englishKey] || englishKey) : value;
+}
 
 export function applyTheme(theme = getTheme()) {
   const root = document.documentElement;
@@ -62,7 +68,12 @@ export function applyLanguage(language = getLanguage()) {
   document.querySelectorAll('[aria-label],[title],[placeholder]').forEach((el) => {
     for (const attr of ['aria-label','title','placeholder']) {
       const value = el.getAttribute(attr);
-      if (value && translations[language]?.[value]) el.setAttribute(attr, translations[language][value]);
+      if (!value) continue;
+      const direct = translations[language]?.[value];
+      const other = language === 'id' ? 'en' : 'id';
+      const englishKey = Object.keys(translations[other]).find((key) => translations[other][key] === value);
+      const translated = direct || (englishKey ? translations[language]?.[englishKey] : null);
+      if (translated) el.setAttribute(attr, translated);
     }
   });
 }
