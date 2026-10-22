@@ -113,7 +113,7 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
           ${icon('settings')}<span class="bar-util-label">Settings</span>
         </button>
         <button class="bar-icon-button" id="notificationButton" type="button" aria-label="Notifications" title="Notifications">
-          ${icon('notification')}<span class="bar-util-label">Notification</span><span class="notification-dot"></span>
+          ${icon('notification')}<span class="bar-util-label">Notification</span><span class="notification-dot" style="display:none"></span>
         </button>
         <button class="bar-icon-button profile-menu-button" id="profileMenuButton" type="button" aria-label="Account menu" aria-expanded="false" title="Profile and sign out">
           ${profile?.avatar_url
@@ -198,6 +198,7 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
   }, { once: true });
 
   mountSettingsMenu();
+  import('./notifications.js?v=1').then((module) => module.mountNotifications({ userId: user?.id })).catch((error) => console.warn('Notifications unavailable:', error));
 
   const authorToggle = document.getElementById('authorStudioToggle');
   if (authorToggle) {
@@ -244,6 +245,7 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
 const SETTINGS_MENU = [
   { href: 'settings-profile.html', label: t('Profile'), icon: 'profile' },
   { href: 'settings-display.html', label: t('Display'), icon: 'display' },
+  { href: 'settings-preferences.html', label: t('Preferences'), icon: 'notification' },
   { href: 'settings-history.html', label: t('History & Bookmarks'), icon: 'bookmark' },
   { href: 'settings-clock.html',   label: t('Clock & timezone'), icon: 'clock' }
 ];
