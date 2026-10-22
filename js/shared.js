@@ -243,7 +243,7 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
 // Settings gear: opens a dropdown in place (no navigation until an item is chosen).
 const SETTINGS_MENU = [
   { href: 'settings-profile.html', label: t('Profile'), icon: 'profile' },
-  { href: 'settings-display.html', label: t('Display'), icon: 'theme' },
+  { href: 'settings-display.html', label: t('Display'), icon: 'display' },
   { href: 'settings-history.html', label: t('History & Bookmarks'), icon: 'bookmark' },
   { href: 'settings-clock.html',   label: t('Clock & timezone'), icon: 'clock' }
 ];
@@ -254,7 +254,7 @@ function mountSettingsMenu() {
 
   const css = document.createElement('link');
   css.rel = 'stylesheet';
-  css.href = new URL('../css/settings-menu.css?v=4', import.meta.url).href;
+  css.href = new URL('../css/settings-menu.css?v=5', import.meta.url).href;
   document.head.append(css);
 
   // lives on <body>: the Main Bar's blur / scroll container would clip or re-anchor a fixed child
