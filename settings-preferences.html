@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#17251d">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/image/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/image/favicon-192.png">
+  <link rel="shortcut icon" href="assets/image/favicon.ico">
+  <link rel="apple-touch-icon" href="assets/image/apple-touch-icon.png">
+  <title>Preferences — Hollow Night Camp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Special+Elite&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/loader.css?v=1">
+  <script src="js/loader.js?v=1"></script>
+  <link rel="stylesheet" href="css/base.css?v=5">
+  <link rel="stylesheet" href="css/mainbar.css?v=11">
+  <link rel="stylesheet" href="css/ui.css?v=4">
+  <link rel="stylesheet" href="css/history.css?v=1">
+  <link rel="stylesheet" href="css/display.css?v=5">
+</head>
+
+<body class="camp-body" data-page="settings">
+
+  <main class="camp-app">
+    <section class="camp-page camp-placeholder-page display-page" id="preferences">
+      <span class="settings-kicker">PREFERENCES</span>
+      <h1>Preferences</h1>
+      <p>Choose which notifications you want to receive.</p>
+
+      <section class="pref-card" aria-labelledby="notifTitle">
+        <div class="pref-head">
+          <span class="pref-icon" aria-hidden="true"><span class="pref-glyph glyph-bell"></span></span>
+          <div>
+            <h2 id="notifTitle">Notifications</h2>
+            <p>The bell in the Main Bar</p>
+          </div>
+        </div>
+        <div class="switch-row" id="row-enabled">
+          <span class="switch-text"><strong>All notifications</strong><small>Master switch for everything below</small></span>
+          <label class="switch"><input type="checkbox" id="pref-enabled" role="switch" aria-label="All notifications"><span class="switch-track" aria-hidden="true"></span></label>
+        </div>
+        <div class="switch-row" id="row-novel_updates">
+          <span class="switch-text"><strong>Novel &amp; chapter updates</strong><small>When a new chapter is published</small></span>
+          <label class="switch"><input type="checkbox" id="pref-novel_updates" role="switch" aria-label="Novel &amp; chapter updates"><span class="switch-track" aria-hidden="true"></span></label>
+        </div>
+        <div class="switch-row" id="row-theory_activity">
+          <span class="switch-text"><strong>Theory activity</strong><small>Replies to and pins of your theories</small></span>
+          <label class="switch"><input type="checkbox" id="pref-theory_activity" role="switch" aria-label="Theory activity"><span class="switch-track" aria-hidden="true"></span></label>
+        </div>
+        <div class="switch-row" id="row-events">
+          <span class="switch-text"><strong>Promotions &amp; events</strong><small>Announcements about camp events</small></span>
+          <label class="switch"><input type="checkbox" id="pref-events" role="switch" aria-label="Promotions &amp; events"><span class="switch-track" aria-hidden="true"></span></label>
+        </div>
+      </section>
+
+      <p class="pref-note">Turning off a type stops new notifications of that type. Ones that already arrived stay in the bell until you read or delete them.</p>
+      <p class="pref-status" id="prefStatus" role="status" aria-live="polite"></p>
+    </section>
+  </main>
+
+  <script type="module">
+    import { initPage } from './js/shared.js?v=18';
+    import { supabase } from './config/supabase.js';
+    import { t } from './js/preferences.js?v=2';
+
+    const ctx = await initPage({ active: 'settings' });
+
+    const KEYS = ['enabled', 'novel_updates', 'theory_activity', 'events'];
+    const box = Object.fromEntries(KEYS.map((key) => [key, document.getElementById('pref-' + key)]));
+    const status = document.getElementById('prefStatus');
+
+    const paint = () => KEYS.slice(1).forEach((key) => {
+      box[key].disabled = !box.enabled.checked;
+      document.getElementById('row-' + key).classList.toggle('is-disabled', !box.enabled.checked);
+    });
+
+    const { data } = await supabase.from('notification_preferences').select('*').eq('user_id', ctx.user.id).maybeSingle();
+    KEYS.forEach((key) => { box[key].checked = data ? data[key] !== false : true; });
+    paint();
+
+    KEYS.forEach((key) => box[key].addEventListener('change', async () => {
+      paint();
+      const row = { user_id: ctx.user.id, updated_at: new Date().toISOString() };
+      KEYS.forEach((k) => { row[k] = box[k].checked; });
+      const { error } = await supabase.from('notification_preferences').upsert(row, { onConflict: 'user_id' });
+      if (error) {
+        box[key].checked = !box[key].checked;
+        paint();
+        status.textContent = t('Could not save your preferences.');
+        return;
+      }
+      status.textContent = t('Preferences saved.');
+      window.dispatchEvent(new Event('hnc:notif-prefs'));
+    }));
+  </script>
+</body>
+</html>

@@ -103,7 +103,7 @@ The statuses below describe what is evidenced by the supplied ZIP's source code.
 | Badge assets | **NOT STARTED** | 12 Camp Rank + Night Owl badges under `assets/badges/` (§5.22). |
 | Settings: profile details | **DONE (core profile) / VERIFY** | Profile form and save feedback exist. |
 | Settings: theme and language | **IMPLEMENTED IN SOURCE** | System / Light / Dark + EN / ID on its own page `settings-display.html` (logic in `js/preferences.js`, stored in localStorage). Only strings in the dictionary are translated; live verification required. |
-| Notification bell / notification center | **PARTIAL** | Bell icon exists; center not implemented. |
+| Notification bell / notification center | **IMPLEMENTED IN SOURCE** | Bell opens a panel on any page after a shake animation; red dot only while unread; realtime; mark read / delete / clear all (`js/notifications.js`). Notifications are created by DB triggers (new chapter, reply on your theory, theory pinned) per `supabase/notifications.sql`. Promotions / Events has a switch but no emitter yet. Live verification required. |
 | Reading history and bookmarks | **IMPLEMENTED IN SOURCE / VERIFY** | `js/reading.js`, `js/history.js`, `settings-history.html`; tables and RLS must be verified in Supabase. |
 | Help / FAQ / bug reports | **NOT STARTED** | No complete in-site support workflow. |
 | Community social links | **NOT STARTED / VERIFY** | Not implemented as a complete Settings section. |
@@ -1344,7 +1344,7 @@ Each table uses stable IDs, timestamps, explicit relationships, indexes.
 - [ ] Avatar persistence through object-storage bucket.
 - [x] System / Light / Dark themes (`settings-display.html`, `js/preferences.js`).
 - [x] English / Indonesian interface localization (`settings-display.html`; dictionary in `js/preferences.js`, extend it as pages get new text).
-- [ ] Notification preferences and notification center.
+- [x] Notification preferences (`settings-preferences.html`) and notification center (bell panel).
 - [x] Reading history and bookmarks (`js/reading.js`, `js/history.js`; tables `bookmarks`, `reading_progress`).
 - [ ] Help / FAQ, support feedback, Community social links.
 - [x] Global Settings gear dropdown available in place on every applicable page.
