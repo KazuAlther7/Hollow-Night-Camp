@@ -19,7 +19,7 @@
 .settings-menu a:focus-visible { box-shadow: inset 0 0 0 2px rgba(255,206,114,.7); }
 
 /* Display entry icon */
-.icon-theme { --mask: url("../assets/icons/theme.png"); }
+.icon-display { --mask: url("../assets/icons/display.png"); }
 
 @media (prefers-reduced-motion: reduce) {
   .settings-trigger .icon, .settings-menu { transition: none; }
