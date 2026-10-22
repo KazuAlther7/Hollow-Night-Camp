@@ -47,71 +47,67 @@ The statuses below describe what is evidenced by the supplied ZIP's source code.
 
 ### 2.1 Feature status
 
-Statuses reflect source code in the supplied ZIP plus deployment/setup progress explicitly confirmed in the ongoing project conversation. A source implementation is not treated as production-verified unless it was tested in the live environment.
-
 | Feature / requirement | Status | Current evidence / remaining work |
 | --- | --- | --- |
 | Login and registration UI | **DONE** | `index.html` and `js/login.js` provide Login / Join Camp flows. |
-| Supabase email/password authentication | **DONE / VERIFY** | `js/auth.js` implements sign-up, sign-in, sign-out, session retrieval and auth-state observation. Live email verification and redirect behavior still require production testing. |
-| Reader profile: nickname and bio | **DONE** | `js/auth.js` reads and updates `profiles`; the Settings page reports successful saves. |
+| Supabase email/password authentication | **DONE / VERIFY** | `js/auth.js` implements sign-up, sign-in, sign-out, session retrieval and auth-state observation. |
+| Reader profile: nickname and bio | **DONE** | `js/auth.js` reads and updates `profiles`; Settings page reports successful saves. |
 | Reader profile picture UI | **PARTIAL** | Avatar preview / remove exists; durable object storage and upload policies need verification. |
-| Reader / Author role distinction | **PARTIAL** | Author role is loaded from `profiles`; Author Mode toggle and UI gating exist. Trusted role assignment and live database enforcement still need testing. |
-| Author-only editor route guard | **DONE (client-side) / VERIFY (server-side)** | `initPage({ requireAuthor: true })` protects editor route. RLS remains the real security boundary and must be tested with Reader credentials. |
-| Campfire homepage / welcome screen | **DONE** | `home.html`, `css/home.css`, and `js/home.js` implement the campfire welcome/home experience and visual effects. |
-| Welcome background depth / parallax | **DONE** | Background and depth assets are wired into `js/parallax.js`. This is not the planned user-controlled distant-camera exploration mode. |
+| Reader / Author role distinction | **PARTIAL** | Author role is loaded from `profiles`; Author Mode toggle and UI gating exist. Trusted role assignment still needs testing. |
+| Author-only editor route guard | **DONE (client-side) / VERIFY (server-side)** | `initPage({ requireAuthor: true })` protects editor route. RLS remains the real security boundary. |
+| Campfire homepage / welcome screen | **DONE** | `home.html`, `css/home.css`, `js/home.js` implement the welcome experience. |
+| Welcome background depth / parallax | **DONE** | Background and depth assets wired into `js/parallax.js`. |
 | Main Bar glass effect | **DONE** | `css/mainbar.css` styles the translucent glass navigation. |
 | Main Bar top / sidebar / compact modes | **DONE** | `js/shared.js` includes persistent mode preferences and navigation rendering. |
-| Author Mode toggle and cross-page state | **DONE (UI/state) / VERIFY (permissions)** | `js/shared.js` stores Author Mode in local storage and renders author navigation/actions. Local state is not authorization; backend policies must enforce permissions. |
+| Author Mode toggle and cross-page state | **DONE (UI/state) / VERIFY (permissions)** | Local state is not authorization; backend policies must enforce permissions. |
 | Editor's three-dot menu | **DONE** | Shared editor menu is implemented in `js/shared.js`. |
-| Mobile navigation behavior | **PARTIAL** | Responsive CSS exists; verify horizontal reachability, clipping, and touch behavior on actual mobile devices. |
+| Mobile navigation behavior | **PARTIAL** | Responsive CSS exists; verify horizontal reachability, clipping, and touch behavior. |
 | Ten requested navigation icons | **DONE (assets)** | Icon assets exist; not all correspond to completed feature workflows. |
-| Supabase project connection | **CONFIGURED / VERIFY** | `config/supabase.js` contains project URL and publishable key. Runtime connectivity and production configuration must be tested. |
-| Supabase `profiles` table / profile persistence | **CONFIGURED / VERIFY** | Project progress confirms profile table and profile saving. Verify policies and cross-device persistence in production. |
-| Novel library page | **DONE (core workflow) / VERIFY** | `js/novels.js` now queries Supabase and renders the library; verify loading, empty/error states and published-only visibility in production. |
-| Novel detail page | **DONE (core workflow) / VERIFY** | `js/novels.js` loads novel details and chapter-management UI from Supabase. |
-| Create / edit / delete novels | **DONE in source / VERIFY** | Novel dialog and Supabase operations exist in `js/novels.js`; verify RLS and persistence with Author and Reader sessions. |
-| Novel cover upload | **PARTIAL / VERIFY** | Upload code targets the `covers` bucket with a 2 MB limit; confirm bucket and Storage policies. |
+| Supabase project connection | **CONFIGURED / VERIFY** | `config/supabase.js` contains project URL and publishable key. |
+| Supabase `profiles` table / profile persistence | **CONFIGURED / VERIFY** | Verify policies and cross-device persistence in production. |
+| Novel library page | **DONE (core workflow) / VERIFY** | `js/novels.js` queries Supabase and renders the library. |
+| Novel detail page | **DONE (core workflow) / VERIFY** | `js/novels.js` loads novel details and chapter-management UI. |
+| Create / edit / delete novels | **DONE in source / VERIFY** | Novel dialog and Supabase operations exist. |
+| Novel cover upload | **PARTIAL / VERIFY** | Upload code targets `covers` bucket with 2 MB limit. |
 | Chapter editor UI and word count | **DONE** | `editor.html` and `js/editor.js` implement chapter fields, body editing and word count. |
-| Save draft / publish chapter | **DONE in source / VERIFY** | `js/editor.js` implements persistence and draft/publish actions. Confirm database schema and RLS in the live project. |
-| Chapter metadata and ordering | **DONE in source / VERIFY** | Editor supports title, subtitle, chapter number and volume fields; verify ordering and database constraints. |
-| Reader chapter page | **DONE in source / VERIFY** | `read.html` and `js/read.js` load a chapter, render its content and provide chapter navigation. Draft protection depends on RLS. |
-| Chapter Ratings (five d20 icons, one vote per reader per chapter) | **IMPLEMENTED IN SOURCE / VERIFY** | `js/rating.js`, `css/rating.css`, and `js/read.js` implement d20-based chapter ratings and shared rating UI. Verify live schema, one-vote enforcement, average/count, realtime updates, and RLS. |
-| Novel Ratings (aggregate of all chapter votes) | **IMPLEMENTED IN SOURCE / VERIFY** | `js/rating.js` and `js/novels.js` include novel rating mounting and statistics helpers. Verify aggregation semantics, published-chapter scope, realtime behavior, and database views/functions in production. |
-| Chapter import from TXT / DOCX / text-based PDF | **DONE in source / VERIFY** | `js/import.js` parses supported formats (5 MB limit), presents review flow and creates draft content. Scanned PDFs/OCR are not supported. |
-| Latest Chapter section | **PARTIAL / VERIFY** | Homepage author controls/status are present, but confirm a complete reader-facing latest-published-chapter section is wired to live chapter data. |
-| Global branded loading animation | **NOT STARTED** | New requirement: logo-led branded loading experience with a distinctive, polished animation used consistently across navigation/data-loading states. |
-| Background music and sound effects controls | **NOT STARTED** | New requirement: separate Music and SFX enable/disable and volume controls in Settings; audio assets will live under `assets/sound/`. |
-| Realtime online readers count | **NOT STARTED** | New requirement: show a live count of active reader sessions, preferably using Supabase Realtime Presence with stale-session cleanup. |
-| Realtime flip-style digital clock | **NOT STARTED** | New requirement: retro folding desk-clock layout, neon digital styling and animated flipping minute cards, with selectable timezone. |
-| Global Settings gear dropdown | **PARTIAL / VERIFY** | Settings currently has a dedicated page; new requirement is a global dropdown trigger that opens in place on every page, with animated gear and links to dedicated settings destinations. |
-| Volumes / arcs and chapter list | **PARTIAL / VERIFY** | Volume metadata and chapter management exist in the editor/novel workflow; verify full grouping/reordering experience. |
-| Theories page | **IMPLEMENTED IN SOURCE / VERIFY** | `theories.html` and `js/theories.js` implement a theory list/detail workflow, categories, posting and replies. Verify schema, moderation rules, email-verification enforcement, and RLS in the live project. |
-| Theory posts, replies and cloud persistence | **IMPLEMENTED IN SOURCE / VERIFY** | `js/theories.js` queries and mutates theory/reply data through Supabase. Verify rate limits, persistence, and policies using Reader and Author accounts. |
-| Theory categories and moderation | **PARTIAL / VERIFY** | Categories Confirmed / Likely / Speculation / Wild Theory are defined in `js/theories.js`; full moderation permissions and workflow need production verification. |
-| Corners Arcade | **NOT STARTED** | `arcade.html` remains a “Coming soon” placeholder; arcade scores, small save-game state, and player profiles should use Supabase-backed tables with RLS. |
-| D&D-style dice roll and games | **NOT STARTED** | No playable dice simulation or arcade game is present. |
-| Camp Rank, EXP and levels | **NOT STARTED** | Planned progression system. No rank/EXP/streak implementation found in this ZIP. |
-| Reading streak and Night Owl badge | **NOT STARTED** | Three consecutive reading days should award the Night Owl badge; requires reliable daily reading activity records and duplicate-safe award logic. |
-| Daily Campfire check-in and Ember wallet | **NOT STARTED** | Check-in currency and balance/ledger system are planned; no Ember implementation found. |
-| Camp Challenge author menu | **NOT STARTED** | Author-created challenges with Ember rewards require challenge CRUD, eligibility, completion validation, and reward ledger. |
-| Category leaderboards and monthly reset | **NOT STARTED** | Top Theorist, Top Reader, and Top Arcade Player, monthly periods, author-controlled reset, badge and Ember rewards are planned. |
-| Author Analytics Dashboard | **NOT STARTED** | Chapter reads, average ratings, popular reading hours, and all available content insights need event aggregation and an author-only dashboard. |
-| Badge assets | **NOT STARTED** | Future badge artwork should be stored in `assets/badges/`; that directory is not present in this ZIP. |
+| Save draft / publish chapter | **DONE in source / VERIFY** | Confirm database schema and RLS in the live project. |
+| Chapter metadata and ordering | **DONE in source / VERIFY** | Editor supports title, subtitle, chapter number and volume fields. |
+| Reader chapter page | **DONE in source / VERIFY** | `read.html` and `js/read.js` load a chapter and provide chapter navigation. |
+| Chapter Ratings (five d20 icons) | **IMPLEMENTED IN SOURCE / VERIFY** | `js/rating.js`, `css/rating.css`, `js/read.js`. Verify live schema, one-vote enforcement, and realtime. |
+| Novel Ratings (aggregate of chapter votes) | **IMPLEMENTED IN SOURCE / VERIFY** | `js/rating.js` and `js/novels.js` include novel rating mounting. |
+| Chapter import from TXT / DOCX / text-based PDF | **DONE in source / VERIFY** | `js/import.js` parses supported formats (5 MB limit). |
+| Latest Chapter section | **PARTIAL / VERIFY** | Homepage author controls present; confirm reader-facing latest-published-chapter section. |
+| Global branded loading animation | **NOT STARTED** | Logo-led branded loading experience. |
+| Background music and sound effects controls | **NOT STARTED** | Separate Music and SFX controls; assets under `assets/sound/`. |
+| Realtime online readers count | **NOT STARTED** | Live count of active reader sessions via Supabase Realtime Presence. |
+| Realtime flip-style digital clock | **NOT STARTED** | Retro folding desk-clock layout with selectable timezone. |
+| Global Settings gear dropdown | **PARTIAL / VERIFY** | Global dropdown trigger; expanding into dedicated settings destinations. |
+| Volumes / arcs and chapter list | **PARTIAL / VERIFY** | Verify full grouping/reordering experience. |
+| Theories page | **IMPLEMENTED IN SOURCE / VERIFY** | `theories.html` and `js/theories.js` implement theory list/detail, categories, posting and replies. |
+| Theory posts, replies and cloud persistence | **IMPLEMENTED IN SOURCE / VERIFY** | Verify rate limits, persistence, and policies. |
+| Theory categories and moderation | **PARTIAL / VERIFY** | Categories Confirmed / Likely / Speculation / Wild Theory. |
+| Corners Arcade | **NOT STARTED** | `arcade.html` remains a "Coming soon" placeholder. |
+| D&D-style dice roll and games | **NOT STARTED** | No playable dice simulation or arcade game present. |
+| Camp Rank, EXP and levels | **NOT STARTED** | 12-tier progression system (§5.22). |
+| Reading streak and Night Owl badge | **NOT STARTED** | Three consecutive reading days → Night Owl badge (§5.22). |
+| Daily Campfire check-in and Ember wallet | **NOT STARTED** | Ember is the primary in-platform currency (§5.22). |
+| Camp Challenge author menu | **NOT STARTED** | Dedicated Main Bar menu + Author CRUD + Ember rewards (§5.23). |
+| Category leaderboards and monthly reset | **NOT STARTED** | Top Theorist / Top Reader / Top Arcade Player (§5.24). |
+| Author Analytics Dashboard | **NOT STARTED** | All instrumented insights (§5.25). |
+| Badge assets | **NOT STARTED** | 12 Camp Rank + Night Owl badges under `assets/badges/` (§5.22). |
 | Settings: profile details | **DONE (core profile) / VERIFY** | Profile form and save feedback exist. |
-| Settings: theme and language | **NOT STARTED** | No complete System / Light / Dark or English / Indonesian preference system found. |
-| Notification bell / notification center | **PARTIAL** | Bell icon exists in shared navigation; a working notification center and preferences are not implemented. |
+| Settings: theme and language | **NOT STARTED** | System / Light / Dark + EN / ID. |
+| Notification bell / notification center | **PARTIAL** | Bell icon exists; center not implemented. |
 | Reading history and bookmarks | **NOT STARTED** | No persistent reading progress or bookmark workflow found. |
-| Help / FAQ / bug reports | **NOT STARTED** | No complete in-site support workflow found. |
-| Community social links | **NOT STARTED / VERIFY** | Not implemented as a complete Settings section in the supplied source. |
+| Help / FAQ / bug reports | **NOT STARTED** | No complete in-site support workflow. |
+| Community social links | **NOT STARTED / VERIFY** | Not implemented as a complete Settings section. |
 | FireWatcher easter egg / inspectable location | **NOT STARTED** | No interactive inspection system found. |
 | Wide-angle / distant mountain camera mode | **NOT STARTED** | Current parallax is not the requested user-controlled camera mode. |
-| Cloudflare deployment | **IN PROGRESS / VERIFY** | Project progress confirms a Cloudflare Worker URL `https://hollow-night-camp.kazualtr.workers.dev/` and that it was added to Supabase Auth Redirect URLs. The supplied ZIP does not include enough deployment configuration to verify canonical domain, build/deploy settings, or live routing. |
-| Supabase database CRUD for novels / chapters | **IMPLEMENTED IN SOURCE / VERIFY** | Queries and mutations exist in `js/novels.js` and `js/editor.js`; production schema, RLS, and data persistence require live tests. |
-| Security: role-based database policies | **VERIFY** | Earlier project progress established RLS and table grants for the initial schema, but current novel/chapter policies and Storage policies must be checked against the actual tables and buckets. |
+| Cloudflare deployment | **IN PROGRESS / VERIFY** | Cloudflare Worker URL confirmed; canonical domain verification pending. |
+| Supabase database CRUD for novels / chapters | **IMPLEMENTED IN SOURCE / VERIFY** | Production schema, RLS, and data persistence require live tests. |
+| Security: role-based database policies | **VERIFY** | RLS and table grants must be checked against actual tables and buckets. |
 
 ### 2.2 Existing source files
-
-The supplied ZIP includes, among others:
 
 ```text
 Hollow-Night-Camp/
@@ -173,6 +169,8 @@ A Reader is a registered community member who can use reader-facing features.
 - Browse characters, maps, locations, and other published world-building information.
 - Create and participate in theory discussions, subject to community rules.
 - Play available arcade games.
+- Participate in Camp Challenge and view Leaderboards (§5.23, §5.24).
+- Earn EXP, level up through Camp Rank tiers, maintain a reading streak, and collect Ember (§5.22).
 - Edit their own nickname, bio, and profile picture.
 - Manage their own theme, language, notifications, reading history, and bookmarks when those features are implemented.
 - Sign in and sign out.
@@ -182,7 +180,8 @@ A Reader is a registered community member who can use reader-facing features.
 - Edit official world-building content or maps.
 - Change their own account role to Author.
 - Modify other users' profiles or data.
-- Access author-only content-management operations.
+- Access author-only content-management operations, Author Studio, Author leaderboard controls, or the Author Analytics Dashboard.
+- Award themselves EXP, Ember, badges, or leaderboard placement directly.
 
 ### 3.2 Author / Site Owner
 
@@ -198,6 +197,9 @@ The Author is the trusted content manager for the site.
 - Manage characters, maps, locations, and world-building content.
 - Upload map images and place named markers on maps.
 - Manage published content and site announcements / notifications where supported.
+- Create, publish, edit, and archive Camp Challenge (§5.23).
+- Manage monthly leaderboard periods, finalize rewards, and reset categories (§5.24).
+- Access the Author Analytics Dashboard to view all instrumented insights (§5.25).
 
 **Role assignment requirement**
 - A user must not be able to become an Author by editing browser storage, a profile form, or a client-side request.
@@ -216,12 +218,14 @@ The primary navigation should contain:
 2. **Novels** — story library and world-building content.
 3. **Theories** — community investigation board.
 4. **Corners Arcade** — games and dice simulation.
-5. **Settings** — a global gear-button dropdown that can be opened from any page without navigating away; its submenu links lead to dedicated settings pages/sections.
-6. **Author Studio** — visible only to Author accounts.
-7. **Notifications** — bell icon and notification center.
-8. **Account / Profile** — profile shortcut and sign-out action.
+5. **Camp Challenge** — Author-managed community challenges with Ember rewards (§5.23). Dedicated menu item required.
+6. **Leaderboards** — Top Theorist / Top Reader / Top Arcade Player, monthly (§5.24). Dedicated menu item required.
+7. **Settings** — global gear-button dropdown, opens in place on any page; submenu links to dedicated settings sections.
+8. **Author Studio** — visible only to Author accounts.
+9. **Notifications** — bell icon and notification center.
+10. **Account / Profile** — profile shortcut, Camp Rank badge, Ember balance, sign-out action.
 
-Settings and Notifications may remain utility controls beside the main navigation, consistent with the current Main Bar.
+Settings and Notifications may remain utility controls beside the main navigation. Camp Challenge and Leaderboards should be primary destinations where space permits, and must remain reachable on mobile via the scrollable Main Bar or the sidebar mode.
 
 ### Main Bar behavior
 
@@ -282,8 +286,6 @@ Priority labels:
 
 **Priority: P1**
 
-The homepage must establish the identity of Hollow Night Camp.
-
 Required elements:
 - Illustrated night campsite with a warm campfire.
 - Pine forest, distant mountains, night sky, and atmospheric lighting.
@@ -300,8 +302,6 @@ Avoid excessive animation, long blocking transitions, and heavy effects that mak
 ### 5.3 Interactive background exploration / FireWatcher easter egg
 
 **Priority: P3**
-
-This is an additional exploration mode for the Campfire homepage.
 
 Requirements:
 1. Provide a clear toggle or switch between the normal camera view and a wider, distant view.
@@ -322,10 +322,8 @@ Requirements:
 
 **Priority: P0 / P1**
 
-The existing Main Bar should be refined, not redesigned from scratch.
-
 Requirements:
-- Keep the existing glass effect, icon assets, and current top-bar/sidebar/compact interactions.
+- Keep existing glass effect, icon assets, and top-bar/sidebar/compact interactions.
 - Keep the bar fixed while allowing only its inner navigation area to scroll on small screens.
 - Prevent the page itself from being dragged horizontally when the user scrolls the Main Bar.
 - Ensure every item can be reached on small screens.
@@ -333,12 +331,11 @@ Requirements:
 - Preserve the three-dot editor menu.
 - Show Author Studio only for the Author role.
 - Provide consistent navigation behavior across all protected pages.
+- Include dedicated Camp Challenge and Leaderboards destinations.
 
 ### 5.5 Novel library
 
 **Priority: P1**
-
-Readers should be able to browse a cloud-backed list of published novels.
 
 Novel metadata:
 - Title
@@ -363,23 +360,14 @@ Requirements:
 
 **Priority: P1**
 
-Author Studio should be a working content-management experience, not merely a set of placeholder buttons.
-
 #### Novel list and creation
 
 - Add a **+ New Novel** action.
 - Open a dedicated **Write New Novel** page or editor panel.
-- Provide fields for:
-  - Novel title
-  - Author / byline
-  - Genre
-  - Status
-  - Tagline
-  - Synopsis
-  - Cover image
+- Provide fields for title, author/byline, genre, status, tagline, synopsis, and cover image.
 - Cover image actions: Add / Replace and Remove.
 - Provide Save and Cancel actions.
-- Validate required fields and display errors next to the relevant controls.
+- Validate required fields and display errors next to relevant controls.
 - Save the novel to Supabase and show it in the Author's novel list.
 
 #### Novel management page
@@ -425,14 +413,14 @@ Author-only actions:
 
 #### Chapter editor
 
-- Provide a comfortable writing surface.
+- Comfortable writing surface.
 - Keep the current live word count.
-- Add explicit Save Draft / Save Changes behavior.
-- Provide clear saved / saving / failed states.
+- Explicit Save Draft / Save Changes behavior.
+- Clear saved / saving / failed states.
 - Warn before navigating away when unsaved changes exist.
 - Support the planned compact three-dot navigation menu.
-- Separate editor controls from the writing page so they do not crowd the text.
-- Keep the layout usable on mobile, while prioritizing long-form writing comfort on desktop.
+- Separate editor controls from the writing page.
+- Keep layout usable on mobile, prioritizing long-form writing on desktop.
 
 #### Reader experience
 
@@ -440,74 +428,70 @@ Author-only actions:
 - Provide next / previous chapter navigation when available.
 - Track reading progress and bookmarks after the History feature is implemented.
 - Do not expose drafts to Readers.
+- Emit chapter completion events to the gamification activity ledger (§5.22, §5.26) once that system ships.
 
-### 5.8 Chapter and Novel Ratings (five-star review system)
+### 5.8 Chapter and Novel Ratings (five d20 review system)
 
 **Priority: P1**
 
-Implement a five-level rating system for published chapters, with a per-chapter summary and a novel-wide aggregate. Replace star artwork everywhere in this rating UI with **five d20 die icons** (icosahedron / twenty-sided die silhouette), not star glyphs. With zero ratings, show five d20 icons as outline strokes only, with no interior fill. Once ratings exist, fill the interior of each d20 icon to represent the aggregate average; use clipping or an equivalent mask so fractional values (for example, 4.5) fill proportionally and cleanly inside the die outline. Keep the outline visible over the fill for legibility. Ratings remain numeric values from 1 to 5. Do not round the underlying calculation; show one decimal place by default.
+Implement a five-level rating system using **five d20 die icons** (icosahedron silhouette) instead of stars. With zero ratings, show five outline-only d20 icons. Once ratings exist, fill the interior proportionally to the aggregate average, preserving the outline. Ratings remain numeric 1–5, one decimal displayed.
 
 #### Rating UI and reader interaction
 - Add a **Chapter Ratings** section on each published chapter reading page.
-- Show five interactive d20 icons, the chapter's average rating (e.g. `4.5 / 5`), and the total number of submitted ratings.
-- When no ratings exist, show `0.0 / 5`, `0 ratings`, and five outline-only d20 icons with no interior fill.
-- A signed-in Reader can submit one integer rating from 1 to 5 for each chapter. Selecting a d20 icon previews/selects that value; provide a clear submit/save interaction or an explicitly documented immediate-save interaction with feedback.
-- Enforce one rating per user per chapter. Repeated clicks or requests must not create duplicate votes. If rating changes are allowed, the same existing vote is updated rather than inserted as a second vote; otherwise the UI must clearly state that a submitted vote cannot be changed. **Default product behavior: allow the reader to update their own rating**, while still keeping exactly one current rating per user/chapter.
-- Guests may view aggregate ratings but must sign in before submitting a rating.
-- Prevent ratings on unpublished drafts and enforce this on the backend, not only in the UI.
-- Provide loading, saved, error, and no-ratings states. Make the star control keyboard accessible and label each choice (for example, “Rate this chapter 4 out of 5”).
+- Show five interactive d20 icons, chapter average (e.g. `4.5 / 5`), and count of ratings.
+- When no ratings exist, show `0.0 / 5`, `0 ratings`, five outline-only d20 icons.
+- A signed-in Reader can submit one integer rating 1–5 per chapter. Default: allow updating their own vote.
+- Enforce one rating per user per chapter via unique constraint.
+- Guests may view aggregate but must sign in to rate.
+- Prevent ratings on unpublished drafts, backend-enforced.
+- Provide loading, saved, error, and no-ratings states with keyboard accessibility.
 
 #### Chapter Ratings calculation
-- Store each reader's current rating as one integer in the range 1–5, linked to both the user/profile and chapter.
-- `chapter_rating_count` is the number of unique current votes for that chapter.
-- `chapter_average_rating` is the sum of all current chapter vote values divided by `chapter_rating_count`.
-- Example: 10 readers vote on one chapter; five give 4 stars and five give 5 stars. The chapter average is `(5 × 4 + 5 × 5) / 10 = 4.5`, with 10 ratings.
-- The d20 interior fill must visually represent the average, including fractional averages such as 4.5, while retaining a crisp visible outline.
+- `chapter_rating_count` = unique current votes.
+- `chapter_average_rating` = sum of votes / count.
+- Example: 5×4 stars + 5×5 stars = 4.5 average, 10 ratings.
+- d20 interior fill visually represents fractional averages with crisp outline.
 
 #### Novel Ratings calculation
-- Add a **Novel Ratings** summary on the novel detail page and, where useful, the novel header/library card.
-- The novel rating is the **weighted average of all individual current chapter votes across every published chapter belonging to that novel**. Sum every vote value from those chapters and divide by the total number of votes across those chapters. Do not simply average chapter averages, because chapters may have different numbers of votes.
-- `novel_rating_count` is the total number of current individual chapter ratings across all published chapters in the novel. A user's rating of two different chapters counts as two chapter votes, because the rating is per chapter.
-- If a novel has no chapter votes, show `0.0 / 5`, `0 ratings`, and five empty stars.
-- Example: Chapter A has 10 votes averaging 4.5; Chapter B has 2 votes averaging 3.0. Novel average is `(10 × 4.5 + 2 × 3.0) / (10 + 2) = 4.25`, displayed as `4.3 / 5` to one decimal place, with 12 ratings.
-- Adding, changing, or removing a valid vote must update both the affected Chapter Ratings and the parent Novel Ratings consistently.
+- Novel rating = **weighted average of all individual chapter votes** across published chapters (do not average chapter averages).
+- `novel_rating_count` = total current chapter votes across the novel.
+- Example: Chapter A (10 votes @ 4.5) + Chapter B (2 votes @ 3.0) = (10×4.5 + 2×3.0)/12 = 4.25 → displayed 4.3 with 12 ratings.
+- Adding, changing, or removing a vote updates both ratings consistently.
 
 #### Realtime behavior and data integrity
-- Aggregate counts and averages must update in realtime for other connected readers without requiring a manual page refresh. Use Supabase Realtime or a secure database-backed refresh strategy appropriate to the final schema.
-- The database must be the source of truth for rating records and aggregates. Do not trust client-supplied averages or counts.
-- Recommended table: `chapter_ratings` with a stable ID, `chapter_id`, `user_id` (or profile ID consistent with the existing schema), integer `rating`, and timestamps.
-- Add a unique constraint on `(chapter_id, user_id)` and a database check constraint that `rating BETWEEN 1 AND 5`.
-- Enable RLS. Readers may read published chapter / novel aggregates and insert or update only their own rating, only for a published chapter. Never allow a Reader to change another user's vote. Avoid exposing voter identities in the public UI.
-- Calculate aggregates using database views, safe RPCs, or equivalent queries. If aggregate values are cached/materialized, ensure rating changes update them atomically and reliably. Index `chapter_id`, `user_id`, and the relevant novel/chapter relationship for lookup and aggregation.
-- Unpublishing or deleting a chapter must not leak its ratings into public Novel Ratings. Define deletion behavior consistently (prefer cascading deletion of chapter ratings when the chapter is permanently deleted).
-- Handle simultaneous submissions, reconnects, duplicate events, and stale realtime subscriptions without double-counting votes. Unsubscribe when leaving the chapter page.
+- Aggregates update in realtime; Supabase Realtime or equivalent.
+- Database is source of truth; never trust client-supplied aggregates.
+- Table: `chapter_ratings` with `chapter_id`, `user_id`, integer `rating`, timestamps.
+- Unique constraint `(chapter_id, user_id)`; check `rating BETWEEN 1 AND 5`.
+- RLS: readers read aggregates; insert/update only own vote on published chapters.
+- Unpublishing/deleting chapter must not leak ratings into Novel Ratings (cascade delete).
+- Handle concurrent submissions, reconnects, duplicate events without double-counting; unsubscribe on leave.
 
 **Acceptance criteria**
-- [ ] A chapter with no votes shows five empty stars and `0.0 / 5` with `0 ratings`.
-- [ ] A signed-in Reader can submit one 1–5 rating per chapter and can update their own vote without creating a duplicate.
-- [ ] The 5 × 4-star plus 5 × 5-star example produces an average of exactly 4.5 and count 10.
-- [ ] The d20 icons use outline-only strokes when there are no ratings, and their interior fills accurately depict fractional averages while preserving the outlines.
-- [ ] Chapter average and count update live across active clients after a vote is saved or changed.
-- [ ] Novel average is computed from all individual chapter votes using a weighted average, and its count equals the total number of current votes across the novel's published chapters.
-- [ ] Novel aggregates update live when a vote on any of its chapters changes.
-- [ ] A Reader cannot rate a draft, impersonate another voter, or submit duplicate votes by bypassing the UI.
-- [ ] RLS, unique constraints, invalid rating rejection, responsive layout, keyboard operation, and realtime unsubscribe behavior are tested.
+- [ ] Zero-vote chapter shows five empty d20 icons and `0.0 / 5` with `0 ratings`.
+- [ ] Signed-in Reader can submit and update their own rating without duplicate.
+- [ ] 5×4 + 5×5 example = exactly 4.5 average, count 10.
+- [ ] d20 outline-only when no ratings; interior fills fractional averages while preserving outlines.
+- [ ] Chapter average/count updates live across active clients.
+- [ ] Novel average is weighted, count = total current votes across published chapters.
+- [ ] Novel aggregates update live on any chapter vote change.
+- [ ] Reader cannot rate a draft, impersonate voters, or bypass UI for duplicates.
+- [ ] RLS, constraints, keyboard operation, and realtime unsubscribe tested.
 
 ### 5.9 Import chapters from PDF / DOC / DOCX
 
 **Priority: P2**
 
-Requirements:
 - Provide an **Import Chapters** action in the novel management page.
-- Initially support clearly documented file formats such as `.txt`, `.docx`, and text-based `.pdf`, subject to the chosen parsing libraries.
-- Show file name, size, and import progress.
+- Support `.txt`, `.docx`, text-based `.pdf` initially.
+- Show filename, size, and import progress.
 - Extract text into a review step before saving.
-- Let the Author assign the imported content to a new chapter or existing draft.
-- Preserve paragraph breaks as well as possible.
+- Let Author assign imported content to a new chapter or existing draft.
+- Preserve paragraph breaks.
 - Report unsupported, scanned, encrypted, oversized, or unreadable files.
-- Never publish imported content automatically without an explicit Author action.
+- Never publish imported content automatically without explicit Author action.
 
-**Important implementation note:** PDF and Word files do not always contain clean, structured chapter data. Importing should create editable draft content first. OCR for scanned PDFs is a separate, optional enhancement.
+**Implementation note:** PDFs and Word files rarely contain clean structured chapter data. Import should create editable draft content first. OCR for scanned PDFs is a separate enhancement.
 
 ### 5.10 World building: characters, maps, and locations
 
@@ -515,534 +499,536 @@ Requirements:
 
 #### Characters
 - List and detail pages for official characters.
-- Support appropriate fields such as name, role, description, appearance, relationships, and image.
-- Only Authors can create, edit, publish, or delete official entries.
+- Fields: name, role, description, appearance, relationships, image.
+- Only Authors can create, edit, publish, delete official entries.
 
 #### Maps
-- Allow Authors to create a map entry and upload a map image.
-- Display the map in a responsive viewer.
-- Allow Authors to place named markers on the map.
-- Each marker should store a stable identifier, label, description, and position relative to the image.
-- Selecting a marker opens its information.
-- Markers must remain correctly positioned when the map scales on different screen sizes.
-- Allow Authors to edit or delete markers.
+- Allow Authors to create map entries and upload images.
+- Responsive viewer with named markers.
+- Markers store stable ID, label, description, position relative to image.
+- Markers remain correctly positioned when the map scales.
+- Authors can edit or delete markers.
 
 #### Locations
 - List and detail pages for official locations.
-- Support name, description, associated map / marker, and optional image.
-- Link related characters, chapters, and locations where appropriate.
+- Fields: name, description, associated map / marker, optional image.
+- Link related characters, chapters, and locations.
 
 #### Data integrity
-- Images should be stored in object storage.
-- Use stable record IDs and explicit relations between world-building entries.
-- Public Readers should only see published content.
+- Images stored in object storage.
+- Stable record IDs and explicit relations.
+- Public Readers only see published content.
 
 ### 5.11 Theories and investigation board
 
 **Priority: P1 / P2**
 
-The Theories page should feel like a large, ongoing investigation board rather than a static article page.
-
 #### Theory categories
-
-Provide category filters:
 - **Confirmed**
 - **Likely**
 - **Speculation**
 - **Wild Theory**
 
-These categories are labels for community interpretation, not automatic truth verification. A clearly defined moderation process should control any official confirmation or category changes.
+Categories are community labels; moderation controls official confirmation.
 
 #### Reader actions
-- Create a theory post with a title and body.
+- Create theory post with title and body.
 - Browse and filter posts by category.
-- Open a theory to read its discussion.
-- Reply to a theory or participate in its thread.
-- See the author nickname and relevant timestamps.
-- Edit or delete their own content according to the chosen policy.
+- Open theory to read discussion.
+- Reply to theory.
+- See author nickname and timestamps.
+- Edit / delete own content per policy.
 - Report inappropriate content.
-- Receive clear empty, loading, and error states.
+- Clear empty, loading, error states.
 
 #### Persistence and live updates
 - Store posts and replies in Supabase.
-- Preserve discussions across sessions and devices.
-- Use Supabase Realtime only where it improves the experience; normal refresh-based loading is an acceptable initial implementation.
-- Apply pagination or incremental loading as the board grows.
+- Preserve across sessions and devices.
+- Use Supabase Realtime only where it improves experience.
+- Pagination or incremental loading as board grows.
+- Emit theory like events for Top Theorist leaderboard (§5.24, §5.26).
 
 #### Safety and moderation
-- Enforce permissions for creating, editing, deleting, and moderating posts.
-- Sanitize user-generated content and render it safely.
-- Provide rate limiting / anti-spam measures where practical.
-- Establish a moderation and reporting workflow before opening the board widely.
+- Enforce permissions for create/edit/delete/moderate.
+- Sanitize user content safely.
+- Rate limiting / anti-spam.
+- Establish moderation and reporting workflow before opening widely.
 
 ### 5.12 Corners Arcade
 
 **Priority: P2**
 
-The Arcade page should contain playable games rather than a “Coming soon” placeholder. Use Supabase as the durable source of truth for player identity and any game data that should follow a user across devices. Keep short-lived animation state and purely temporary session state client-side where appropriate.
+The Arcade page should contain playable games rather than a "Coming soon" placeholder. Use Supabase as durable source of truth for player identity and persistent game data.
 
 #### Player profile and persistence
-- Provide a tidy player profile linked to the authenticated Supabase user / `profiles` record. Reuse the existing profile rather than creating a second identity system.
-- Store persistent high scores / leaderboard entries, small save-game state, and player-specific arcade statistics in Supabase tables, rather than relying only on browser storage.
-- Suggested tables: `arcade_scores` (game key, user ID, score, achieved timestamp, optional metadata), `arcade_saves` (user ID, game key, versioned compact save payload, updated timestamp), and optionally `arcade_player_stats` if stats cannot be derived efficiently from score records. Final schema may consolidate these where appropriate.
-- A save payload must be small, versioned, validated, and limited to the data required to resume a game. Do not store secrets, executable code, or untrusted HTML in save payloads.
-- Use stable game identifiers and database constraints/indexes for leaderboard sorting and per-user lookups. Define whether each leaderboard is global, per-game, or seasonal before implementation.
-- Show a clear save/load state and handle loading, empty, offline, permission, and save-failure states. Avoid claiming a save succeeded until Supabase confirms it.
-- Permit guests to play games that do not need persistence. Require sign-in to submit persistent scores or sync a save across devices; explain this at the point of use.
-- Enforce RLS so users can read public leaderboard data but can only create/update their own saves and profile-linked records. Do not trust client-submitted user IDs, score values, or metadata. Validate score submissions server-side or through trusted database functions where cheating risk matters; never expose a service-role key in the frontend.
-- Do not store every frame or transient input in the database. Persist only meaningful score submissions, checkpoints, and compact save-state changes; debounce or explicitly trigger save operations to avoid excessive writes.
+- Tidy player profile linked to authenticated Supabase user / `profiles`.
+- Persistent high scores, save-game state, and stats in Supabase tables.
+- Suggested tables: `arcade_scores`, `arcade_saves`, optionally `arcade_player_stats`.
+- Save payloads must be small, versioned, validated, and limited.
+- Stable game identifiers with database constraints for sorting.
+- Show clear save/load states; avoid claiming success before Supabase confirms.
+- Permit guests to play games that don't need persistence.
+- Enforce RLS: users read public leaderboards, write only own saves/scores.
+- Validate scores server-side or via trusted database functions; never expose service-role keys.
+- Persist only meaningful score/checkpoint events; debounce saves.
+- Submit validated arcade scores to Top Arcade Player leaderboard (§5.24) and Author Analytics (§5.25).
 
 #### D&D-style dice simulation
-
-#### D&D-style dice simulation
-- Support common dice types such as d4, d6, d8, d10, d12, d20, and d100.
-- Allow the user to choose a die and roll it.
-- Animate the roll and then display the final result clearly.
-- Provide a roll history for the current session.
-- Include an accessible reduced-motion or instant-result mode.
+- Support d4, d6, d8, d10, d12, d20, d100.
+- Choose die, animate roll, display result.
+- Session roll history.
+- Reduced-motion / instant-result mode.
 
 #### Simple arcade games
-- Add lightweight, browser-based games that fit the camp theme.
-- Ensure games work on desktop and mobile.
-- Avoid requiring an account for simple single-player games unless saving scores becomes a feature.
-- Keep game code isolated so additional games can be added later.
+- Lightweight browser games fitting the camp theme.
+- Work on desktop and mobile.
+- Guests can play games that don't require accounts.
+- Isolated code so additional games can be added.
 
 ### 5.13 Settings
 
 **Priority: P2**
-
-Organize Settings into clear, interactive sections.
 
 #### Profile
 - Nickname
 - Bio
 - Profile picture: upload / replace / remove
 - Account role (read-only)
+- Camp Rank badge and current Ember balance (read-only)
 - Save profile
-- Sign in / sign out behavior appropriate to the current session
+- Sign in / sign out
 
 #### Display
 - Theme: **System / Light / Dark**
 - Language: **English / Indonesian**
-
-Theme and language preferences should persist across sessions. The initial implementation may use browser storage for non-sensitive preferences.
+- Persist across sessions.
 
 #### Notifications
 - Novel / Chapter Updates: On / Off
 - Promotions / Events: On / Off
 - Global notifications enabled: On / Off
-- Explain that turning off notifications stops the selected notification types.
-- Store preferences in the user's profile or a related preference table.
-- Keep the bell icon and notification center in sync with preferences.
+- Store in profile or preference table.
+- Keep bell icon and notification center in sync.
 
 #### History
 - Reading history
 - Last-read chapter / progress
-- Add and remove bookmarks
-- Resume reading from a saved location
-- Allow the user to clear their own history.
+- Add / remove bookmarks
+- Resume reading from saved location
+- Clear own history
 
 #### Support & Feedback
 - Bug / error report
-- New feature suggestion
+- Feature suggestion
 - FAQ / Help Center
 - Contact email: `juliandoniel07@gmail.com`
-
-The support interface should provide a clear subject and message workflow. If it opens the user's email client, label that behavior clearly; if reports are stored in the cloud, provide a privacy notice and status feedback.
+- Clear subject and message workflow.
+- If opens email client, label that clearly.
 
 #### Community
-Provide links to the creator's community channels:
 - Instagram: `https://www.instagram.com/kazu.png_`
 - X / Twitter: `https://x.com/KazuAltr`
 - TikTok: `https://www.tiktok.com/@kazualther`
 - YouTube: `https://www.youtube.com/@kazualther`
 - Discord: `https://discord.gg/C4hf3kkNEe`
 
-Use recognizable platform icons while respecting their trademarks and each platform's brand guidance. Open external destinations safely, using appropriate `rel` attributes for new tabs.
+Open external destinations safely with appropriate `rel` attributes.
 
 #### Information
 - About Hollow Night Camp
 - Version / release information
 - Credits
 - Privacy information
-- Terms / community guidelines as the project matures
+- Terms / community guidelines
 
 ### 5.14 Notifications center
 
 **Priority: P2**
 
-- Bell icon remains visible in the Main Bar.
-- Clicking it opens a notification panel or page.
-- Show relevant updates such as newly published novels or chapters and site announcements.
-- Support read / unread states and a mark-as-read action.
-- Show a clear empty state.
-- Respect the user's notification preferences.
-- Do not show a permanent unread indicator when there are no unread notifications.
-- Notification delivery method and whether email notifications are included must be decided separately; the initial requirement is an in-site notification center.
+- Bell icon remains in Main Bar.
+- Clicking opens notification panel or page.
+- Show updates such as newly published novels / chapters and announcements.
+- Read / unread states with mark-as-read.
+- Clear empty state.
+- Respect user notification preferences.
+- No permanent unread indicator when there are no unread notifications.
+- Initial delivery: in-site only; email notifications decided separately.
 
 ### 5.15 Language and localization
 
 **Priority: P2**
 
-- Provide English and Indonesian.
-- Keep interface text in translation resources rather than scattering hard-coded strings across scripts.
-- Persist the selected language.
-- Use the selected language consistently across navigation, settings, error messages, and core workflows.
-- Novel content remains in the language chosen by the Author; changing interface language should not automatically translate story content.
+- English and Indonesian.
+- Interface text in translation resources, not hard-coded.
+- Persist selected language.
+- Consistent across navigation, settings, error messages, and core workflows.
+- Novel content remains in Author's chosen language; interface language does not auto-translate story content.
 
 ### 5.16 Latest Chapter
 
 **Priority: P1**
 
-- Show the latest **published** chapter on the homepage.
-- Include chapter title, parent novel, publication/update date, and a link to read.
-- Determine “latest” from a reliable publication timestamp or chapter ordering rule.
+- Show latest **published** chapter on homepage.
+- Include chapter title, parent novel, publication/update date, and link to read.
+- Determine "latest" from reliable publication timestamp or chapter ordering.
+- Designed empty state when no published chapters exist.
 
 ### 5.17 Global branded loading animation
 
 **Priority: P1**
 
-Create a custom loading experience that uses the official Hollow Night Camp logo (`assets/image/hollow-night-logo.png`) as its visual anchor. It must feel original to the site's mysterious campsite identity, polished, and memorable rather than using a generic spinner.
+Custom loading experience using the official Hollow Night Camp logo (`assets/image/hollow-night-logo.png`) as visual anchor. Original, polished, memorable — not a generic spinner.
 
-- Design a distinctive logo-led animation that can combine subtle logo movement/glow, a campfire or ember motif, and restrained atmospheric details. Treat these as art-direction guidance; the final animation should remain coherent and not visually cluttered.
-- Use the same loading language for initial app/page transitions and meaningful asynchronous states (for example, novel/chapter data loads). Avoid covering the whole page for tiny operations that can use inline feedback.
-- Show loading text or an accessible status label where appropriate; keep the logo's alternative text meaningful.
-- The loader must not trap interaction indefinitely. Always remove it on success, empty results, or errors, and provide a usable error/retry state when necessary.
-- Keep animation performant on mobile and low-powered devices. Respect `prefers-reduced-motion` with a calm static/fade alternative.
-- Avoid replaying a long full-screen intro on every small navigation action. Use a short transition for subsequent loads and reserve the full treatment for initial entry or genuinely blocking loads.
-- Do not make sound a prerequisite for the loader; loading visuals must work when audio is disabled or blocked by the browser.
+- Distinctive logo-led animation combining subtle logo movement/glow, campfire or ember motif, and restrained atmospheric details.
+- Same loading language for initial page transitions and meaningful async states. Avoid covering the whole page for tiny operations.
+- Accessible status label; meaningful logo alt text.
+- Loader must not trap interaction indefinitely. Always remove on success, empty, or error with usable error/retry state.
+- Performant on mobile. Respect `prefers-reduced-motion` with calm static/fade alternative.
+- Avoid replaying long full-screen intro on every small navigation.
+- Loading visuals must work with audio disabled.
 
 ### 5.18 Music and sound effects
 
 **Priority: P2**
 
-Add independent background Music and Sound Effects (SFX) controls to Settings. Audio assets will be supplied by the maintainer and stored under `assets/sound/`; do not invent filenames before the assets are provided.
+Independent Music and SFX controls in Settings. Assets stored under `assets/sound/`.
 
-- Provide separate enable/disable toggles for Music and SFX. Disabling one must not disable or alter the other.
-- Provide an independent volume slider for each category, with an understandable numeric or percentage indication.
-- Suggested preference keys: `musicEnabled`, `musicVolume`, `sfxEnabled`, and `sfxVolume`. Persist preferences across pages and sessions; use account-backed preferences when available, with a local preference fallback for signed-out visitors.
-- Apply volume changes immediately. A volume of zero must be silent even if the category is enabled.
-- Background music must not autoplay with audible sound before a user gesture. Start or resume playback only after an allowed user interaction, handle browser autoplay restrictions gracefully, and provide clear state feedback.
-- Music should avoid restarting on every page transition where technically feasible. Prevent duplicate overlapping tracks and stop/release audio resources when no longer needed.
-- SFX should be short, purposeful, and not play on every pointer movement. Respect the SFX toggle and volume for every effect.
-- If a requested audio file is missing or fails to load, the site must remain usable and must not throw an uncaught error. Log useful diagnostics in development without exposing sensitive information to readers.
-- Keep a documented asset convention under `assets/sound/` (for example, separate music and sfx subfolders if useful), and update this PRD when actual filenames/formats are selected.
-- Respect reduced-motion settings as applicable, and provide an obvious way to mute audio. Audio should never be required to understand the interface.
+- Separate enable/disable toggles for Music and SFX.
+- Independent volume sliders with numeric/percentage display.
+- Preference keys: `musicEnabled`, `musicVolume`, `sfxEnabled`, `sfxVolume`. Persist across sessions.
+- Volume changes apply immediately. Zero volume = silent even if enabled.
+- Background music must not autoplay before user gesture. Handle browser autoplay restrictions.
+- Music should avoid restarting on every page transition.
+- SFX short, purposeful; respect toggle and volume.
+- Missing or failed audio files must not break the site.
+- Document asset conventions under `assets/sound/`.
+- Obvious mute control. Audio never required to understand interface.
 
 ### 5.19 Realtime online readers count
 
 **Priority: P2**
 
-Display a live count of currently active readers/sessions in an appropriate shared site location. The count must represent active sessions rather than cumulative visits or registered accounts.
+Live count of active readers/sessions in shared site location. Represents active sessions, not cumulative visits.
 
-- Prefer Supabase Realtime Presence or an equivalent server-backed mechanism that supports joining/leaving and expiry of stale sessions.
-- Define “online” as a session that has an active presence heartbeat/connection within a documented timeout window. Remove disconnected or stale sessions automatically; do not let closed tabs inflate the count indefinitely.
-- Count unique active sessions or users consistently and document which interpretation is used. Avoid counting the same session multiple times due to reconnects.
-- Update the display when sessions join or leave without requiring a page refresh. Show a small loading/unknown state while connecting, and a graceful fallback if realtime is unavailable.
-- Do not expose reader identities, emails, IP addresses, or other personal details. The UI should display only the aggregate count.
-- Avoid storing long-term behavioral tracking just to show the aggregate. Apply database/channel access controls and validate the design against Supabase Realtime limits.
-- Test multiple tabs, reconnects, network loss, signed-out visitors, mobile backgrounding, and cleanup of stale sessions. Document whether bots and the current visitor are included in the count.
+- Prefer Supabase Realtime Presence or equivalent with stale-session expiry.
+- "Online" = active heartbeat within documented timeout. Remove disconnected sessions automatically.
+- Count unique active sessions or users consistently. Avoid double-counting reconnects.
+- Update display when sessions join/leave without refresh.
+- Do not expose reader identities, emails, IPs, or personal details.
+- Avoid long-term behavioral tracking just for aggregate.
+- Test multiple tabs, reconnects, network loss, signed-out visitors, mobile backgrounding, stale cleanup.
+- Document whether bots and current visitor included.
 
 ### 5.20 Realtime retro neon flip clock
 
 **Priority: P2**
 
-Create a real-time digital clock styled like a retro split-flap/folding desk clock, reimagined with a digital neon finish that fits Hollow Night Camp's visual identity.
+Real-time digital clock styled like retro split-flap/folding desk clock with neon finish fitting Hollow Night Camp's visual identity.
 
-- Display the current hour and minute and update automatically in real time. The default format should be 24-hour, with a 12/24-hour preference only if the wider settings design supports it cleanly.
-- Use a desk-clock silhouette with separate upper/lower digit panels. When a digit changes, animate the front card flipping forward/down to reveal the next digit, like a vintage flip clock. The animation should be convincingly card-like rather than a generic number fade.
-- Add restrained neon glow, contrast, shadows, and retro detailing so digits remain readable on desktop and mobile. Avoid excessive glow that reduces legibility or causes performance issues.
-- Include a timezone selector in Settings. Offer a sensible default based on the browser's detected timezone, allow a manual IANA timezone selection (for example, `Asia/Jakarta`), and persist the selected value across sessions. Clearly label the selected timezone near the clock or in its settings.
-- Use timezone-aware date formatting; do not manually add fixed offsets, because daylight-saving changes vary by timezone.
-- Update the time without repeated network polling; the clock should use the client clock and timezone APIs. Handle invalid saved timezone values by falling back safely to the browser timezone.
-- Respect `prefers-reduced-motion`: reduce or replace the flip animation with a subtle transition while still updating the time. Ensure screen readers receive a useful time label without announcing every visual frame.
-- Test minute/hour/day rollovers, 12 AM/PM boundaries if 12-hour mode is supported, timezone changes, mobile sizing, and reduced-motion behavior.
+- Display hour and minute; default 24-hour; 12/24-hour preference if settings support cleanly.
+- Desk-clock silhouette with separate upper/lower digit panels. Front card flips forward/down to reveal next digit.
+- Restrained neon glow, contrast, shadows, retro detailing. Readable on desktop and mobile.
+- Timezone selector in Settings. Default from browser; allow manual IANA selection. Persist across sessions.
+- Timezone-aware date formatting; no manual fixed offsets.
+- Update without repeated network polling; use client clock and timezone APIs.
+- Handle invalid saved timezone by falling back to browser timezone.
+- Respect `prefers-reduced-motion`: reduce or replace flip animation.
+- Test minute/hour/day rollovers, AM/PM boundaries if 12-hour, timezone changes, mobile sizing, reduced-motion.
 
 ### 5.21 Global Settings gear dropdown
 
 **Priority: P1**
 
-The Settings gear must act as a global in-place dropdown trigger available from every applicable page. Clicking the gear must not navigate away from the current page. The existing Settings content remains organized into the sections specified in §5.12; dropdown entries act as shortcuts to their corresponding dedicated settings page or destination.
+Settings gear acts as a global in-place dropdown trigger on every applicable page. Clicking the gear must not navigate away.
 
-- Opening the menu reveals a dropdown anchored to the gear button, regardless of which site page the reader is currently viewing.
-- Animate the gear rotation in sync with the dropdown opening/closing. The dropdown should unfold/slide down with a polished, coordinated transition; clicking the gear again reverses the motion and closes the menu.
-- Clicking a submenu item navigates to the correct dedicated settings destination. Opening or closing the dropdown alone must preserve the current route and page state.
-- Include the existing planned settings destinations: Profile, Display, Notifications, History, Support & Feedback, Community, and Information. Add the new Audio controls and Clock / timezone preferences to suitable settings sections.
-- Close the dropdown after a destination is selected, when the user clicks outside it, or presses Escape. Keep keyboard focus predictable and return focus to the trigger when Escape closes it.
-- Use correct button semantics, `aria-expanded`, `aria-controls`, and accessible names. Do not rely on gear rotation alone to communicate open state.
-- Ensure it fits inside the viewport on small screens, does not get clipped by parent containers, and layers above page content without blocking unrelated controls when closed.
-- Respect `prefers-reduced-motion` by shortening or disabling the rotation/dropdown animation.
-- Avoid duplicate dropdown instances or event listeners when navigating between pages. Keep shared behavior in the shared navigation layer where possible.
-- Do not show drafts.
-- Show a designed empty state if no published chapters exist.
-
----
+- Dropdown anchored to gear button regardless of page.
+- Gear rotates in sync with opening/closing animation.
+- Clicking submenu navigates to dedicated settings destination; opening alone preserves current route.
+- Include destinations: Profile, Display, Notifications, History, Support & Feedback, Community, Information, Audio, Clock / timezone.
+- Close on destination selection, outside click, or Escape. Focus returns to trigger on Escape.
+- Use correct button semantics, `aria-expanded`, `aria-controls`, accessible names.
+- Fits viewport on small screens; layers above page content.
+- Respect `prefers-reduced-motion`.
+- No duplicate dropdown instances or listeners across pages.
 
 ### 5.22 Camp Rank, EXP, levels, and achievements
 
 **Priority: P2 — planned; not implemented in the supplied ZIP**
 
-Hollow Night Camp will use a progression system called **Camp Rank** to reward meaningful reading and community participation. The system should encourage exploration without turning reading into a grind or making the community hostile.
+Hollow Night Camp uses a progression system called **Camp Rank** to reward meaningful reading and community participation.
 
 #### Rank thresholds
 
-The number is the minimum level required for each named rank. Levels between named thresholds retain the previous rank until the next threshold is reached.
+Minimum level for each named rank. Levels between thresholds retain the previous rank. **Twelve tiers:**
 
-| Level | Camp Rank |
-| ---: | --- |
-| 1 | Wanderer |
-| 5 | Camper |
-| 10 | Story Seeker |
-| 20 | Clue Hunter |
-| 30 | Night Reader |
-| 40 | Theorist |
-| 50 | Hollow Investigator |
-| 60 | Fire Watcher |
-| 70 | Hollow Watcher |
-| 80 | Hollow Flame |
-| 90 | The UnderReader |
-| 100 | Hollow Legend |
+| Level | Camp Rank | Badge key / file |
+| ---: | --- | --- |
+| 1 | Wanderer | `rank:wanderer` → `assets/badges/wanderer.png` |
+| 5 | Camper | `rank:camper` → `assets/badges/camper.png` |
+| 10 | Story Seeker | `rank:story-seeker` → `assets/badges/story-seeker.png` |
+| 20 | Clue Hunter | `rank:clue-hunter` → `assets/badges/clue-hunter.png` |
+| 30 | Night Reader | `rank:night-reader` → `assets/badges/night-reader.png` |
+| 40 | Theorist | `rank:theorist` → `assets/badges/theorist.png` |
+| 50 | Hollow Investigator | `rank:hollow-investigator` → `assets/badges/hollow-investigator.png` |
+| 60 | Fire Watcher | `rank:fire-watcher` → `assets/badges/fire-watcher.png` |
+| 70 | Hollow Watcher | `rank:hollow-watcher` → `assets/badges/hollow-watcher.png` |
+| 80 | Hollow Flame | `rank:hollow-flame` → `assets/badges/hollow-flame.png` |
+| 90 | The UnderReader | `rank:under-reader` → `assets/badges/under-reader.png` |
+| 100 | Hollow Legend | `rank:hollow-legend` → `assets/badges/hollow-legend.png` |
 
 #### EXP rules
-
-- Define a central, documented EXP event catalogue before implementation.
-- Award EXP only for server-verifiable or otherwise abuse-resistant actions, such as completing a published chapter or approved challenge.
-- Do not award EXP repeatedly for refreshing a page, reopening the same chapter, or replaying a client request.
-- Keep EXP transactions auditable and idempotent; users must not be able to set their own EXP or level through client-side data.
-- Calculate level and Camp Rank from the canonical EXP total rather than trusting values submitted by the browser.
-- Display current EXP, next rank, progress to next rank, and earned achievements in the reader profile.
-- The exact EXP amounts per activity remain an implementation decision and must be documented before release.
+- Define central documented EXP event catalogue before implementation.
+- Award EXP only for server-verifiable or abuse-resistant actions.
+- No repeated EXP for refreshing, reopening chapters, or client-request replay.
+- EXP transactions auditable and idempotent; users cannot set their own EXP.
+- Calculate level and Camp Rank from canonical server EXP total.
+- Display current EXP, next rank, progress, and achievements in profile.
+- Exact EXP amounts per activity decided before release.
 
 #### Reading streak and Night Owl badge
-
-- A reading day counts when a signed-in reader completes a meaningful reading activity on a published chapter; define a minimum threshold and persist the event server-side.
-- A streak advances at most once per user per calendar day, using one explicitly chosen timezone policy.
-- Three consecutive qualifying days award the **Night Owl** badge once.
-- Missing a calendar day resets the active streak; the longest streak may remain as a profile statistic.
+- Reading day counts when signed-in reader completes meaningful activity on a published chapter; minimum threshold persisted server-side.
+- Streak advances at most once per user per calendar day, using one explicit timezone policy.
+- Three consecutive qualifying days award the **Night Owl** badge once. Badge key: `achievement:night-owl`, asset at `assets/badges/night-owl.png`.
+- Missing a calendar day resets active streak; longest streak remains as profile statistic.
 - Prevent duplicate awards during retries, parallel requests, and timezone/day-boundary changes.
 
 #### Daily Campfire check-in and Ember
+- Daily check-in action in Campfire area.
+- Successful check-in grants **Ember**, the **primary in-platform currency of Hollow Night Camp**. Ember is intended to unlock future items or experiences; redemption catalog and prices deferred.
+- No more than once per calendar day; duplicate clicks and retries must not create extra currency.
+- Show claim result, current balance, and next eligible check-in.
+- Ember is non-cash, in-platform reward currency with no real-world value or cash-out.
 
-- Provide a daily check-in action in the Campfire area.
-- A successful check-in grants Ember, the platform's planned reward currency.
-- A reader may claim no more than once per defined calendar day; duplicate clicks and retries must not create extra currency.
-- Show the claim result, current balance, and next eligible check-in.
-- Ember is intended to unlock future items or experiences; redemption catalog and prices are intentionally deferred.
-- Treat Ember as a non-cash, in-platform reward currency with no real-world monetary value or cash-out feature.
+#### Badge assets and naming convention
+- Custom badge art authored later, stored under `assets/badges/`.
+- Kebab-case filenames matching stable badge key (`wanderer.png`, `night-owl.png`, `under-reader.png`, `hollow-legend.png`).
+- Badge key in database is source of truth; asset path is rendering detail. An image existing in repo must not itself grant a badge.
+- UI tolerates missing badge images gracefully — fallback to text-only badge pill with rank name and neutral ring.
+- Badge definitions, award records, and assets are separate concerns.
 
-#### Badge assets
-
-- Custom badge art will be authored later and stored under `assets/badges/`.
-- The interface must tolerate missing badge images gracefully during development.
-- Badge awards should reference stable badge IDs/keys rather than hard-coded image paths.
-- Badge definitions, award records, and assets are separate concerns; an image existing in the repository must not itself grant a badge.
+#### Acceptance criteria
+- [ ] Reader's Camp Rank derived from server-stored EXP.
+- [ ] Tier list renders exactly the 12 documented ranks at documented thresholds.
+- [ ] Repeated refreshes or reopening same chapter does not grant duplicate EXP.
+- [ ] Three consecutive qualifying reading days award Night Owl exactly once.
+- [ ] Daily check-in grants Ember at most once per calendar day.
+- [ ] Reader cannot set own EXP, level, streak, or Ember balance via client.
+- [ ] Missing badge images render text fallback.
 
 ### 5.23 Camp Challenge
 
 **Priority: P2 — planned; not implemented in the supplied ZIP**
 
-Add a dedicated **Camp Challenge** destination reachable from the main navigation or a clearly discoverable community menu.
+**Dedicated Camp Challenge menu item in the Main Bar navigation** reachable by both Author and Reader accounts.
 
 Author capabilities:
-- Create, edit, publish, unpublish, schedule, and archive a challenge.
-- Define title, description, instructions, start/end time, eligibility, completion criteria, and Ember reward.
-- Review challenge participation and completion records.
-- Cancel a challenge with a clear reason and a policy for already-issued rewards.
-- Manage challenge availability without changing unrelated reader progression data.
+- Create, edit, publish, unpublish, schedule, archive challenges.
+- Define title, description, instructions, start/end time, eligibility, completion criteria, Ember reward.
+- Review participation and completion records.
+- Cancel challenge with clear reason and reward policy.
+- Manage challenge availability without affecting reader progression data.
 
 Reader capabilities:
-- Browse active, upcoming, and completed challenges.
-- View requirements, time remaining, reward, and progress.
-- Submit or trigger completion through a validated workflow.
+- Browse active, upcoming, completed challenges.
+- View requirements, time remaining, reward, progress.
+- Submit or trigger completion via validated workflow.
 - See completion history and Ember rewards.
 
 System requirements:
-- Completion criteria must be validated server-side; do not trust a client-supplied `completed=true`.
-- Each user may receive a challenge reward only once per challenge unless the challenge is explicitly configured as repeatable.
-- Award Ember through the same auditable ledger used by daily check-in and other reward sources.
-- Enforce author permissions and RLS on challenge creation, edits, moderation, participation, and rewards.
-- Provide loading, empty, success, and error states.
+- Completion validated server-side; never trust client `completed=true`.
+- Each user receives reward only once per challenge unless explicitly repeatable.
+- Award Ember through same auditable ledger as daily check-in.
+- Enforce author permissions and RLS.
+- Loading, empty, success, error states.
+- Camp Challenge menu appears correctly for eligible roles even with no published challenges.
 
 Acceptance criteria:
-- An Author can publish a challenge and see it appear to Readers.
-- A Reader can complete an eligible challenge and receive the configured Ember reward once.
-- Repeated requests, refreshes, or concurrent submissions cannot duplicate rewards.
-- Unpublished and future challenges are not exposed as active challenges to ordinary Readers.
+- [ ] Author can publish challenge appearing to Readers via Camp Challenge menu.
+- [ ] Reader can complete eligible challenge receiving Ember reward once.
+- [ ] Repeated requests / concurrent submissions cannot duplicate rewards.
+- [ ] Unpublished / future challenges not exposed as active.
 
 ### 5.24 Community leaderboards and monthly rewards
 
 **Priority: P2 — planned; not implemented in the supplied ZIP**
 
-Create a dedicated **Leaderboards** menu/page with separate categories rather than one all-purpose score ranking.
+**Dedicated Leaderboards menu/page in Main Bar** with separate categories.
 
 Categories:
-1. **Top Theorist** — rank by likes received on eligible theories.
-2. **Top Reader** — rank by published chapters completed.
-3. **Top Arcade Player** — rank by validated total score across eligible arcade games.
+1. **Top Theorist** — likes received on eligible theories.
+2. **Top Reader** — published chapters completed.
+3. **Top Arcade Player** — validated total score across eligible arcade games.
 
 Rules and safeguards:
-- Leaderboards are grouped into calendar months using a single documented timezone, with the current month clearly labeled.
-- Define tie-break rules before launch. Recommended tie-breakers: earliest achievement of the tied score, then stable display-name ordering.
-- Only count eligible, non-deleted content and valid activity. Exclude self-likes, duplicate likes, test records, and invalid or suspicious score submissions.
-- Avoid exposing private account details; display only public nickname/avatar and the relevant metric.
-- Make the experience community-focused: no public shaming, negative rankings, or “worst user” lists.
-- The monthly board should preserve past-period results as an archive rather than deleting history when a new month starts.
+- Grouped by calendar months using single documented timezone; current month clearly labeled.
+- Define tie-break rules: earliest achievement, then stable display-name ordering.
+- Only count eligible, non-deleted content and valid activity. Exclude self-likes, duplicate likes, test records, invalid scores.
+- Do not expose private account details; display only nickname/avatar and metric.
+- Community-focused: no public shaming, negative rankings, "worst user" lists.
+- Preserve past-period results as archive.
 
 #### Monthly rewards and Author controls
-
-- At the end of each month, eligible winners can receive a configured badge and Ember reward.
-- Add an Author-only leaderboard management area to preview the month, inspect eligible results, trigger/finalize the monthly settlement, and issue or correct rewards through an audited workflow.
-- Support an explicit reset/close action for the active period, but do not allow a reset to silently erase historical results or reward records.
-- Prefer automated period boundaries plus an Author-controlled finalization step over destructive manual clearing.
-- Require confirmation for finalization/reset actions and record actor, timestamp, period, and reason.
-- Make reward settlement idempotent so repeated finalization cannot award duplicate badges or Ember.
+- Eligible winners receive configured badge and Ember reward.
+- **Author-only leaderboard management menu accessible both from Author Studio AND from a control panel on Leaderboards page.** Author can preview current month, inspect results, trigger/finalize settlement, adjust reward amounts per rank, issue or correct rewards through audited workflow.
+- Explicit reset/close action for active period; never silently erase historical results or reward records.
+- Prefer automated boundaries plus Author-controlled finalization over destructive manual clearing.
+- Require confirmation for finalization/reset; record actor, timestamp, period, reason.
+- Idempotent reward settlement.
 
 Acceptance criteria:
-- Each category has its own metric and ranking.
-- The displayed month and metric definition are visible to users.
-- Only authorized Authors can manage/finalize monthly boards.
-- A monthly settlement is reproducible from stored activity records and cannot pay rewards twice.
+- [ ] Each category has its own metric and ranking.
+- [ ] Displayed month and metric definition visible.
+- [ ] Only authorized Authors can manage/finalize monthly boards.
+- [ ] Settlement is reproducible and cannot pay rewards twice.
+- [ ] Author control panel reachable from Leaderboards page in one click.
 
 ### 5.25 Author Analytics Dashboard
 
 **Priority: P2 — planned; not implemented in the supplied ZIP**
 
-Provide an Author-only **Analytics** menu within Author Studio. It should surface all insights supported by reliable data, clearly distinguishing observed metrics from estimates.
+Author-only **Analytics menu within Author Studio** (linked from Author leaderboard management view). Single source of truth: surfaces **all insights supported by instrumented data**, clearly distinguishes observed from estimated, **never displays fabricated zero** for uninstrumented metrics — label as "not yet instrumented."
 
 Initial analytics:
-- **Chapter reads:** total and unique reads per chapter, with date range and trend where data supports it.
-- **Most-read chapters:** ranked chapter list and period comparison.
-- **Average ratings:** chapter and novel rating averages, vote counts, and changes over time where historical snapshots exist.
-- **Favorite reading hours:** aggregated distribution of qualifying reading activity by hour; disclose the timezone used.
-- **Reading completion:** completed chapters and completion rates where completion events are instrumented.
-- **Reader engagement:** daily/weekly active readers and returning-reader trends only when privacy-safe activity records support them.
-- **Community insights:** theory counts, likes, and replies where relevant and available.
-- **Challenge / reward insights:** participation, completion, and Ember rewards after Camp Challenge ships.
-- **Arcade insights:** plays and validated scores after arcade tracking ships.
-- **Data coverage:** clearly indicate which metrics are unavailable because instrumentation has not yet shipped.
+- **Chapter reads:** total and unique reads per chapter, date range and trend.
+- **Most-read chapters:** ranked list and period comparison.
+- **Average ratings:** chapter and novel averages, vote counts, changes over time.
+- **Favorite reading hours:** distribution by hour; disclose timezone.
+- **Reading completion:** completed chapters and rates where instrumented.
+- **Reader engagement:** daily/weekly active readers and retention.
+- **Community insights:** theory counts, likes, replies.
+- **Challenge / reward insights:** participation, completion, Ember rewards.
+- **Arcade insights:** plays and validated scores.
+- **Gamification insights:** rank distribution, streak length distribution, Ember in circulation, daily check-in rate, monthly leaderboard participation.
+- **Data coverage:** explicit section listing unavailable metrics with reason and delivery phase.
 
 Privacy and correctness:
-- Analytics are available only to authorized Authors and should not expose private reading histories tied to identifiable users unless a separately approved moderation purpose requires it.
-- Use aggregated data by default and apply reasonable minimum group sizes where appropriate.
-- Define “read,” “unique read,” “completed chapter,” and “favorite hour” explicitly before reporting metrics.
-- Avoid counting every page refresh as a meaningful read; use deduplication windows or qualifying reading events.
-- Use timezone-aware aggregation and state the timezone in the dashboard.
-- Do not fabricate historical data for events that were not tracked.
-- Ensure expensive reports are paginated, indexed, cached, or pre-aggregated as needed.
+- Only authorized Authors; no private reading histories tied to identifiable users unless separately approved.
+- Aggregated data by default; minimum group sizes where appropriate.
+- Define "read," "unique read," "completed chapter," "favorite hour" explicitly.
+- Avoid counting every refresh as meaningful read; use deduplication windows.
+- Timezone-aware aggregation with visible timezone.
+- Do not fabricate historical data.
+- Expensive reports paginated, indexed, cached, or pre-aggregated.
 
 Acceptance criteria:
-- An Author can select a date range and inspect chapter-level read counts and rating summaries.
-- Favorite reading hours are derived from recorded qualifying events with a visible timezone.
-- The dashboard labels missing or incomplete instrumentation rather than displaying misleading zeros.
-- Readers cannot access author analytics through direct routes or direct database requests.
+- [ ] Author can select date range and inspect chapter reads and rating summaries.
+- [ ] Favorite reading hours derived from recorded qualifying events with visible timezone.
+- [ ] Dashboard labels missing instrumentation instead of misleading zeros.
+- [ ] Dashboard surfaces ALL instrumented insights (gamification, challenge, arcade, community).
+- [ ] Readers cannot access analytics through routes or direct database requests.
 
 ### 5.26 Shared economy, activity ledger, and data model
 
 **Priority: P0 for secure implementation of the above systems**
 
-The progression, check-in, challenge, and leaderboard systems share rewards and must use one consistent source of truth.
+Progress, check-in, challenge, and leaderboard systems share rewards and must use one consistent source of truth.
 
-Recommended logical entities (exact physical schema may vary):
-- `reader_activity_events`: validated events such as chapter completion, challenge completion, and eligible theory interactions.
-- `reader_progress`: canonical EXP total, level/rank derivation, current streak, longest streak, and last qualifying reading date.
-- `badge_definitions`: stable badge key, title, description, and optional asset path.
-- `user_badges`: user/badge award record, source event, and award timestamp.
-- `ember_ledger`: append-only credit/debit transactions, source type/ID, amount, timestamp, and idempotency key.
-- `daily_checkins`: one record per user per eligible day.
-- `camp_challenges`: author-managed challenge definitions and publication schedule.
-- `challenge_participation`: user status, progress, completion time, and reward settlement status.
-- `leaderboard_periods`: month, category, state, and finalization metadata.
-- `leaderboard_snapshots` or equivalent aggregate records: reproducible period results and rank metrics.
-- `analytics_events` or pre-aggregated analytics tables: qualifying reads, completion events, and timestamps needed for dashboard reports.
+Recommended logical entities:
+- `reader_activity_events`: validated events (chapter completion, challenge completion, eligible theory interactions)
+- `reader_progress`: EXP total, level/rank derivation, current/longest streak, last qualifying reading date
+- `badge_definitions`: stable key, title, description, optional asset path
+- `user_badges`: user/badge award record, source event, timestamp
+- `ember_ledger`: append-only credit/debit transactions with source type/ID, amount, timestamp, idempotency key
+- `daily_checkins`: one record per user per eligible day
+- `camp_challenges`: author-managed definitions and publication schedule
+- `challenge_participation`: user status, progress, completion time, reward settlement status
+- `leaderboard_periods`: month, category, state, finalization metadata
+- `leaderboard_snapshots` or equivalent aggregates: reproducible period results
+- `analytics_events` or pre-aggregated tables: qualifying reads, completion events, timestamps
 
 Security requirements:
-- Enable RLS on exposed tables and write policies for the exact Reader/Author access model.
-- Use database constraints, unique indexes, and trusted server-side logic/RPCs for one-per-day check-ins, unique badge awards, and idempotent reward settlement.
-- Never trust browser-submitted EXP, Ember balance, leaderboard totals, challenge completion, or winner status.
-- Do not expose service-role credentials in frontend code.
-- Keep a transaction trail for corrections; do not silently overwrite or delete economy history.
-- Test unauthorized reads/writes and concurrent duplicate submissions before release.
+- Enable RLS on exposed tables with exact Reader/Author model.
+- Constraints, unique indexes, trusted RPCs for one-per-day check-ins, unique badge awards, idempotent reward settlement.
+- Never trust browser-submitted EXP, Ember, leaderboard totals, challenge completion, winner status.
+- Do not expose service-role credentials.
+- Keep transaction trail for corrections; never silently overwrite/delete economy history.
+- Test unauthorized reads/writes and concurrent duplicates before release.
 
+---
 
 ## 6. Visual and Interaction Design
 
 ### Art direction
 
-- Illustrated, atmospheric, slightly quirky, mysterious, and welcoming.
-- A palette built around midnight blues / forest greens, warm firelight, parchment-like neutrals, and restrained accent colors.
-- Use expressive headings and readable body text.
-- Favor layered scene composition, silhouettes, hand-crafted details, and subtle environmental animation.
-- Keep the design playful rather than corporate or overly rigid.
-- Do not use copyrighted show assets or imitate exact protected artwork.
+- Illustrated, atmospheric, slightly quirky, mysterious, welcoming.
+- Palette: midnight blues / forest greens, warm firelight, parchment neutrals, restrained accents.
+- Expressive headings, readable body text.
+- Layered scene composition, silhouettes, hand-crafted details, subtle environmental animation.
+- Playful rather than corporate.
+- No copyrighted show assets or imitation of protected artwork.
+
+### Gamification visual identity
+
+- Camp Rank badges follow one coherent art style matching the site's mysterious camp aesthetic: flame progression, owl motif for Night Owl, hollow sigil for higher tiers.
+- Each badge combines a symbol with the rank name; reads clearly at 24–32 px (comments) and 64–96 px (profile).
+- Badge files use kebab-case under `assets/badges/`.
+- Until artwork is ready, show **text-only badge pill** with rank name in a neutral ring; never show broken image.
+- Ember represented with small flame glyph; balance visible next to Camp Rank in profile header and Main Bar account chip.
 
 ### Interface principles
 
 1. **Atmosphere without sacrificing clarity.** Visual effects must not reduce text contrast.
 2. **Consistent components.** Reuse shared buttons, inputs, cards, badges, menus, dialogs, and empty states.
-3. **Mobile-first navigation.** Do not let labels or controls become unreachable on narrow screens.
-4. **Useful feedback.** Every save, upload, login, import, or delete operation needs a visible result.
+3. **Mobile-first navigation.** Nothing unreachable on narrow screens.
+4. **Useful feedback.** Every save, upload, login, import, or delete shows visible result.
 5. **Accessible motion.** Respect `prefers-reduced-motion`.
-6. **Responsive images.** Use optimized image sizes and appropriate loading behavior.
-7. **No dead controls.** If a control is visible, it must work or be explicitly marked as unavailable / coming soon.
+6. **Responsive images.** Optimized sizes and appropriate loading behavior.
+7. **No dead controls.** Visible controls work or are explicitly marked unavailable.
 
 ---
 
 ## 7. Technical Requirements and Architecture
 
-### Current stack found in the ZIP
+### Current stack
 
 - HTML5
 - CSS3
 - JavaScript ES modules
 - Supabase JavaScript client v2 loaded from `esm.sh`
 - Supabase Auth and profile queries
-- CSS / JavaScript parallax effect using a background image and depth map
-- Planned shared loader animation, browser audio controls for `assets/sound/`, Supabase Realtime Presence for online-session counts, timezone-aware client clock, and shared Settings dropdown.
+- CSS / JavaScript parallax with background image and depth map
+- Planned: shared loader animation, browser audio controls for `assets/sound/`, Supabase Realtime Presence for online-session counts, timezone-aware client clock, shared Settings dropdown, Camp Rank / Ember / Challenge / Leaderboard / Analytics systems (§5.22–§5.26)
 
 ### Proposed responsibilities
 
 | Layer | Responsibility |
 | --- | --- |
-| Static frontend | Page layout, responsive UI, interaction states, and navigation |
-| Supabase Auth | Registration, login, session handling, and logout |
-| Supabase Postgres | Novels, chapters, world-building, theories, replies, notifications, preferences, bookmarks, and reading history |
-| Supabase Storage | Novel covers, profile pictures, map images, character art, and location images |
-| Supabase RLS | Enforce ownership, public visibility, Reader permissions, and Author permissions |
-| Hosting platform | Serve the frontend over HTTPS and deploy repository changes |
-| Optional edge / server functions | Trusted administrative operations, import processing, moderation tools, or notification jobs where client-side access is insufficient |
+| Static frontend | Page layout, responsive UI, interaction states, navigation |
+| Supabase Auth | Registration, login, session handling, logout |
+| Supabase Postgres | Novels, chapters, world-building, theories, replies, notifications, preferences, bookmarks, reading history, EXP, Ember, badges, challenges, leaderboards, analytics events |
+| Supabase Storage | Novel covers, profile pictures, map images, character art, location images, badge assets |
+| Supabase RLS | Enforce ownership, visibility, permissions, reward/ranking integrity |
+| Hosting platform | Serve frontend over HTTPS, deploy repository changes |
+| Optional edge / server functions | Trusted admin operations, import processing, moderation, notification jobs, challenge validation, leaderboard settlement, analytics aggregation |
 
 ### Cloudflare deployment
 
-The request mentions Cloudflare. The supplied ZIP does not prove that Cloudflare Pages is already connected or configured.
-
 Before changing hosting:
-1. Confirm the current live deployment provider and domain settings.
-2. If Cloudflare Pages is selected, connect the GitHub repository and configure the correct project root / build settings for a static HTML project.
-3. Confirm that direct navigation to every `.html` page works.
+1. Confirm current live deployment provider and domain settings.
+2. If Cloudflare Pages is selected, connect GitHub and configure project root / build settings for static HTML.
+3. Confirm direct navigation to every `.html` page works.
 4. Configure required environment values and safe deployment practices.
-5. Test the production domain and Supabase Auth redirect URLs.
-6. Document the deployment process so future updates are repeatable.
+5. Test production domain and Supabase Auth redirect URLs.
+6. Document repeatable deployment process.
 
-A static frontend generally does not need a build command if no build tool is introduced. Do not add Cloudflare configuration files without a specific need.
+Static frontend generally does not need a build command unless a build tool is introduced.
 
 ### Environment and secrets
 
-- The current Supabase client configuration contains a publishable client key. Publishable keys are intended for frontend use only when the database and Storage are correctly secured with RLS and policies.
-- Never expose a Supabase service-role key, database password, private token, or other server secret in frontend files or Git history.
-- Use environment variables / platform secrets for any server-side credentials.
-- Confirm Auth redirect URLs and allowed origins for local development and production.
+- Publishable client key is for frontend use only when database and Storage are secured with RLS.
+- Never expose service-role key, database password, private tokens, or server secrets in frontend files or Git history.
+- Use environment variables / platform secrets for server-side credentials.
+- Confirm Auth redirect URLs and allowed origins for local and production.
 
 ### Database entities to plan for
-
-The exact final schema should be designed and migrated deliberately. Suggested entities:
 
 - `profiles`
 - `novels`
 - `chapters`
-- `chapter_ratings` (one current rating per user per chapter; unique `(chapter_id, user_id)`; rating constrained to 1–5)
-- `arcade_scores` (persistent score submissions / leaderboard records, linked to a Supabase user and stable game key)
-- `arcade_saves` (compact, versioned save-game payloads linked to a Supabase user and game key)
-- `arcade_player_stats` (optional derived or cached arcade profile statistics; avoid storing data that can be safely derived from scores)
+- `chapter_ratings` (unique `(chapter_id, user_id)`; rating 1–5)
+- `arcade_scores`
+- `arcade_saves`
+- `arcade_player_stats`
 - `characters`
 - `maps`
 - `map_markers`
@@ -1053,241 +1039,258 @@ The exact final schema should be designed and migrated deliberately. Suggested e
 - `notification_preferences`
 - `reading_progress`
 - `bookmarks`
-- `support_reports` (if reports are stored in the application)
-- `user_preferences` or equivalent fields for audio settings, timezone, display preferences, and other per-user settings (avoid duplicating preferences already represented in `profiles`).
-- Realtime Presence channel/configuration for aggregate online sessions; this may not require a persistent table if Supabase Presence is used.
+- `support_reports`
+- `user_preferences`
+- `reader_activity_events`
+- `reader_progress`
+- `badge_definitions`
+- `user_badges`
+- `ember_ledger`
+- `daily_checkins`
+- `camp_challenges`
+- `challenge_participation`
+- `leaderboard_periods`
+- `leaderboard_snapshots`
+- `analytics_events`
+- Realtime Presence channel/configuration for aggregate online sessions.
 
-Each table should use stable IDs, timestamps where appropriate, and explicit relationships. Add indexes for common list queries, sorting, and foreign keys.
+Each table uses stable IDs, timestamps, explicit relationships, indexes.
 
 ### Security rules
 
 - Enable and test RLS on every user-facing table.
-- Public users may read only content intended to be public and published.
-- Readers may create and manage only the content explicitly allowed to them.
-- Readers may only update their own profile and preference records.
-- Author privileges must be based on a trusted role source.
-- Do not trust role values supplied by the browser.
-- Validate input and file uploads; limit file size and allowed content types.
-- Render user-generated text safely and prevent script injection.
-- Confirm Storage policies for uploaded files.
-- Test policies using both Reader and Author sessions, plus unauthenticated requests.
+- Public users read only published content.
+- Readers manage only content explicitly allowed.
+- Readers update only own profile and preferences.
+- Author privileges based on trusted role source.
+- Do not trust role values from browser.
+- Validate input and file uploads; limit size and content types.
+- Render user content safely; prevent script injection.
+- Confirm Storage policies.
+- Validate all EXP, Ember, badge, challenge, and leaderboard writes through trusted RPCs or database functions — never trust the client.
+- Test with Reader, Author, and unauthenticated sessions.
 
 ---
 
 ## 8. Non-Functional Requirements
 
 ### Performance
-- Optimize images and avoid loading large scene assets on pages that do not need them.
-- Pause or reduce animation loops when the scene is hidden or the page is not active.
-- Avoid excessive database requests and load long lists incrementally.
-- Keep interactions responsive on mid-range mobile devices.
+- Optimize images; avoid large scene assets on pages not needing them.
+- Pause animation loops when scene hidden or page inactive.
+- Avoid excessive database requests; load long lists incrementally.
+- Responsive on mid-range mobile.
 
 ### Accessibility
-- Use semantic HTML and meaningful accessible names.
-- Ensure keyboard navigation and visible focus states.
-- Maintain sufficient color contrast.
-- Do not rely on color alone to communicate status.
-- Provide reduced-motion behavior for parallax and dice animations.
-- Associate form labels with inputs and announce errors / success states to assistive technologies.
+- Semantic HTML with meaningful accessible names.
+- Keyboard navigation and visible focus states.
+- Sufficient color contrast.
+- Do not rely on color alone.
+- Reduced-motion behavior for parallax and dice animations.
+- Form labels associated with inputs; errors/success announced to assistive tech.
+- Badge and Ember displays include accessible text descriptions.
 
 ### Reliability
-- Provide loading, empty, error, and success states for data-driven pages.
-- Prevent duplicate submissions during saves.
-- Confirm destructive actions such as deleting a novel or chapter.
-- Preserve unsaved editor text when a save fails.
-- Handle missing or unavailable Supabase data gracefully.
+- Loading, empty, error, success states on data-driven pages.
+- Prevent duplicate submissions.
+- Confirm destructive actions.
+- Preserve unsaved editor text on save failure.
+- Graceful handling of missing Supabase data.
+- Gamification and economy endpoints idempotent; no duplicate EXP, Ember, badges.
 
 ### Compatibility
 - Support current major mobile and desktop browsers.
-- Test narrow mobile screens, tablet layouts, and desktop widths.
-- Verify that Supabase Auth redirects, cookies / sessions, and page navigation work on the production origin.
+- Test narrow mobile, tablet, desktop widths.
+- Verify Supabase Auth redirects, cookies, sessions, and navigation on production origin.
 
 ### Maintainability
-- Reuse shared UI and authentication utilities.
-- Keep content data separate from page presentation.
-- Avoid duplicating navigation and permission logic across pages.
+- Reuse shared UI and auth utilities.
+- Separate content data from presentation.
+- Avoid duplicating navigation and permission logic.
 - Document schema changes and deployment settings.
-- Keep TODOs and feature status updated as the project evolves.
+- Keep TODOs and feature status updated.
 
 ---
 
 ## 9. Delivery Plan and Current Progress
 
-The checkboxes below track the implementation visible in the supplied repository. “Verify” means the code exists but must still be tested against the live Supabase / Cloudflare setup.
-
 ### Phase 0 — Audit and stabilization
-- [x] Establish the repository and initial static website structure.
-- [x] Implement Supabase email/password sign-up and sign-in client flow.
-- [x] Implement profile read/update for nickname and bio.
-- [x] Implement shared navigation and Author-only editor route guard.
-- [x] Build the campfire welcome screen and parallax depth effect.
-- [x] Add glass Main Bar and top-bar / sidebar / compact navigation modes.
-- [x] Configure Supabase project URL and publishable client key in frontend.
-- [x] Create the `profiles` table and confirm profile save behavior in project progress.
-- [x] Add the Cloudflare Worker URL to Supabase Auth Redirect URLs, as confirmed in project progress.
-- [ ] Implement shared logo-led loading animation with error/reduced-motion states.
-- [ ] Verify production sign-up, email verification / redirect, login, logout and session persistence end-to-end.
-- [ ] Test RLS and Storage policies using Reader, Author and signed-out sessions.
-- [ ] Confirm canonical production domain and repeatable deployment workflow (the README still references GitHub Pages).
+- [x] Repository and initial static website structure.
+- [x] Supabase email/password sign-up and sign-in client flow.
+- [x] Profile read/update for nickname and bio.
+- [x] Shared navigation and Author-only editor route guard.
+- [x] Campfire welcome screen and parallax depth effect.
+- [x] Glass Main Bar with top-bar / sidebar / compact navigation modes.
+- [x] Supabase project URL and publishable client key configured.
+- [x] `profiles` table created; profile save behavior confirmed.
+- [x] Cloudflare Worker URL added to Supabase Auth Redirect URLs.
+- [ ] Shared logo-led loading animation with error/reduced-motion states.
+- [ ] Production sign-up, email verification, login, logout, session persistence verified end-to-end.
+- [ ] RLS and Storage policies tested with Reader, Author, signed-out sessions.
+- [ ] Canonical production domain and repeatable deployment workflow confirmed.
 
-**Current exit status: PARTIALLY COMPLETE.** Main frontend foundation and account/profile workflow exist; live security and deployment checks remain.
+**Current exit status: PARTIALLY COMPLETE.**
 
 ### Phase 1 — Core story library and authoring
-- [x] Implement novel library data loading and rendering in `js/novels.js`.
-- [x] Implement novel detail and chapter-management workflow in `js/novels.js`.
-- [x] Implement novel create/edit/delete operations in source.
-- [x] Implement chapter editor with title, subtitle, chapter number, volume and word count.
-- [x] Implement save-draft and publish actions in source.
-- [x] Add reader-facing chapter page and chapter navigation.
-- [ ] Implement Chapter Ratings with five d20 icons (outline-only when unrated, proportionally filled interiors after ratings), one current vote per Reader per chapter, fractional fill, and realtime chapter average/count.
-- [ ] Implement weighted Novel Ratings aggregated from all individual votes across published chapters, with realtime count/average updates and database-enforced uniqueness/RLS; use the same d20 rating visual system.
-- [x] Add chapter import flow for TXT, DOCX and text-based PDF, with review before draft creation.
-- [ ] Verify database schema, RLS, published-only Reader visibility, Storage bucket policies and cross-session persistence.
-- [ ] Verify complete latest-published-chapter display on the Campfire homepage.
-- [ ] Verify chapter ordering, volume / arc grouping and deletion confirmation in the live workflow.
-- [ ] Test unsaved-change protection and save failure recovery.
+- [x] Novel library data loading in `js/novels.js`.
+- [x] Novel detail and chapter-management workflow.
+- [x] Novel create/edit/delete in source.
+- [x] Chapter editor with metadata and word count.
+- [x] Save-draft and publish actions in source.
+- [x] Reader-facing chapter page and navigation.
+- [ ] Chapter Ratings with five d20 icons; one current vote per reader; fractional fill; realtime aggregates.
+- [ ] Weighted Novel Ratings with realtime updates and DB-enforced uniqueness / RLS.
+- [x] Chapter import for TXT, DOCX, text-based PDF with review before draft creation.
+- [ ] Database schema, RLS, published-only visibility, Storage bucket policies, cross-session persistence verified.
+- [ ] Latest-published-chapter section on Campfire homepage verified.
+- [ ] Chapter ordering, volume / arc grouping, deletion confirmation in live workflow verified.
+- [ ] Unsaved-change protection and save failure recovery tested.
 
-**Current exit status: IMPLEMENTED IN SOURCE, LIVE VERIFICATION REQUIRED.** This phase is substantially further along than the earlier PRD audit indicated.
+**Current exit status: IMPLEMENTED IN SOURCE, LIVE VERIFICATION REQUIRED.**
 
 ### Phase 2 — Author tools and world building
-- [ ] Complete volume / arc organization and chapter reordering.
-- [x] Add dedicated Characters management and reader pages (`characters.html`, `js/world.js`; Author-only editing, Readers view published).
-- [x] Add Maps, map image upload and responsive named markers (`maps.html`; markers stored as % of image, Author add / edit / move / delete).
-- [x] Add Locations management and linked lore records (`locations.html`; links to a map + marker and to characters based there). Links to chapters still open.
-- [x] Add Novels sub-navigation (Novels / Characters / Maps / Locations) under each page headline, above the Author toolbar.
-- [ ] Run `supabase/world-building.sql` in Supabase, then verify RLS and the `worldbuilding` Storage bucket with Reader, Author and signed-out sessions.
-- [ ] Verify and improve novel cover / image upload through Supabase Storage.
+- [ ] Volume / arc organization and chapter reordering completed.
+- [x] Characters management and reader pages (`characters.html`, `js/world.js`).
+- [x] Maps, map image upload, responsive named markers (`maps.html`).
+- [x] Locations management and linked lore (`locations.html`).
+- [x] Novels sub-navigation under each page headline.
+- [ ] `supabase/world-building.sql` run; RLS and `worldbuilding` Storage bucket verified.
+- [ ] Novel cover / image upload through Supabase Storage verified and improved.
 
-**Current exit status: NOT COMPLETE.** Chapter volume metadata and cover-upload code exist, but full world-building management is not implemented.
+**Current exit status: NOT COMPLETE.**
 
 ### Phase 3 — Community investigation
-- [ ] Implement theory creation and listing.
-- [ ] Implement Confirmed / Likely / Speculation / Wild Theory filters.
-- [ ] Implement theory detail pages and replies.
-- [ ] Add ownership rules, reporting, moderation and anti-spam protections.
-- [ ] Verify persistence and RLS.
+- [x] Theory creation and listing.
+- [x] Confirmed / Likely / Speculation / Wild Theory filters.
+- [x] Theory detail pages and replies.
+- [ ] Ownership rules, reporting, moderation, anti-spam.
+- [ ] Persistence and RLS verified.
+- [ ] Theory like events emitted for Top Theorist leaderboard.
 
-**Current exit status: NOT STARTED.** Theories page is still a placeholder.
+**Current exit status: IMPLEMENTED IN SOURCE, LIVE VERIFICATION REQUIRED.**
 
 ### Phase 4 — Settings and notifications
-- [x] Implement profile nickname / bio editing and save feedback.
-- [ ] Complete avatar persistence through an object-storage bucket.
-- [ ] Implement System / Light / Dark themes.
-- [ ] Implement English / Indonesian interface localization.
-- [ ] Implement notification preferences and notification center.
-- [x] Implement reading history and bookmarks (`js/reading.js`, `js/history.js`, tables `bookmarks` + `reading_progress` in `supabase/bookmarks-history.sql`; Bookmark / Resume on `read.html`, Continue reading on `novel.html`, History section in Settings with clear-history). Live verification still required.
-- [ ] Add Help / FAQ, support feedback and Community social links.
-- [x] Add global Settings gear dropdown available in place on every applicable page, with synchronized gear rotation/dropdown animation and accessible close behavior (`shared.js`, `css/settings-menu.css`). Entries so far: Profile, History & Bookmarks, Clock & timezone; add Display / Notifications / Support / Community / Information as those sections are built.
-- [ ] Add independent Music and SFX enable/disable and volume controls backed by `assets/sound/` assets.
-- [x] Add persisted timezone selection and the retro neon split-flap clock UI (`js/status-widget.js`, `css/status.css`; timezone chosen in Settings, stored in localStorage `hnc_timezone`, 24-hour). Top-right placement; widget sits under the Main Bar on narrow screens.
+- [x] Profile nickname / bio editing and save feedback.
+- [ ] Avatar persistence through object-storage bucket.
+- [ ] System / Light / Dark themes.
+- [ ] English / Indonesian interface localization.
+- [ ] Notification preferences and notification center.
+- [x] Reading history and bookmarks (`js/reading.js`, `js/history.js`; tables `bookmarks`, `reading_progress`).
+- [ ] Help / FAQ, support feedback, Community social links.
+- [x] Global Settings gear dropdown available in place on every applicable page.
+- [ ] Music and SFX enable/disable and volume controls backed by `assets/sound/`.
+- [x] Persisted timezone selection and retro neon split-flap clock UI.
 
-**Current exit status: PARTIAL.** Profile basics work; remaining account preferences and utilities are outstanding.
+**Current exit status: PARTIAL.**
 
 ### Phase 4B — Camp Rank, rewards, challenges, leaderboards, and analytics
-- [ ] Define EXP events, rank calculation, streak day boundary, and Night Owl award rules.
-- [ ] Add Camp Rank profile display and server-validated activity tracking.
-- [ ] Implement daily Campfire check-in and the append-only Ember ledger.
-- [ ] Add `assets/badges/` and badge definition / user award records.
-- [ ] Build Author-managed Camp Challenge creation, publishing, completion validation, and Ember rewards.
-- [ ] Build category leaderboards: Top Theorist, Top Reader, Top Arcade Player.
-- [ ] Add monthly archive, Author-controlled finalization/reset, and idempotent badge/Ember rewards.
-- [ ] Build Author Analytics Dashboard for chapter reads, ratings, reading-hour trends, and all instrumented insights.
-- [ ] Add RLS, abuse prevention, idempotency, privacy review, and concurrency tests for every reward/ranking flow.
+- [ ] EXP events, rank calculation, streak day boundary, Night Owl award rules defined.
+- [ ] Camp Rank profile display and server-validated activity tracking.
+- [ ] Daily Campfire check-in and append-only Ember ledger.
+- [ ] `assets/badges/` created with 12-rank list and Night Owl naming convention.
+- [ ] Dedicated **Camp Challenge** menu, Author CRUD, Reader flow, server-side completion validation, Ember rewards.
+- [ ] Dedicated **Leaderboards** menu with Top Theorist, Top Reader, Top Arcade Player.
+- [ ] Monthly archive, Author-controlled leaderboard management (reachable from Leaderboards page), idempotent badge/Ember rewards.
+- [ ] Author Analytics Dashboard covering ALL instrumented insights with explicit "not yet instrumented" labels.
+- [ ] RLS, abuse prevention, idempotency, privacy review, concurrency tests for every reward/ranking flow.
 
-**Current exit status: NOT STARTED.** The supplied ZIP contains no implementation for Camp Rank, streaks, Ember, Camp Challenge, monthly leaderboards, or Author Analytics.
+**Current exit status: NOT STARTED.**
 
 ### Phase 5 — Arcade
-- [ ] Implement Supabase-backed arcade score submissions and leaderboards with RLS and validated score writes.
-- [ ] Implement compact, versioned Supabase save-game records and player-linked stats/profile display; retain guest play for games that do not require persistence.
-- [ ] Implement animated dice rolling and session roll history.
-- [ ] Add simple playable browser games.
-- [ ] Test mobile input and reduced-motion behavior.
+- [ ] Supabase-backed arcade score submissions and leaderboards with RLS and validated writes.
+- [ ] Compact versioned Supabase save-game records and player stats.
+- [ ] Animated dice rolling and session roll history.
+- [ ] Simple playable browser games.
+- [ ] Mobile input and reduced-motion behavior tested.
+- [ ] Validated scores submitted to Top Arcade Player leaderboard and Author Analytics.
 
-**Current exit status: NOT STARTED.** Arcade remains a placeholder. Supabase-backed leaderboards, compact cross-device game saves, and player-linked arcade stats are requirements for persistent arcade features; simple guest play can remain local-only.
+**Current exit status: NOT STARTED.**
 
 ### Phase 6 — Camp exploration, deployment and polish
-- [ ] Add wide-angle / distant-camera mode.
-- [ ] Add FireWatcher inspection interaction and optional easter eggs.
-- [ ] Optimize scene assets and animation performance.
-- [x] Implement aggregate realtime online-reader count with stale-session cleanup and privacy-safe display (`js/status-widget.js`, Supabase Realtime Presence channel `camp-online`, one key per tab, count only). Live verification still required.
-- [ ] Conduct accessibility, responsive and regression testing.
-- [ ] Verify Cloudflare Worker / Pages deployment, canonical domain, direct-page navigation and Supabase Auth redirects.
-- [ ] Update README deployment instructions to match the actual hosting setup.
+- [ ] Wide-angle / distant-camera mode.
+- [ ] FireWatcher inspection interaction and optional easter eggs.
+- [ ] Scene assets and animation performance optimized.
+- [x] Aggregate realtime online-reader count with stale-session cleanup.
+- [ ] Accessibility, responsive, regression testing.
+- [ ] Cloudflare Worker / Pages deployment, canonical domain, direct-page navigation, Supabase Auth redirects verified.
+- [ ] README deployment instructions updated to match actual hosting setup.
 
-**Current exit status: PARTIAL.** The existing welcome parallax is implemented, and Cloudflare Worker URL / Auth redirect setup has progressed, but the exploration mode and full deployment verification remain.
+**Current exit status: PARTIAL.**
+
+---
 
 ## 10. Definition of Done
 
 A feature is complete only when all relevant conditions are met:
 
-- [ ] The UI matches the intended design and works on mobile and desktop.
-- [ ] All visible controls have working behavior.
-- [ ] Data persists correctly where persistence is required.
-- [ ] Loading, empty, success, and error states are handled.
-- [ ] Reader and Author permissions are enforced at the backend.
-- [ ] RLS and Storage policies have been tested with real role sessions.
-- [ ] No secrets are exposed in frontend code.
-- [ ] Keyboard navigation and reduced-motion behavior are considered.
-- [ ] Existing working features have not regressed.
-- [ ] The feature is tested in the deployed environment, not only locally.
-- [ ] This PRD's status table is updated to reflect the actual implementation.
+- [ ] UI matches intended design; works on mobile and desktop.
+- [ ] All visible controls work.
+- [ ] Data persists where required.
+- [ ] Loading, empty, success, error states handled.
+- [ ] Reader and Author permissions enforced at backend.
+- [ ] RLS and Storage policies tested with real role sessions.
+- [ ] No secrets exposed in frontend.
+- [ ] Keyboard navigation and reduced-motion behavior considered.
+- [ ] No regressions in existing features.
+- [ ] Feature tested in deployed environment, not only locally.
+- [ ] PRD status table updated to reflect actual implementation.
 
 ---
 
 ## 11. Open Decisions
 
-Resolve these during implementation rather than guessing:
-
-1. **Cloudflare:** Is Cloudflare Pages the intended permanent host, or should the existing GitHub Pages deployment remain active?
-2. **Author assignment:** Which trusted administrative method will grant the initial Author role and future role changes?
-3. **Chapter imports:** Which formats must be supported in the first release, and what file-size limits should apply?
-4. **Theory moderation:** Who can mark a theory as Confirmed, and can the original poster change a category after publishing?
-5. **Notifications:** Should the first release provide in-site notifications only, or also email notifications?
-6. **Map markers:** Should markers open a popover, side panel, or dedicated location page?
-7. **Support reports:** Should reports open the user's email client or be submitted and tracked inside the site?
-8. **Community accounts:** Should theory posting require a verified email address?
-9. **Reading history:** Should reading progress sync across devices, and should users be able to delete it?
-10. **Localization:** Which language should be selected by default for new visitors?
-11. **Audio assets:** What are the final filenames, formats, and intended looping behavior for music and SFX under `assets/sound/`?
-12. **Online readers:** Should the count represent unique users or active browser sessions, and should the current visitor be included? Default proposal: active sessions, including the current visitor, with no identities exposed.
-13. **Clock placement:** Where should the clock and online count appear across the shared site layout (for example, Main Bar utility area or a homepage status panel)?
-14. **Clock format:** Should 24-hour time be mandatory or should users be able to choose 12/24-hour format? Default proposal: 24-hour.
-15. **EXP schedule:** How much EXP should each qualifying action award, and which actions are eligible?
-16. **Streak timezone:** Should streaks follow the reader's selected timezone or one platform-wide timezone? Prevent retroactive timezone changes from granting extra streak days.
-17. **Ember economy:** What will Ember unlock, what are the costs, and should any rewards expire? Keep this undecided until the first reward catalog is designed.
-18. **Challenge verification:** Which challenge types can be automatically validated, and which require Author review?
-19. **Monthly leaderboard settlement:** What exact monthly timezone, tie-breakers, and reward amounts should apply to each category?
-20. **Analytics privacy:** What minimum aggregation threshold and retention period should apply to reading-hour and reader-engagement analytics?
-21. **Reading completion definition:** What qualifies a chapter as completed for Top Reader and streak eligibility?
+1. **Cloudflare:** Is Cloudflare Pages the intended permanent host, or should GitHub Pages remain active?
+2. **Author assignment:** Which trusted administrative method grants the initial Author role and future changes?
+3. **Chapter imports:** Which formats required in first release? File-size limits?
+4. **Theory moderation:** Who can mark a theory as Confirmed? Can original poster change category after publishing?
+5. **Notifications:** In-site only, or also email in first release?
+6. **Map markers:** Popover, side panel, or dedicated location page?
+7. **Support reports:** Email client or in-site tracking?
+8. **Community accounts:** Require verified email for theory posting?
+9. **Reading history:** Sync across devices? User able to delete?
+10. **Localization:** Default language for new visitors?
+11. **Audio assets:** Final filenames, formats, loop behavior for music and SFX.
+12. **Online readers:** Unique users or active sessions? Include current visitor? Default proposal: active sessions, including current visitor, no identities exposed.
+13. **Clock placement:** Where on shared site layout?
+14. **Clock format:** 24-hour mandatory or user choice? Default proposal: 24-hour.
+15. **EXP schedule:** Amounts per qualifying action; which actions eligible?
+16. **Streak timezone:** Reader's timezone or platform-wide? Prevent retroactive timezone changes from granting extra days.
+17. **Ember economy:** What will Ember unlock? Costs? Rewards expire? Keep undecided until first reward catalog designed.
+18. **Challenge verification:** Which types auto-validated vs Author review?
+19. **Monthly leaderboard settlement:** Timezone, tie-breakers, reward amounts per category?
+20. **Analytics privacy:** Minimum aggregation threshold and retention period for reading-hour and engagement analytics?
+21. **Reading completion definition:** What qualifies as chapter completion for Top Reader and streak eligibility?
+22. **Camp Rank threshold check:** Confirm Lv 5 threshold for Camper is intentional, or shift first tier step to Lv 10 for a 1–10–20–…–100 pattern (11 tiers).
+23. **Badge artwork timing:** When will custom badge art for 12 ranks + Night Owl be delivered? Ship with text-only pills or placeholder artwork until then?
+24. **Leaderboard category exclusivity:** Can a user appear on multiple leaderboards simultaneously, or must they pick one at settlement?
 
 ---
 
 ## 12. Source Audit Notes
 
-This update was based on the supplied `Hollow-Night-Camp-main (10).zip` and relevant implementation files:
+Update based on `Hollow-Night-Camp-main (10).zip` and implementation files:
 
-- `index.html` and `js/login.js`: login / registration interface and form flow.
-- `js/auth.js`: Supabase Auth, session observation, profile retrieval and profile updates.
-- `js/shared.js`: page/session guard, Author role check, Author Mode state, Main Bar and editor three-dot menu.
-- `home.html`, `js/home.js`, `js/parallax.js`: welcome screen, homepage interactions and depth-map parallax.
-- `novels.html`, `novel.html`, `js/novels.js`: novel listing, novel details, author novel operations and chapter-management workflow.
-- `editor.html`, `js/editor.js`: chapter metadata, body editor, word count, draft saving and publishing.
-- `read.html`, `js/read.js`: reader-facing chapter display and chapter navigation.
-- `js/import.js`: TXT / DOCX / text-based PDF extraction, review step and draft import.
+- `index.html`, `js/login.js`: login / registration interface and form flow.
+- `js/auth.js`: Supabase Auth, session observation, profile retrieval and updates.
+- `js/shared.js`: page/session guard, Author role check, Author Mode state, Main Bar, editor three-dot menu.
+- `home.html`, `js/home.js`, `js/parallax.js`: welcome screen, homepage interactions, depth-map parallax.
+- `novels.html`, `novel.html`, `js/novels.js`: novel listing, details, author operations, chapter management.
+- `editor.html`, `js/editor.js`: chapter metadata, body editor, word count, draft saving, publishing.
+- `read.html`, `js/read.js`: reader-facing chapter display and navigation.
+- `js/import.js`: TXT / DOCX / text-based PDF extraction with review step.
 - `js/rating.js`, `css/rating.css`: d20 rating visuals and chapter/novel rating helpers.
 - `js/status-widget.js`: timezone-aware retro flip clock and Supabase Realtime Presence online-reader count.
 - `settings.html`: profile editor and avatar UI.
-- `theories.html` and `js/theories.js`: theory list/detail, category, post, and reply workflows are present in source; `arcade.html` remains a placeholder.
+- `theories.html`, `js/theories.js`: theory list/detail, categories, posting, replies.
 - `config/supabase.js`: Supabase project URL and publishable client key.
-- `css/mainbar.css` and `assets/icons/`: glass navigation styling and icon assets.
+- `css/mainbar.css`, `assets/icons/`: glass navigation styling and icon assets.
 
 ### External progress noted on 2026-10-20
 
-The ongoing project conversation confirms that the Cloudflare Worker URL `https://hollow-night-camp.kazualtr.workers.dev/` was added to Supabase Auth Redirect URLs. This is evidence of configuration progress, not proof that all sign-in redirects, production routes, or deployment settings have passed end-to-end tests. The repository README still contains the older GitHub Pages URL and should be reconciled with the intended canonical domain.
+Cloudflare Worker URL `https://hollow-night-camp.kazualtr.workers.dev/` added to Supabase Auth Redirect URLs. Configuration progress — not proof of end-to-end production sign-in. README still references older GitHub Pages URL.
 
-**Security note:** A client-side Author Mode switch or route guard is not sufficient authorization. Verify that database RLS policies and Supabase Storage policies reject unauthorized writes. Do not place service-role keys or private credentials in frontend files.
+**Security note:** A client-side Author Mode switch or route guard is not sufficient authorization. Verify RLS and Storage policies reject unauthorized writes. Do not place service-role keys or private credentials in frontend files.
 
-**Audit limitation:** This is a source-code and project-progress review, not a live penetration test. External dashboard state, production routing, deployed code parity, RLS behavior, and actual persistence must be verified separately.
+**Audit limitation:** Source-code and project-progress review, not a live penetration test. External dashboard state, production routing, deployed code parity, RLS behavior, and persistence must be verified separately.
 
 <div align="center">
 
@@ -1296,12 +1299,10 @@ The ongoing project conversation confirms that the Cloudflare Worker URL `https:
 
 </div>
 
-
 ### Feature requirements recorded on 2026-10-21
 
-The following are **planned requirements only** and are not claimed to be implemented in the supplied ZIP: (1) custom logo-led loading animation, (2) separate Music and SFX controls with independent volumes and assets under `assets/sound/`, (3) aggregate realtime online-reader count, (4) timezone-configurable retro neon split-flap clock, and (5) a global in-place Settings gear dropdown with synchronized gear/dropdown animation. Detailed acceptance criteria are defined in §5.16–§5.20. Update the status table and phase checkboxes only after implementation is present in the repository; verify runtime behavior separately.
+Planned only, not implemented in supplied ZIP: (1) custom logo-led loading animation, (2) separate Music and SFX controls with independent volumes under `assets/sound/`, (3) aggregate realtime online-reader count, (4) timezone-configurable retro neon split-flap clock, (5) global in-place Settings gear dropdown with synchronized gear/dropdown animation. Detailed acceptance criteria in §5.16–§5.21.
 
+### Camp Rank / gamification requirements recorded on 2026-10-21
 
-### New requirements recorded on 2026-10-21
-
-The following Camp Rank features are **planned requirements only** and are not implemented in the supplied ZIP: Camp Rank levels and EXP, the three-day Night Owl streak badge, daily Campfire check-in and Ember currency, Author-managed Camp Challenge, monthly category leaderboards with badge/Ember rewards and Author controls, and an Author Analytics Dashboard. Custom badge art is planned for `assets/badges/`, which does not exist in the supplied ZIP. Detailed requirements, security controls, acceptance criteria, and suggested data entities are defined in §5.22–§5.26. Do not mark these features complete until the implementation and backend policies have been verified.
+Planned only, not implemented in supplied ZIP: **12-tier Camp Rank** (Wanderer → Camper → Story Seeker → Clue Hunter → Night Reader → Theorist → Hollow Investigator → Fire Watcher → Hollow Watcher → Hollow Flame → The UnderReader → Hollow Legend), EXP and levels, three-day Night Owl streak badge, daily Campfire check-in and **Ember as the primary in-platform currency**, **dedicated Camp Challenge menu** with Author-managed challenges and Ember rewards, **dedicated Leaderboards menu** with Top Theorist / Top Reader / Top Arcade Player categories, monthly period settlement, Author-controlled leaderboard management, and **Author Analytics Dashboard** surfacing all instrumented insights. Custom badge art planned for `assets/badges/` with kebab-case naming. Requirements, controls, acceptance criteria, and data entities in §5.22–§5.26. Do not mark complete until implementation and backend policies verified.
