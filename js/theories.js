@@ -5,7 +5,7 @@
 
 import { supabase } from '../config/supabase.js';
 import { el, formatDate } from './dom.js?v=2';
-import { initPage } from './shared.js?v=13';
+import { initPage, trackLoad } from './shared.js?v=14';
 
 const ctx = await initPage({ active: 'theories' });
 const root = document.getElementById('theoriesRoot');
@@ -223,7 +223,7 @@ async function renderList() {
     moreButton.hidden = data.length < PAGE_SIZE;
   }
 
-  await load(true);
+  await trackLoad(load(true), 'Reading the theories');
 }
 
 // ---------- detail ----------

@@ -1,7 +1,7 @@
 // HOLLOW NIGHT CAMP — world building: characters.html, maps.html, locations.html.
 // Everyone can read published entries; only Authors can create / edit / delete (RLS enforces it again in the database).
 
-import { initPage } from './shared.js?v=13';
+import { initPage, trackLoad } from './shared.js?v=14';
 import { supabase } from '../config/supabase.js';
 import { el } from './dom.js?v=2';
 
@@ -767,6 +767,6 @@ async function maps() {
 
 // ---------------------------------------------------------------
 const handlers = { characters, maps, locations };
-await handlers[page]?.();
+await trackLoad(handlers[page]?.(), 'Gathering the camp');
 // Author toolbar stays hidden on detail pages (they carry their own actions).
 if (entryId) toolbar.hidden = true;

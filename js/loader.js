@@ -1,245 +1,482 @@
-// Hollow Night Camp — global logo loader.
-// Usage:  import { HNCLoader } from './loader.js';
-//   HNCLoader.show({ label })            // manual
-//   HNCLoader.hide()
-//   await HNCLoader.run(() => fetchStuff(), { label })   // auto hide + error/retry
-//   HNCLoader.fail('message', retryFn)
-// Auto-shows on import. Opt out of auto mode: <html data-hnc-manual> and call hide() yourself.
+/* HOLLOW NIGHT CAMP — global logo-led loader (PRD §5.17).
+   Classic <script> in <head> so the overlay paints with the very first frame (no flash of half-built page).
 
-const LOGO = 'assets/image/hollow-night-logo.png';
-const CSS = 'css/loader.css';
-const STUCK_MS = 15000;
+   Flow (frames from assets/loader/):
+     intro   1 orb -> 2 burst (shockwave + shards) -> 3 -> 4 -> 5 logo forms -> 7/8 glow loop
+     exit    6 pixel dissolve -> fade
+   First visit of a session plays the full intro; later page loads use a short glow-only version.
 
-const id = (document.documentElement.lang || '').startsWith('id');
-const T = id
-  ? { load: 'Memuat…', err: 'Gagal memuat. Hutan sedang sunyi.', retry: 'Coba lagi', close: 'Tutup',
-      lines: ['Menyalakan api unggun…', 'Membaca jejak di hutan…', 'Menghitung bintang…', 'Membuka gerbang kamp…'] }
-  : { load: 'Loading…', err: 'Could not load. The woods are quiet.', retry: 'Try again', close: 'Close',
-      lines: ['Lighting the campfire…', 'Reading the woods…', 'Counting the stars…', 'Opening the camp gates…'] };
+   API (window.HNLoader):
+     ready()                 shell is built (called by initPage)
+     hold(label) -> release  keep the loader up while data loads
+     track(promise, label)   hold() until the promise settles; returns the promise
+     fail(message, retryFn)  show error + Retry / Continue (never traps the reader)
+     leave()                 short fade-in while navigating away
+     mini(text)              small inline loader element for tiny async states
+*/
+(function () {
+  'use strict';
+  if (window.HNLoader) return;
 
-const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
-const rnd = (a, b) => a + Math.random() * (b - a);
+  var script = document.currentScript;
+  var BASE = script && script.src ? new URL('../assets/loader/', script.src).href : 'assets/loader/';
+  var SEEN_KEY = 'hnc_loader_seen';
+  var WATCHDOG_MS = 15000;
+  var MESSAGES = ['Lighting the fire', 'Following the trail', 'Counting the campers', 'Listening to the woods'];
 
-let el, fx, ctx, W = 0, dpr = 1;
-let depth = 0, shownAt = 0, minMs = 0, mode = 'full', phase = 'orb', retryFn = null;
-let timers = [], raf = 0, embers = [], orbits = [], phaseT = 0, leaving = false;
+  var doc = document.documentElement;
+  var reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var lowPower = (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
+                 (navigator.deviceMemory && navigator.deviceMemory <= 2) ||
+                 window.innerWidth < 640;
 
-const later = (fn, ms) => timers.push(setTimeout(fn, ms));
-const clearAll = () => { timers.forEach(clearTimeout); timers = []; cancelAnimationFrame(raf); raf = 0; };
+  var S = null;          // current instance
+  var holds = 0;
+  var shellReady = false;
 
-function ensureCss() {
-  if (document.querySelector(`link[href$="loader.css"]`)) return;
-  const l = document.createElement('link');
-  l.rel = 'stylesheet'; l.href = CSS;
-  document.head.appendChild(l);
-}
-
-function build(label) {
-  const shards = Array.from({ length: 6 }, (_, i) =>
-    `<img class="hnc-shard" src="${LOGO}" alt="" aria-hidden="true" style="--i:${i};--x:${rnd(-120, 120)}px;--y:${rnd(-120, 120)}px;--r:${rnd(-70, 70)}deg">`
-  ).join('');
-  const d = document.createElement('div');
-  d.className = 'hnc-loader';
-  d.setAttribute('role', 'status');
-  d.setAttribute('aria-live', 'polite');
-  d.setAttribute('aria-label', label);
-  d.style.setProperty('--logo', `url("${LOGO}")`);
-  d.innerHTML = `
-    <div class="hnc-fog"></div>
-    <div class="hnc-stage">
-      <div class="hnc-orb"><i class="r1"></i><i class="r2"></i><b></b></div>
-      <div class="hnc-wave"></div>
-      <div class="hnc-logo">${shards}<img class="hnc-main" src="${LOGO}" alt="Hollow Night Camp"><div class="hnc-sweep"></div></div>
-      <canvas class="hnc-fx" aria-hidden="true"></canvas>
-    </div>
-    <p class="hnc-text" aria-hidden="true">${label}</p>
-    <div class="hnc-bar" aria-hidden="true"></div>
-    <div class="hnc-err" role="alert">
-      <p>${T.err}</p>
-      <div><button type="button" data-a="retry">${T.retry}</button><button type="button" data-a="close">${T.close}</button></div>
-    </div>`;
-  return d;
-}
-
-function setPhase(p) { phase = p; phaseT = performance.now(); if (el) el.dataset.p = p; }
-
-/* ---------- particles: orbiting orbs -> embers ---------- */
-function initParticles() {
-  fx = el.querySelector('.hnc-fx');
-  dpr = Math.min(devicePixelRatio || 1, 2);
-  W = el.querySelector('.hnc-stage').clientWidth || 200;
-  fx.width = fx.height = W * dpr;
-  ctx = fx.getContext('2d');
-  ctx.scale(dpr, dpr);
-  orbits = Array.from({ length: 14 }, (_, i) => ({ a: (i / 14) * Math.PI * 2, r: rnd(.40, .48) * W, s: rnd(.6, 1.4) * (i % 2 ? 1 : -1), z: rnd(1.5, 4) }));
-  embers = Array.from({ length: 16 }, () => spawn(true));
-}
-function spawn(init) {
-  return { x: W / 2 + rnd(-.32, .32) * W, y: init ? rnd(.3, .9) * W : W * rnd(.78, .92), vy: rnd(10, 30), vx: rnd(-6, 6), z: rnd(.8, 2.2), life: init ? rnd(0, 1) : 0, ttl: rnd(1.6, 3.2) };
-}
-let last = 0;
-function tick(t) {
-  raf = requestAnimationFrame(tick);
-  if (document.hidden || !ctx) return;
-  const dt = Math.min((t - (last || t)) / 1000, .05); last = t;
-  ctx.clearRect(0, 0, W, W);
-  ctx.globalCompositeOperation = 'lighter';
-  if (phase === 'orb' || phase === 'shards') {
-    const k = phase === 'orb' ? 1 : Math.max(0, 1 - (performance.now() - phaseT) / 600); // suck inward
-    for (const o of orbits) {
-      o.a += o.s * dt * (phase === 'orb' ? 1 : 3);
-      const r = o.r * k, x = W / 2 + Math.cos(o.a) * r, y = W / 2 + Math.sin(o.a) * r;
-      ctx.shadowBlur = 10; ctx.shadowColor = '#38bdf8';
-      ctx.fillStyle = `rgba(150,215,255,${.9 * k})`;
-      ctx.beginPath(); ctx.arc(x, y, o.z, 0, 7); ctx.fill();
-    }
-  } else if (phase === 'glow' || phase === 'solid') {
-    for (const e of embers) {
-      e.life += dt / e.ttl; e.y -= e.vy * dt; e.x += e.vx * dt;
-      if (e.life >= 1) Object.assign(e, spawn(false));
-      const a = Math.sin(Math.min(e.life, 1) * Math.PI) * .85;
-      ctx.shadowBlur = 8; ctx.shadowColor = '#38bdf8';
-      ctx.fillStyle = `rgba(170,230,255,${a})`;
-      ctx.fillRect(e.x, e.y, e.z * 1.6, e.z * 1.6);
-    }
+  /* ---------------- particles: blue spirit motes, warm embers, burst shards ---------------- */
+  function sprite(rgb) {
+    var c = document.createElement('canvas');
+    c.width = c.height = 48;
+    var g = c.getContext('2d');
+    var grad = g.createRadialGradient(24, 24, 0, 24, 24, 24);
+    grad.addColorStop(0, 'rgba(255,255,255,1)');
+    grad.addColorStop(0.22, 'rgba(' + rgb + ',0.9)');
+    grad.addColorStop(1, 'rgba(' + rgb + ',0)');
+    g.fillStyle = grad;
+    g.fillRect(0, 0, 48, 48);
+    return c;
   }
-  ctx.shadowBlur = 0; ctx.globalCompositeOperation = 'source-over';
-}
 
-/* ---------- exit: pixel dissolve, bottom first ---------- */
-function dissolve(done) {
-  try {
-    const img = el.querySelector('.hnc-main');
-    const S = Math.round(W * .84), o = Math.round(W * .08), B = 5;
-    const off = document.createElement('canvas'); off.width = off.height = S;
-    const c = off.getContext('2d', { willReadFrequently: true });
-    const sc = Math.min(S / img.naturalWidth, S / img.naturalHeight);
-    const w = img.naturalWidth * sc, h = img.naturalHeight * sc;
-    c.drawImage(img, (S - w) / 2, (S - h) / 2, w, h);
-    const px = c.getImageData(0, 0, S, S).data, blocks = [];
-    for (let y = 0; y < S; y += B) for (let x = 0; x < S; x += B) {
-      const i = (Math.min(y + 2, S - 1) * S + Math.min(x + 2, S - 1)) * 4;
-      if (px[i + 3] < 40) continue;
-      blocks.push({ x: o + x, y: o + y, r: px[i], g: px[i + 1], b: px[i + 2],
-        d: (1 - y / S) * 380 + rnd(0, 160), vy: rnd(30, 150), vx: rnd(-25, 25) });
+  function createParticles(canvas, stage) {
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+
+    var dpr = lowPower ? 1 : Math.min(window.devicePixelRatio || 1, 2);
+    var sprBlue = sprite('110,185,255');
+    var sprWarm = sprite('255,170,80');
+    var sprWhite = sprite('225,242,255');
+    var MOTES = lowPower ? 9 : 20;
+    var EMBERS = lowPower ? 7 : 15;
+    var list = [];
+    var w = 0, h = 0, cx = 0, cy = 0, size = 200;
+    var raf = 0, last = 0, running = false;
+
+    function resize() {
+      w = window.innerWidth;
+      h = window.innerHeight;
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      var r = stage.getBoundingClientRect();
+      cx = r.left + r.width / 2;
+      cy = r.top + r.height / 2;
+      size = r.width || 200;
     }
-    cancelAnimationFrame(raf);
-    el.dataset.dissolve = '1';
-    const t0 = performance.now(), DUR = 950;
-    (function step(t) {
-      const el_ = t - t0;
-      ctx.clearRect(0, 0, W, W);
-      let alive = 0;
-      for (const b of blocks) {
-        const p = (el_ - b.d) / 600;
-        if (p >= 1) continue;
-        alive++;
-        const q = Math.max(p, 0), s = q * q;
-        const k = Math.min(q * 1.4, 1); // drift toward cyan while falling
-        ctx.fillStyle = `rgba(${b.r + (56 - b.r) * k | 0},${b.g + (189 - b.g) * k | 0},${b.b + (248 - b.b) * k | 0},${1 - q})`;
-        ctx.fillRect(b.x + b.vx * s, b.y + b.vy * s * 1.6, B, B);
+
+    function spawn(kind, seeded) {
+      var life, p;
+      if (kind === 'ember') {
+        life = 4 + Math.random() * 4;
+        p = { k: 'ember', spr: sprWarm, x: cx + (Math.random() - 0.5) * w * 0.55, y: h + 12,
+              vx: (Math.random() - 0.5) * 10, vy: -(20 + Math.random() * 38), s: 7 + Math.random() * 9,
+              life: life, age: 0, seed: Math.random() * 6.28, sway: 8 + Math.random() * 14 };
+        if (seeded) { p.age = Math.random() * life; p.y = h * (0.35 + Math.random() * 0.65); }
+      } else if (kind === 'mote') {
+        var a = Math.random() * 6.283;
+        var r = size * (0.55 + Math.random() * 0.9);
+        life = 2.6 + Math.random() * 2.8;
+        p = { k: 'mote', spr: Math.random() < 0.35 ? sprWhite : sprBlue, x: cx + Math.cos(a) * r, y: cy + Math.sin(a) * r,
+              vx: Math.cos(a) * 5, vy: -(6 + Math.random() * 14), s: 4 + Math.random() * 7,
+              life: life, age: 0, seed: Math.random() * 6.28, sway: 3 + Math.random() * 5 };
+        if (seeded) p.age = Math.random() * life;
       }
-      if (alive && el_ < DUR + 400) requestAnimationFrame(step); else done();
-    })(t0);
-  } catch { done(); } // tainted canvas / missing image: plain fade
-}
+      list.push(p);
+    }
 
-/* ---------- public API ---------- */
-function show(opts = {}) {
-  depth++;
-  if (el && !leaving) { if (opts.label) setLabel(opts.label); return; }
-  if (el) teardown();
-  ensureCss();
-  const first = !sessionStorage.getItem('hnc_intro');
-  mode = opts.mode || (first ? 'full' : 'quick');
-  if (reduced()) mode = 'quick';
-  try { sessionStorage.setItem('hnc_intro', '1'); } catch {}
-  leaving = false;
-  el = build(opts.label || T.load);
-  document.body.appendChild(el);
-  document.documentElement.style.overflow = 'hidden';
-  el.addEventListener('click', onClick);
-  addEventListener('keydown', onKey);
-  shownAt = performance.now();
-  initParticles();
-  raf = requestAnimationFrame(tick);
-  requestAnimationFrame(() => requestAnimationFrame(() => { if (el) el.dataset.show = '1'; }));
+    function burst() {
+      var n = lowPower ? 14 : 26;
+      for (var i = 0; i < n; i++) {
+        var a = Math.random() * 6.283;
+        var sp = 150 + Math.random() * 230;
+        list.push({ k: 'shard', spr: Math.random() < 0.5 ? sprWhite : sprBlue, x: cx, y: cy,
+                    vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, s: 4 + Math.random() * 7,
+                    life: 0.7 + Math.random() * 0.6, age: 0, seed: 0, sway: 0 });
+      }
+    }
 
-  if (mode === 'full') {
-    minMs = 2400; setPhase('orb');
-    later(() => setPhase('shards'), 800);
-    later(() => setPhase('solid'), 1650);
-    later(() => setPhase('glow'), 2200);
-    let i = 0; const txt = el.querySelector('.hnc-text');
-    if (!opts.label) later(function rot() { txt.textContent = T.lines[i++ % T.lines.length]; later(rot, 1500); }, 600);
-  } else {
-    minMs = 600; setPhase('solid'); later(() => setPhase('glow'), 350);
+    function count(kind) {
+      var n = 0;
+      for (var i = 0; i < list.length; i++) if (list[i].k === kind) n++;
+      return n;
+    }
+
+    function frame(now) {
+      if (!running) return;
+      raf = requestAnimationFrame(frame);
+      var dt = Math.min((now - last) / 1000, 0.05);
+      last = now;
+
+      if (count('mote') < MOTES && Math.random() < 0.35) spawn('mote');
+      if (count('ember') < EMBERS && Math.random() < 0.25) spawn('ember');
+
+      ctx.clearRect(0, 0, w, h);
+      ctx.globalCompositeOperation = 'lighter';
+
+      for (var i = list.length - 1; i >= 0; i--) {
+        var p = list[i];
+        p.age += dt;
+        if (p.age >= p.life) { list.splice(i, 1); continue; }
+        var t = p.age / p.life;
+        var alpha;
+
+        if (p.k === 'shard') {
+          var f = Math.exp(-2.4 * dt);
+          p.vx *= f; p.vy *= f;
+          alpha = (1 - t) * 0.9;
+        } else {
+          alpha = Math.min(t / 0.15, 1) * Math.min((1 - t) / 0.4, 1);
+          alpha *= p.k === 'ember' ? 0.72 + 0.28 * Math.sin(p.age * 9 + p.seed) : 0.85;
+          p.vx += Math.sin(p.age * 1.6 + p.seed) * p.sway * dt;
+        }
+
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        ctx.globalAlpha = Math.max(0, alpha);
+        ctx.drawImage(p.spr, p.x - p.s, p.y - p.s, p.s * 2, p.s * 2);
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    function start() {
+      if (running) return;
+      resize();
+      for (var i = 0; i < MOTES; i++) spawn('mote', true);
+      for (var j = 0; j < EMBERS; j++) spawn('ember', true);
+      running = true;
+      last = performance.now();
+      raf = requestAnimationFrame(frame);
+      window.addEventListener('resize', resize);
+      document.addEventListener('visibilitychange', onVis);
+    }
+
+    function onVis() {
+      if (document.hidden) { running = false; cancelAnimationFrame(raf); }
+      else if (!running) { running = true; last = performance.now(); raf = requestAnimationFrame(frame); }
+    }
+
+    function stop() {
+      running = false;
+      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', resize);
+      document.removeEventListener('visibilitychange', onVis);
+      list.length = 0;
+    }
+
+    return { start: start, stop: stop, burst: burst, resize: resize };
   }
-  later(() => fail(T.err, retryFn), opts.timeout || STUCK_MS); // never trap the user
-}
 
-function setLabel(s) {
-  if (!el) return;
-  el.setAttribute('aria-label', s);
-  const t = el.querySelector('.hnc-text'); if (t) t.textContent = s;
-}
+  /* ---------------- overlay build / teardown ---------------- */
+  function frameImg(n) {
+    return '<img class="hnl-f" data-f="' + n + '" src="' + BASE + 'frame-' + n + '.webp" alt="" decoding="async" draggable="false">';
+  }
 
-function hide(force) {
-  if (!el || leaving) return;
-  depth = force ? 0 : Math.max(0, depth - 1);
-  if (depth > 0) return;
-  const wait = Math.max(0, shownAt + minMs - performance.now());
-  later(() => {
-    leaving = true;
-    const finish = () => {
-      if (!el) return;
-      el.dataset.leaving = '1';
-      later(teardown, 600);
+  function build(mode, rm) {
+    var frames = mode === 'full' ? [1, 2, 3, 4, 5, 6, 7, 8] : (rm ? [5] : [7, 8, 6]);
+    var el = document.createElement('div');
+    el.id = 'hnLoader';
+    el.className = 'hnl hnl-' + mode + (rm ? ' hnl-rm' : '');
+    el.setAttribute('role', 'status');
+    el.setAttribute('aria-busy', 'true');
+    el.innerHTML =
+      '<div class="hnl-bg" aria-hidden="true"></div>' +
+      '<div class="hnl-mist hnl-mist-a" aria-hidden="true"></div>' +
+      '<div class="hnl-mist hnl-mist-b" aria-hidden="true"></div>' +
+      '<canvas class="hnl-canvas" aria-hidden="true"></canvas>' +
+      '<div class="hnl-center">' +
+        '<div class="hnl-stage" role="img" aria-label="Hollow Night Camp logo">' +
+          '<div class="hnl-halo" aria-hidden="true"></div>' +
+          '<div class="hnl-ring hnl-ring-a" aria-hidden="true"></div>' +
+          '<div class="hnl-ring hnl-ring-b" aria-hidden="true"></div>' +
+          '<div class="hnl-frames" aria-hidden="true">' + frames.map(frameImg).join('') + '</div>' +
+          '<div class="hnl-sheen" aria-hidden="true"></div>' +
+        '</div>' +
+        '<p class="hnl-label" aria-hidden="true"><span class="hnl-label-text"></span><span class="hnl-dots"><i>.</i><i>.</i><i>.</i></span></p>' +
+        '<div class="hnl-bar" aria-hidden="true"><i></i></div>' +
+        '<div class="hnl-error" role="alert">' +
+          '<p class="hnl-error-text"></p>' +
+          '<div class="hnl-actions">' +
+            '<button type="button" class="hnl-btn hnl-btn-primary" data-hnl="retry">Try again</button>' +
+            '<button type="button" class="hnl-btn" data-hnl="dismiss">Continue anyway</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<span class="hnl-sr">Loading Hollow Night Camp</span>';
+
+    doc.appendChild(el);
+    doc.classList.add('hnl-lock');
+
+    var inst = {
+      el: el, mode: mode, rm: rm, started: Date.now(), timers: [], frames: {}, cur: 0,
+      exiting: false, leaving: false, errored: false, particles: null, msg: 0, retry: null
     };
-    if (mode === 'full' && !reduced() && !el.dataset.error) dissolve(finish); else finish();
-  }, force ? 0 : wait);
-}
+    var imgs = el.querySelectorAll('.hnl-f');
+    for (var i = 0; i < imgs.length; i++) inst.frames[imgs[i].getAttribute('data-f')] = imgs[i];
 
-function teardown() {
-  clearAll();
-  removeEventListener('keydown', onKey);
-  el?.remove(); el = ctx = null; leaving = false; depth = 0;
-  document.documentElement.style.overflow = '';
-}
+    el.querySelector('[data-hnl="retry"]').addEventListener('click', function () {
+      if (inst.retry) { var fn = inst.retry; clearError(inst); fn(); } else { window.location.reload(); }
+    });
+    el.querySelector('[data-hnl="dismiss"]').addEventListener('click', function () { exit(inst, true); });
 
-function fail(msg, retry) {
-  if (!el) show({ mode: 'quick' });
-  retryFn = retry || null;
-  clearAll();
-  el.dataset.error = '1';
-  el.querySelector('.hnc-err p').textContent = msg || T.err;
-  el.querySelector('[data-a="retry"]').hidden = false;
-  el.setAttribute('aria-label', msg || T.err);
-  el.querySelector('[data-a="retry"]').focus();
-}
-
-function onClick(e) {
-  const a = e.target.closest('button')?.dataset.a;
-  if (a === 'close') hide(true);
-  if (a === 'retry') {
-    const fn = retryFn; retryFn = null;
-    if (fn) { teardown(); fn(); } else location.reload();
+    return inst;
   }
-}
-function onKey(e) { if (e.key === 'Escape' && el?.dataset.error) hide(true); }
 
-async function run(work, opts = {}) {
-  const fn = typeof work === 'function' ? work : () => work;
-  show(opts); retryFn = () => run(fn, opts);
-  try { const r = await fn(); retryFn = null; hide(); return r; }
-  catch (err) { console.error('[HNCLoader]', err); fail(opts.error || T.err, () => run(fn, opts)); throw err; }
-}
+  function later(inst, fn, ms) {
+    var id = setTimeout(function () { if (S === inst) fn(); }, ms);
+    inst.timers.push(id);
+    return id;
+  }
 
-export const HNCLoader = { show, hide, run, fail, setLabel };
-window.HNCLoader = HNCLoader;
+  function clearTimers(inst) {
+    for (var i = 0; i < inst.timers.length; i++) { clearTimeout(inst.timers[i]); clearInterval(inst.timers[i]); }
+    inst.timers.length = 0;
+  }
 
-if (!document.documentElement.hasAttribute('data-hnc-manual')) {
-  show();
-  if (document.readyState === 'complete') later(() => hide(), 150);
-  else addEventListener('load', () => hide(), { once: true });
-}
+  function setFrame(inst, n, fade) {
+    if (!inst.frames[n]) return;
+    inst.el.style.setProperty('--hnl-fade', (fade == null ? 120 : fade) + 'ms');
+    if (inst.cur === n) return;
+    if (inst.cur && inst.frames[inst.cur]) inst.frames[inst.cur].classList.remove('on');
+    inst.frames[n].classList.add('on');
+    inst.cur = n;
+  }
+
+  function setLabel(inst, text) {
+    var node = inst.el.querySelector('.hnl-label-text');
+    if (!node || node.textContent === text) return;
+    if (!node.textContent) { node.textContent = text; return; }
+    node.classList.add('is-swap');
+    setTimeout(function () { node.textContent = text; node.classList.remove('is-swap'); }, 260);
+  }
+
+  function startRotation(inst) {
+    setLabel(inst, MESSAGES[0]);
+    if (inst.rm) return;
+    var id = setInterval(function () {
+      if (S !== inst || inst.exiting || inst.customLabel) return;
+      inst.msg = (inst.msg + 1) % MESSAGES.length;
+      setLabel(inst, MESSAGES[inst.msg]);
+    }, 2300);
+    inst.timers.push(id);
+  }
+
+  function burstFx(inst) {
+    inst.el.classList.remove('fx-burst');
+    void inst.el.offsetWidth;
+    inst.el.classList.add('fx-burst');
+    if (inst.particles) inst.particles.burst();
+  }
+
+  function startLoop(inst) {
+    inst.el.classList.add('is-looping');
+    var n = 7;
+    setFrame(inst, 7, 420);
+    var id = setInterval(function () {
+      if (S !== inst || inst.exiting || inst.errored) return;
+      n = n === 7 ? 8 : 7;
+      setFrame(inst, n, 460);
+    }, 950);
+    inst.timers.push(id);
+  }
+
+  function playIntro(inst) {
+    var steps = [
+      [0,    function () { setFrame(inst, 1, 60); }],
+      [650,  function () { setFrame(inst, 2, 40); burstFx(inst); }],
+      [940,  function () { setFrame(inst, 3, 50); }],
+      [1110, function () { setFrame(inst, 4, 50); }],
+      [1290, function () { setFrame(inst, 5, 70); }],
+      [1560, function () { startLoop(inst); }]
+    ];
+    steps.forEach(function (s) { later(inst, s[1], s[0]); });
+  }
+
+  /* ---------------- lifecycle ---------------- */
+  function start(opts) {
+    if (S) return S;
+    opts = opts || {};
+    var seen = false;
+    try { seen = sessionStorage.getItem(SEEN_KEY) === '1'; } catch (e) {}
+    var mode = (seen || reduced || opts.short) ? 'short' : 'full';
+    if (mode === 'full') { try { sessionStorage.setItem(SEEN_KEY, '1'); } catch (e) {} }
+
+    var inst = build(mode, reduced);
+    S = inst;
+    inst.minAt = inst.started + (mode === 'full' ? 2500 : 520);
+
+    var canvas = inst.el.querySelector('.hnl-canvas');
+    if (!reduced) inst.particles = createParticles(canvas, inst.el.querySelector('.hnl-stage'));
+
+    startRotation(inst);
+
+    if (reduced) {
+      setFrame(inst, 5, 200);
+    } else if (mode === 'full') {
+      var first = inst.frames[1];
+      var go = function () { if (S !== inst || inst.began) return; inst.began = true; if (inst.particles) inst.particles.start(); playIntro(inst); };
+      if (first && !first.complete) {
+        first.addEventListener('load', go, { once: true });
+        first.addEventListener('error', go, { once: true });
+        later(inst, go, 700);
+      } else { go(); }
+    } else {
+      if (inst.particles) inst.particles.start();
+      startLoop(inst);
+    }
+
+    later(inst, function () {
+      if (!inst.exiting) fail('The camp is taking longer than usual.', null);
+    }, WATCHDOG_MS);
+
+    return inst;
+  }
+
+  function destroy(inst) {
+    if (!inst) return;
+    clearTimers(inst);
+    if (inst.particles) inst.particles.stop();
+    if (inst.el.parentNode) inst.el.parentNode.removeChild(inst.el);
+    if (S === inst) S = null;
+    doc.classList.remove('hnl-lock');
+  }
+
+  function exit(inst, force) {
+    inst = inst || S;
+    if (!inst || inst.exiting) return;
+    inst.exiting = true;
+    clearTimers(inst);
+    inst.el.setAttribute('aria-busy', 'false');
+    inst.el.classList.remove('is-error');
+
+    if (inst.mode === 'full' && !inst.rm && inst.frames[6] && !force) {
+      setFrame(inst, 6, 70);
+      inst.el.classList.add('is-out');
+      setTimeout(function () { inst.el.classList.add('is-gone'); }, 520);
+      setTimeout(function () { destroy(inst); }, 520 + 440);
+    } else {
+      inst.el.classList.add('is-gone');
+      setTimeout(function () { destroy(inst); }, 360);
+    }
+  }
+
+  var checkTimer = 0;
+  function check() {
+    if (!S || S.exiting || S.leaving) return;
+    if (!shellReady || holds > 0) return;
+    var wait = S.minAt - Date.now();
+    clearTimeout(checkTimer);
+    if (wait > 0) { checkTimer = setTimeout(check, wait + 10); return; }
+    exit(S);
+  }
+
+  function clearError(inst) {
+    inst.errored = false;
+    inst.el.classList.remove('is-error');
+    inst.el.setAttribute('role', 'status');
+  }
+
+  function fail(message, retryFn) {
+    if (!S || S.exiting) return;
+    S.errored = true;
+    S.retry = retryFn || null;
+    S.el.querySelector('.hnl-error-text').textContent = message || 'Something went wrong around the campfire.';
+    S.el.classList.add('is-error');
+    S.el.setAttribute('aria-busy', 'false');
+    setFrame(S, S.frames[8] ? 8 : (S.frames[5] ? 5 : 7), 300);
+    var btn = S.el.querySelector('[data-hnl="retry"]');
+    if (btn) { try { btn.focus({ preventScroll: true }); } catch (e) {} }
+  }
+
+  /* ---------------- public API ---------------- */
+  function hold(label) {
+    holds++;
+    if (S && label) { S.customLabel = true; setLabel(S, label); }
+    var done = false;
+    return function release() {
+      if (done) return;
+      done = true;
+      holds = Math.max(0, holds - 1);
+      if (S) S.customLabel = false;
+      if (holds === 0) { clearTimeout(checkTimer); checkTimer = setTimeout(check, 120); }
+    };
+  }
+
+  function track(promise, label) {
+    var release = hold(label);
+    var p = Promise.resolve(promise);
+    p.then(release, release);
+    return p;
+  }
+
+  function ready() {
+    shellReady = true;
+    // small grace so page scripts can register their own holds right after initPage resolves
+    clearTimeout(checkTimer);
+    checkTimer = setTimeout(check, 260);
+  }
+
+  function leave() {
+    if (S && !S.exiting) return;
+    if (S) destroy(S);
+    var inst = build('short', reduced);
+    S = inst;
+    inst.leaving = true;
+    inst.el.classList.add('is-leaving');
+    setFrame(inst, reduced ? 5 : 7, 80);
+    startRotation(inst);
+    // safety: a cancelled navigation must never leave the page covered
+    later(inst, function () { destroy(inst); }, 3200);
+  }
+
+  function mini(text) {
+    var wrap = document.createElement('div');
+    wrap.className = 'hnl-mini';
+    wrap.setAttribute('role', 'status');
+    var logo = document.createElement('span');
+    logo.className = 'hnl-mini-logo';
+    var img = document.createElement('img');
+    img.src = BASE + 'frame-7.webp';
+    img.alt = '';
+    img.decoding = 'async';
+    logo.appendChild(img);
+    var label = document.createElement('span');
+    label.textContent = text || 'Loading…';
+    wrap.appendChild(logo);
+    wrap.appendChild(label);
+    return wrap;
+  }
+
+  window.HNLoader = { ready: ready, hold: hold, track: track, fail: fail, leave: leave, mini: mini, exit: function () { exit(S, true); } };
+
+  /* ---------------- boot ---------------- */
+  start();
+
+  // page restored from the back/forward cache: drop any leftover overlay
+  window.addEventListener('pageshow', function (event) {
+    if (event.persisted && S && S.leaving) destroy(S);
+  });
+
+  // same-origin link clicks: fade the loader in while the next page loads
+  document.addEventListener('click', function (event) {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    if (document.body && document.body.classList.contains('editor-mode')) return;
+    var a = event.target && event.target.closest ? event.target.closest('a[href]') : null;
+    if (!a || a.hasAttribute('download')) return;
+    if (a.target && a.target !== '_self') return;
+    var url;
+    try { url = new URL(a.href, location.href); } catch (e) { return; }
+    if (url.origin !== location.origin) return;
+    if (url.pathname === location.pathname && url.search === location.search) return;
+    leave();
+  });
+})();

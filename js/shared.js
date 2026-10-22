@@ -10,6 +10,11 @@ import {
 
 export const ENTERED_KEY = 'hnc_entered';
 
+// Keep the branded loader (js/loader.js) up while a page's own data loads; no-op if the loader is absent.
+export function trackLoad(promise, label) {
+  return window.HNLoader ? window.HNLoader.track(promise, label) : Promise.resolve(promise);
+}
+
 const NAV = [
   { id: 'campfire', href: 'home.html',     icon: 'campfire', label: 'Campfire' },
   { id: 'novels',   href: 'novels.html',   icon: 'novels', label: 'Novels' },
@@ -399,6 +404,9 @@ export async function initPage(options = {}) {
       window.location.replace('index.html');
     }
   });
+
+  // shell is built: the loader may leave once any tracked page data has settled
+  if (window.HNLoader) window.HNLoader.ready();
 
   return {
     user: session.user,
