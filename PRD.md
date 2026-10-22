@@ -3,7 +3,7 @@
 > **Document type:** Product Requirements Document (PRD)  
 > **Product:** Hollow Night Camp  
 > **Document status:** Working specification  
-> **Audit basis:** `Hollow-Night-Camp-main (10).zip` supplied on 2026-10-21, cross-checked against the current project conversation  
+> **Audit basis:** `Hollow-Night-Camp-main (12).zip` supplied on 2026-10-21, cross-checked against the current project conversation  
 > **Primary maintainer:** Kazu Alther  
 > **Repository:** https://github.com/KazuAlther7/Hollow-Night-Camp  
 > **Deployment reference:** Cloudflare Worker URL `https://hollow-night-camp.kazualtr.workers.dev/` (configured in Supabase Auth Redirect URLs per project progress). The repository README still references GitHub Pages; canonical production domain and final deployment routing should be verified.
@@ -77,11 +77,11 @@ The statuses below describe what is evidenced by the supplied ZIP's source code.
 | Novel Ratings (aggregate of chapter votes) | **IMPLEMENTED IN SOURCE / VERIFY** | `js/rating.js` and `js/novels.js` include novel rating mounting. |
 | Chapter import from TXT / DOCX / text-based PDF | **DONE in source / VERIFY** | `js/import.js` parses supported formats (5 MB limit). |
 | Latest Chapter section | **PARTIAL / VERIFY** | Homepage author controls present; confirm reader-facing latest-published-chapter section. |
-| Global branded loading animation | **NOT STARTED** | Logo-led branded loading experience. |
+| Global branded loading animation | **PARTIAL / VERIFY** | `assets/loader/` contains multiple WebP frames and `css/loader.css`, `js/loader.js` exist. Verify integration, transitions, error cleanup, and reduced-motion behavior on every route. |
 | Background music and sound effects controls | **NOT STARTED** | Separate Music and SFX controls; assets under `assets/sound/`. |
-| Realtime online readers count | **NOT STARTED** | Live count of active reader sessions via Supabase Realtime Presence. |
-| Realtime flip-style digital clock | **NOT STARTED** | Retro folding desk-clock layout with selectable timezone. |
-| Global Settings gear dropdown | **PARTIAL / VERIFY** | Global dropdown trigger; expanding into dedicated settings destinations. |
+| Realtime online readers count | **IMPLEMENTED IN SOURCE / VERIFY** | `js/status-widget.js` uses Supabase Realtime Presence channel `camp-online`; verify production Realtime config, duplicate-tab behavior, stale-session cleanup, and privacy. |
+| Realtime flip-style digital clock | **IMPLEMENTED IN SOURCE / VERIFY** | `js/status-widget.js` and `settings-clock.html` implement a timezone-aware 24-hour retro flip clock; verify saved timezone behavior and reduced motion. |
+| Global Settings gear dropdown | **IMPLEMENTED IN SOURCE / VERIFY** | Shared Settings dropdown exists in `js/shared.js`; verify keyboard, focus, mobile placement, and route coverage. |
 | Volumes / arcs and chapter list | **PARTIAL / VERIFY** | Verify full grouping/reordering experience. |
 | Theories page | **IMPLEMENTED IN SOURCE / VERIFY** | `theories.html` and `js/theories.js` implement theory list/detail, categories, posting and replies. |
 | Theory posts, replies and cloud persistence | **IMPLEMENTED IN SOURCE / VERIFY** | Verify rate limits, persistence, and policies. |
@@ -90,15 +90,21 @@ The statuses below describe what is evidenced by the supplied ZIP's source code.
 | D&D-style dice roll and games | **NOT STARTED** | No playable dice simulation or arcade game present. |
 | Camp Rank, EXP and levels | **NOT STARTED** | 12-tier progression system (§5.22). |
 | Reading streak and Night Owl badge | **NOT STARTED** | Three consecutive reading days → Night Owl badge (§5.22). |
-| Daily Campfire check-in and Ember wallet | **NOT STARTED** | Ember is the primary in-platform currency (§5.22). |
-| Camp Challenge author menu | **NOT STARTED** | Dedicated Main Bar menu + Author CRUD + Ember rewards (§5.23). |
+| Daily Campfire check-in and Amber wallet | **NOT STARTED** | Amber is the primary in-platform currency (§5.22). |
+| Camp Challenge author menu | **NOT STARTED** | Dedicated Main Bar menu + Author CRUD + Amber rewards (§5.23). |
 | Category leaderboards and monthly reset | **NOT STARTED** | Top Theorist / Top Reader / Top Arcade Player (§5.24). |
 | Author Analytics Dashboard | **NOT STARTED** | All instrumented insights (§5.25). |
+| AI Camp Staff assistant | **NOT STARTED** | No Cloudflare Worker source or chat assistant implementation found in ZIP; §5.27. |
+| Personal Cabin | **NOT STARTED** | No cabin page, SVG room renderer, or cabin item tables found; §5.28. |
+| Ambience Mixer | **NOT STARTED** | No `assets/sound/ambience/` assets or mixer implementation found; §5.29. |
+| Character Relationship Graph | **NOT STARTED** | Character pages exist, but no relationship graph/schema with spoiler-aware reveal filtering found; §5.30. |
+| Digital Letters | **NOT STARTED** | No letter authoring, delivery, inbox, or archive workflow found; §5.31. |
+| Amber currency icon | **NOT STARTED** | No Amber currency asset found; requested future path `assets/icon/` differs from current `assets/icons/` convention. |
 | Badge assets | **NOT STARTED** | 12 Camp Rank + Night Owl badges under `assets/badges/` (§5.22). |
 | Settings: profile details | **DONE (core profile) / VERIFY** | Profile form and save feedback exist. |
 | Settings: theme and language | **NOT STARTED** | System / Light / Dark + EN / ID. |
 | Notification bell / notification center | **PARTIAL** | Bell icon exists; center not implemented. |
-| Reading history and bookmarks | **NOT STARTED** | No persistent reading progress or bookmark workflow found. |
+| Reading history and bookmarks | **IMPLEMENTED IN SOURCE / VERIFY** | `js/reading.js`, `js/history.js`, `settings-history.html`; tables and RLS must be verified in Supabase. |
 | Help / FAQ / bug reports | **NOT STARTED** | No complete in-site support workflow. |
 | Community social links | **NOT STARTED / VERIFY** | Not implemented as a complete Settings section. |
 | FireWatcher easter egg / inspectable location | **NOT STARTED** | No interactive inspection system found. |
@@ -170,7 +176,7 @@ A Reader is a registered community member who can use reader-facing features.
 - Create and participate in theory discussions, subject to community rules.
 - Play available arcade games.
 - Participate in Camp Challenge and view Leaderboards (§5.23, §5.24).
-- Earn EXP, level up through Camp Rank tiers, maintain a reading streak, and collect Ember (§5.22).
+- Earn EXP, level up through Camp Rank tiers, maintain a reading streak, and collect Amber (§5.22).
 - Edit their own nickname, bio, and profile picture.
 - Manage their own theme, language, notifications, reading history, and bookmarks when those features are implemented.
 - Sign in and sign out.
@@ -181,7 +187,7 @@ A Reader is a registered community member who can use reader-facing features.
 - Change their own account role to Author.
 - Modify other users' profiles or data.
 - Access author-only content-management operations, Author Studio, Author leaderboard controls, or the Author Analytics Dashboard.
-- Award themselves EXP, Ember, badges, or leaderboard placement directly.
+- Award themselves EXP, Amber, badges, or leaderboard placement directly.
 
 ### 3.2 Author / Site Owner
 
@@ -218,12 +224,12 @@ The primary navigation should contain:
 2. **Novels** — story library and world-building content.
 3. **Theories** — community investigation board.
 4. **Corners Arcade** — games and dice simulation.
-5. **Camp Challenge** — Author-managed community challenges with Ember rewards (§5.23). Dedicated menu item required.
+5. **Camp Challenge** — Author-managed community challenges with Amber rewards (§5.23). Dedicated menu item required.
 6. **Leaderboards** — Top Theorist / Top Reader / Top Arcade Player, monthly (§5.24). Dedicated menu item required.
 7. **Settings** — global gear-button dropdown, opens in place on any page; submenu links to dedicated settings sections.
 8. **Author Studio** — visible only to Author accounts.
 9. **Notifications** — bell icon and notification center.
-10. **Account / Profile** — profile shortcut, Camp Rank badge, Ember balance, sign-out action.
+10. **Account / Profile** — profile shortcut, Camp Rank badge, Amber balance, sign-out action.
 
 Settings and Notifications may remain utility controls beside the main navigation. Camp Challenge and Leaderboards should be primary destinations where space permits, and must remain reachable on mobile via the scrollable Main Bar or the sidebar mode.
 
@@ -594,7 +600,7 @@ The Arcade page should contain playable games rather than a "Coming soon" placeh
 - Bio
 - Profile picture: upload / replace / remove
 - Account role (read-only)
-- Camp Rank badge and current Ember balance (read-only)
+- Camp Rank badge and current Amber balance (read-only)
 - Save profile
 - Sign in / sign out
 
@@ -792,12 +798,12 @@ Minimum level for each named rank. Levels between thresholds retain the previous
 - Missing a calendar day resets active streak; longest streak remains as profile statistic.
 - Prevent duplicate awards during retries, parallel requests, and timezone/day-boundary changes.
 
-#### Daily Campfire check-in and Ember
+#### Daily Campfire check-in and Amber
 - Daily check-in action in Campfire area.
-- Successful check-in grants **Ember**, the **primary in-platform currency of Hollow Night Camp**. Ember is intended to unlock future items or experiences; redemption catalog and prices deferred.
+- Successful check-in grants **Amber**, the **primary in-platform currency of Hollow Night Camp**. Amber is intended to unlock future items or experiences; redemption catalog and prices deferred.
 - No more than once per calendar day; duplicate clicks and retries must not create extra currency.
 - Show claim result, current balance, and next eligible check-in.
-- Ember is non-cash, in-platform reward currency with no real-world value or cash-out.
+- Amber is non-cash, in-platform reward currency with no real-world value or cash-out.
 
 #### Badge assets and naming convention
 - Custom badge art authored later, stored under `assets/badges/`.
@@ -811,8 +817,8 @@ Minimum level for each named rank. Levels between thresholds retain the previous
 - [ ] Tier list renders exactly the 12 documented ranks at documented thresholds.
 - [ ] Repeated refreshes or reopening same chapter does not grant duplicate EXP.
 - [ ] Three consecutive qualifying reading days award Night Owl exactly once.
-- [ ] Daily check-in grants Ember at most once per calendar day.
-- [ ] Reader cannot set own EXP, level, streak, or Ember balance via client.
+- [ ] Daily check-in grants Amber at most once per calendar day.
+- [ ] Reader cannot set own EXP, level, streak, or Amber balance via client.
 - [ ] Missing badge images render text fallback.
 
 ### 5.23 Camp Challenge
@@ -823,7 +829,7 @@ Minimum level for each named rank. Levels between thresholds retain the previous
 
 Author capabilities:
 - Create, edit, publish, unpublish, schedule, archive challenges.
-- Define title, description, instructions, start/end time, eligibility, completion criteria, Ember reward.
+- Define title, description, instructions, start/end time, eligibility, completion criteria, Amber reward.
 - Review participation and completion records.
 - Cancel challenge with clear reason and reward policy.
 - Manage challenge availability without affecting reader progression data.
@@ -832,19 +838,19 @@ Reader capabilities:
 - Browse active, upcoming, completed challenges.
 - View requirements, time remaining, reward, progress.
 - Submit or trigger completion via validated workflow.
-- See completion history and Ember rewards.
+- See completion history and Amber rewards.
 
 System requirements:
 - Completion validated server-side; never trust client `completed=true`.
 - Each user receives reward only once per challenge unless explicitly repeatable.
-- Award Ember through same auditable ledger as daily check-in.
+- Award Amber through same auditable ledger as daily check-in.
 - Enforce author permissions and RLS.
 - Loading, empty, success, error states.
 - Camp Challenge menu appears correctly for eligible roles even with no published challenges.
 
 Acceptance criteria:
 - [ ] Author can publish challenge appearing to Readers via Camp Challenge menu.
-- [ ] Reader can complete eligible challenge receiving Ember reward once.
+- [ ] Reader can complete eligible challenge receiving Amber reward once.
 - [ ] Repeated requests / concurrent submissions cannot duplicate rewards.
 - [ ] Unpublished / future challenges not exposed as active.
 
@@ -868,7 +874,7 @@ Rules and safeguards:
 - Preserve past-period results as archive.
 
 #### Monthly rewards and Author controls
-- Eligible winners receive configured badge and Ember reward.
+- Eligible winners receive configured badge and Amber reward.
 - **Author-only leaderboard management menu accessible both from Author Studio AND from a control panel on Leaderboards page.** Author can preview current month, inspect results, trigger/finalize settlement, adjust reward amounts per rank, issue or correct rewards through audited workflow.
 - Explicit reset/close action for active period; never silently erase historical results or reward records.
 - Prefer automated boundaries plus Author-controlled finalization over destructive manual clearing.
@@ -896,9 +902,9 @@ Initial analytics:
 - **Reading completion:** completed chapters and rates where instrumented.
 - **Reader engagement:** daily/weekly active readers and retention.
 - **Community insights:** theory counts, likes, replies.
-- **Challenge / reward insights:** participation, completion, Ember rewards.
+- **Challenge / reward insights:** participation, completion, Amber rewards.
 - **Arcade insights:** plays and validated scores.
-- **Gamification insights:** rank distribution, streak length distribution, Ember in circulation, daily check-in rate, monthly leaderboard participation.
+- **Gamification insights:** rank distribution, streak length distribution, Amber in circulation, daily check-in rate, monthly leaderboard participation.
 - **Data coverage:** explicit section listing unavailable metrics with reason and delivery phase.
 
 Privacy and correctness:
@@ -928,7 +934,7 @@ Recommended logical entities:
 - `reader_progress`: EXP total, level/rank derivation, current/longest streak, last qualifying reading date
 - `badge_definitions`: stable key, title, description, optional asset path
 - `user_badges`: user/badge award record, source event, timestamp
-- `ember_ledger`: append-only credit/debit transactions with source type/ID, amount, timestamp, idempotency key
+- `amber_ledger`: append-only credit/debit transactions with source type/ID, amount, timestamp, idempotency key
 - `daily_checkins`: one record per user per eligible day
 - `camp_challenges`: author-managed definitions and publication schedule
 - `challenge_participation`: user status, progress, completion time, reward settlement status
@@ -939,12 +945,171 @@ Recommended logical entities:
 Security requirements:
 - Enable RLS on exposed tables with exact Reader/Author model.
 - Constraints, unique indexes, trusted RPCs for one-per-day check-ins, unique badge awards, idempotent reward settlement.
-- Never trust browser-submitted EXP, Ember, leaderboard totals, challenge completion, winner status.
+- Never trust browser-submitted EXP, Amber, leaderboard totals, challenge completion, winner status.
 - Do not expose service-role credentials.
 - Keep transaction trail for corrections; never silently overwrite/delete economy history.
 - Test unauthorized reads/writes and concurrent duplicates before release.
 
 ---
+
+
+
+### 5.27 AI Camp Staff — lore-aware reader assistant
+
+**Priority: P2 — planned; not implemented in the supplied ZIP**
+
+A conversational AI assistant called **Camp Staff** answers reader questions about the Hollow Night Camp website, published story content, characters, locations, and community guidelines. It should feel like an in-universe keeper of a hidden underground library rather than a generic support chatbot.
+
+#### Persona and knowledge
+- Define a detailed `systemPrompt` in a server-side Cloudflare Worker. Persona example: an enigmatic keeper of the underground library who treats fan theories as closely guarded secrets.
+- Persona is flavor, not a reason to invent canon. The assistant must distinguish official published lore, reader theories, and speculation.
+- Provide only content the reader is authorized to see. Never reveal unpublished chapters, author-only notes, secrets marked for future chapters, private profiles, or moderation data.
+- If no verified source supports an answer, say it is unknown or present it explicitly as a theory.
+- Keep prompt instructions and provider secrets server-side; never put secret AI API keys in browser code.
+- Prefer retrieval from published novels, chapters, character/location entries, and approved FAQs. Include source chapter/entry links when feasible.
+- Apply input/output limits, abuse protection, timeout handling, and clear fallback errors.
+
+#### Free-first implementation
+- Target a $0 operating-cost design initially, using a provider/Cloudflare Worker route with a currently available free tier or free model where eligible.
+- **Free does not mean unlimited:** provider quotas, rate limits, context limits, model availability, and Cloudflare limits may change. Confirm current terms before selecting a provider; show a graceful quota-exceeded state and never promise unlimited free responses.
+- Keep a provider adapter so the model can be replaced without rewriting the chat UI.
+- Enforce per-user/IP/session rate limits and message-size limits at the Worker. Avoid logging sensitive chat content unnecessarily.
+- Never silently fall back to a paid model or create billable usage without explicit owner approval.
+- If the Worker is unavailable, show a retry option and links to relevant site sections.
+
+#### Conversation memory
+- Store the last 5–10 message turns in browser `localStorage` and send that bounded history with each request, after validating length and structure.
+- Provide a clear-chat control; document that browser-local history is not shared across devices and can be cleared by the user.
+- Do not treat client-supplied conversation history as trusted facts or instructions. Server system policy always takes precedence.
+- Avoid storing passwords, access tokens, or sensitive personal data in chat history.
+
+#### Immersive response feedback
+- When Camp Staff replies, optionally play a short crackling-fire or whisper-style effect from `assets/sound/` (preferred subfolder: `assets/sound/ai/`).
+- Optional subtle vibration on supported mobile devices may use the browser vibration API only after user interaction and only if supported. Include a setting to disable it; do not vibrate continuously.
+- Respect the global SFX toggle and SFX volume. Audio must not autoplay before a user gesture and must fail gracefully when assets are missing.
+- Include visible typing/loading state, accessible live announcement for new responses, keyboard support, and reduced-motion behavior.
+
+#### Acceptance criteria
+- [ ] Reader can open Camp Staff and receive a response through a server-side Worker without exposing provider secrets.
+- [ ] Assistant answers based on published/approved lore and labels uncertainty/theories accurately.
+- [ ] Last 5–10 turns are sent as bounded context and can be cleared.
+- [ ] Unpublished and author-only information cannot be retrieved by a Reader.
+- [ ] Provider quota/rate limit/outage returns a friendly non-blocking error.
+- [ ] No paid fallback occurs without explicit owner approval.
+- [ ] Sound/vibration feedback is optional, accessible, and respects user preferences.
+
+### 5.28 Personal Cabin — customizable reader space
+
+**Priority: P2 — planned; not implemented in the supplied ZIP**
+
+Each reader has a **Personal Cabin**: a small, shareable digital room that represents their reading identity. It is a visual profile space, not merely a conventional profile table.
+
+#### Interactive cabin
+- Cabin includes slot-based customization for **wallpaper, lighting, bookshelf, floor, and decorations**.
+- Render the room using responsive SVG-based scene composition so items remain crisp and interactive across screen sizes.
+- Clicking the bookshelf opens chapters the reader has completed or saved, respecting the reader's privacy settings.
+- Clicking a decorative item opens its lore/item description.
+- Clicking the cabin door returns to Campfire.
+- Provide separate **Public View** and **Edit Mode**. Public View uses a shareable URL with a stable, non-sensitive public identifier; private account data must not appear in the URL.
+- Allow the owner to preview before saving and reset to a default cabin.
+
+#### Item catalog and ownership
+- `cabin_items`: catalog of items with stable ID, name, description/lore, asset path, slot type, unlock method, price in Amber if applicable, and availability.
+- `user_cabin_items`: ownership/equipped placement. Minimum logical fields: `user_id`, `item_id`, `slot`, `position`; add stable IDs, timestamps, rotation/layer where needed.
+- Unlock sources may include Amber purchases, challenges, badges, or special Author grants.
+- Validate slot compatibility, ownership, item availability, and Amber balance server-side. Purchase and equip actions must not allow negative balance or duplicate charges.
+- Asset convention: create an organized cabin asset directory when artwork is ready (e.g. `assets/cabin/`); do not assume the directory exists in the current repository.
+- Public view must hide private bookshelf/progress details unless the owner explicitly enables sharing.
+
+#### Acceptance criteria
+- [ ] Reader can customize supported slots and reload without losing saved layout.
+- [ ] Server/database validates item ownership and Amber purchases.
+- [ ] Public share URL displays only explicitly public cabin information.
+- [ ] Interactive shelf, item lore, and door actions work with keyboard/touch as well as pointer.
+- [ ] SVG scene remains responsive and accessible.
+
+### 5.29 Ambience Mixer — personalized reading soundscape
+
+**Priority: P2 — planned; not implemented in the supplied ZIP**
+
+A compact ambience panel lets readers blend three independent loop channels while reading:
+1. 🔥 Campfire
+2. 🌧️ Rain
+3. 🐺 Forest sounds
+
+#### Controls and behavior
+- Three vertical sliders, each with channel icon/label, accessible numeric value, mute/zero state, and independent gain.
+- Presets: **Cozy Night**, **Storm Reading**, **Silent Forest**. Presets set channel levels, not override a user's global mute preference.
+- A clear global mute button immediately silences all channels.
+- Assets should be organized under `assets/sound/ambience/`; audio files are not present in the supplied ZIP.
+- Use Web Audio API gain nodes for independent mixing where supported; provide a simpler HTMLAudioElement fallback if practical.
+- Start playback only after an explicit user gesture. Loop assets efficiently and release/pause audio when leaving reading mode or when the document is hidden, according to documented behavior.
+- Persist mix preferences in `localStorage` for guests and optionally sync signed-in preferences through `user_preferences`.
+- Respect global SFX/music preferences without conflating ambience with short SFX; define a separate ambience toggle/volume if necessary.
+- Missing files, unsupported Web Audio APIs, or playback rejection must not break reading.
+
+#### Acceptance criteria
+- [ ] Each of the three channels can be adjusted independently.
+- [ ] Presets and global mute work consistently.
+- [ ] Mix settings persist locally and optionally sync for signed-in readers.
+- [ ] No audio starts before user gesture; mobile autoplay restrictions handled.
+- [ ] Sliders work with keyboard, screen readers, and touch.
+
+### 5.30 Character Relationship Graph — spoiler-aware relationship map
+
+**Priority: P2 — planned; not implemented in the supplied ZIP**
+
+On character detail pages, display an interactive graph of character relationships authored and curated by the Author.
+
+#### Relationship data and author workflow
+- Proposed table: `character_relationships` with at least `id`, `from_character_id`, `to_character_id`, `relationship_type`, `description`, `revealed_in_chapter_id` (or equivalent ordered reveal index), timestamps, and publication state.
+- Relationship types may include family, friendship, rivalry/enmity, romance, alliance, and secret. Author controls the type and description.
+- Author can create, edit, and remove relationship edges through an authorized management UI.
+- Use lightweight custom SVG or a small maintained graph library; prefer SVG if it meets interaction and accessibility needs.
+- Nodes link to character detail pages. Hover/focus displays a short tooltip; touch opens a detail popover.
+
+#### Spoiler protection
+- Filter edges against the signed-in user's reading progress and the chapter in which the relationship is revealed.
+- Never send unrevealed spoiler descriptions to the client and merely hide them with CSS; filter at the query/API boundary.
+- For guests or users with no reading progress, apply a documented conservative spoiler policy (default: show only relationships revealed in the earliest public chapters or let the user choose a spoiler-safe mode).
+- Add a visible spoiler warning and allow the reader to reveal eligible spoiler content intentionally.
+- Avoid graph layout that reveals hidden relationships indirectly through unexplained nodes/edges.
+
+#### Acceptance criteria
+- [ ] Author-managed relationship edges persist with correct character and reveal-chapter links.
+- [ ] Reader sees only relationships allowed by their reading progress/spoiler settings.
+- [ ] Unrevealed relationship data is not present in unauthorized client responses.
+- [ ] Graph is navigable by keyboard/touch and has a text-list fallback.
+- [ ] Empty states and characters without relationships render cleanly.
+
+### 5.31 Digital Letters — in-universe character mail
+
+**Priority: P2 — planned; not implemented in the supplied ZIP**
+
+Readers may receive fictional letters from characters in an inbox/notification area. Letters can deliver clues, backstory, event greetings, or brief in-universe messages.
+
+#### Author controls and delivery triggers
+- Proposed `letters` table: `id`, `author_created`, `character_id` (optional), `title`, `letter_html` or sanitized structured content, `trigger_condition`, `trigger_chapter_id` (optional), `scheduled_at` (optional), publication state, timestamps.
+- Author can draft, preview, schedule, publish, and archive letters and configure eligible trigger conditions.
+- Initial trigger types: reader completes a specified published chapter, or a specified date/event occurs.
+- Ensure trigger processing is idempotent; a reader should not receive duplicate copies from refreshes or repeated events.
+- Proposed delivery/archive table should record `user_id`, `letter_id`, delivered/read timestamps, and delivery source. Keep a Letter Archive accessible from the reader's profile.
+- Do not send letters containing spoilers before the reader qualifies. Check chapter progress server-side.
+
+#### Letter presentation
+- Display in an inbox/notification panel and open in a modal with a gentle unfolding animation.
+- Visual style: handwriting-like SVG details, readable cursive font, subtle paper folds and coffee marks. Keep text contrast high and avoid overdecorating the text area.
+- Respect reduced-motion preferences; offer a static opening mode.
+- Sanitize any Author-authored HTML using a strict allowlist or use structured content instead of arbitrary HTML.
+- Allow marking read and revisiting letters in the archive. Define whether letters can be deleted by the reader.
+
+#### Acceptance criteria
+- [ ] Author can create and configure a letter and preview its rendering.
+- [ ] Eligible reader receives the letter once when its trigger condition is met.
+- [ ] Spoiler eligibility is enforced server-side.
+- [ ] Letter can be opened, marked read, and revisited in the archive.
+- [ ] HTML sanitization, keyboard support, and reduced-motion behavior are tested.
+
 
 ## 6. Visual and Interaction Design
 
@@ -963,7 +1128,7 @@ Security requirements:
 - Each badge combines a symbol with the rank name; reads clearly at 24–32 px (comments) and 64–96 px (profile).
 - Badge files use kebab-case under `assets/badges/`.
 - Until artwork is ready, show **text-only badge pill** with rank name in a neutral ring; never show broken image.
-- Ember represented with small flame glyph; balance visible next to Camp Rank in profile header and Main Bar account chip.
+- Amber represented with small flame glyph; balance visible next to Camp Rank in profile header and Main Bar account chip.
 
 ### Interface principles
 
@@ -987,7 +1152,7 @@ Security requirements:
 - Supabase JavaScript client v2 loaded from `esm.sh`
 - Supabase Auth and profile queries
 - CSS / JavaScript parallax with background image and depth map
-- Planned: shared loader animation, browser audio controls for `assets/sound/`, Supabase Realtime Presence for online-session counts, timezone-aware client clock, shared Settings dropdown, Camp Rank / Ember / Challenge / Leaderboard / Analytics systems (§5.22–§5.26)
+- Planned: shared loader animation, browser audio controls for `assets/sound/`, Supabase Realtime Presence for online-session counts, timezone-aware client clock, shared Settings dropdown, Camp Rank / Amber / Challenge / Leaderboard / Analytics systems (§5.22–§5.26)
 
 ### Proposed responsibilities
 
@@ -995,7 +1160,7 @@ Security requirements:
 | --- | --- |
 | Static frontend | Page layout, responsive UI, interaction states, navigation |
 | Supabase Auth | Registration, login, session handling, logout |
-| Supabase Postgres | Novels, chapters, world-building, theories, replies, notifications, preferences, bookmarks, reading history, EXP, Ember, badges, challenges, leaderboards, analytics events |
+| Supabase Postgres | Novels, chapters, world-building, theories, replies, notifications, preferences, bookmarks, reading history, EXP, Amber, badges, challenges, leaderboards, analytics events |
 | Supabase Storage | Novel covers, profile pictures, map images, character art, location images, badge assets |
 | Supabase RLS | Enforce ownership, visibility, permissions, reward/ranking integrity |
 | Hosting platform | Serve frontend over HTTPS, deploy repository changes |
@@ -1045,7 +1210,7 @@ Static frontend generally does not need a build command unless a build tool is i
 - `reader_progress`
 - `badge_definitions`
 - `user_badges`
-- `ember_ledger`
+- `amber_ledger`
 - `daily_checkins`
 - `camp_challenges`
 - `challenge_participation`
@@ -1053,6 +1218,12 @@ Static frontend generally does not need a build command unless a build tool is i
 - `leaderboard_snapshots`
 - `analytics_events`
 - Realtime Presence channel/configuration for aggregate online sessions.
+- `cabin_items`
+- `user_cabin_items`
+- `character_relationships`
+- `letters`
+- `user_letters` (delivery/read/archive state)
+- `camp_staff_conversations` only if server-side conversation persistence is later chosen; browser-local history is the initial default.
 
 Each table uses stable IDs, timestamps, explicit relationships, indexes.
 
@@ -1067,7 +1238,7 @@ Each table uses stable IDs, timestamps, explicit relationships, indexes.
 - Validate input and file uploads; limit size and content types.
 - Render user content safely; prevent script injection.
 - Confirm Storage policies.
-- Validate all EXP, Ember, badge, challenge, and leaderboard writes through trusted RPCs or database functions — never trust the client.
+- Validate all EXP, Amber, badge, challenge, and leaderboard writes through trusted RPCs or database functions — never trust the client.
 - Test with Reader, Author, and unauthenticated sessions.
 
 ---
@@ -1087,7 +1258,7 @@ Each table uses stable IDs, timestamps, explicit relationships, indexes.
 - Do not rely on color alone.
 - Reduced-motion behavior for parallax and dice animations.
 - Form labels associated with inputs; errors/success announced to assistive tech.
-- Badge and Ember displays include accessible text descriptions.
+- Badge and Amber displays include accessible text descriptions.
 
 ### Reliability
 - Loading, empty, error, success states on data-driven pages.
@@ -1095,7 +1266,7 @@ Each table uses stable IDs, timestamps, explicit relationships, indexes.
 - Confirm destructive actions.
 - Preserve unsaved editor text on save failure.
 - Graceful handling of missing Supabase data.
-- Gamification and economy endpoints idempotent; no duplicate EXP, Ember, badges.
+- Gamification and economy endpoints idempotent; no duplicate EXP, Amber, badges.
 
 ### Compatibility
 - Support current major mobile and desktop browsers.
@@ -1123,7 +1294,7 @@ Each table uses stable IDs, timestamps, explicit relationships, indexes.
 - [x] Supabase project URL and publishable client key configured.
 - [x] `profiles` table created; profile save behavior confirmed.
 - [x] Cloudflare Worker URL added to Supabase Auth Redirect URLs.
-- [ ] Shared logo-led loading animation with error/reduced-motion states.
+- [x] Loader assets and loader implementation files exist; [ ] verify complete global integration, error/reduced-motion states.
 - [ ] Production sign-up, email verification, login, logout, session persistence verified end-to-end.
 - [ ] RLS and Storage policies tested with Reader, Author, signed-out sessions.
 - [ ] Canonical production domain and repeatable deployment workflow confirmed.
@@ -1137,8 +1308,8 @@ Each table uses stable IDs, timestamps, explicit relationships, indexes.
 - [x] Chapter editor with metadata and word count.
 - [x] Save-draft and publish actions in source.
 - [x] Reader-facing chapter page and navigation.
-- [ ] Chapter Ratings with five d20 icons; one current vote per reader; fractional fill; realtime aggregates.
-- [ ] Weighted Novel Ratings with realtime updates and DB-enforced uniqueness / RLS.
+- [x] Chapter Ratings d20 UI and rating helpers present in source; [ ] verify schema, one-vote enforcement, fractional fill, realtime aggregates.
+- [x] Novel rating helpers present in source; [ ] verify weighted aggregation, realtime updates, uniqueness, and RLS.
 - [x] Chapter import for TXT, DOCX, text-based PDF with review before draft creation.
 - [ ] Database schema, RLS, published-only visibility, Storage bucket policies, cross-session persistence verified.
 - [ ] Latest-published-chapter section on Campfire homepage verified.
@@ -1177,7 +1348,7 @@ Each table uses stable IDs, timestamps, explicit relationships, indexes.
 - [x] Reading history and bookmarks (`js/reading.js`, `js/history.js`; tables `bookmarks`, `reading_progress`).
 - [ ] Help / FAQ, support feedback, Community social links.
 - [x] Global Settings gear dropdown available in place on every applicable page.
-- [ ] Music and SFX enable/disable and volume controls backed by `assets/sound/`.
+- [ ] Music and SFX enable/disable and independent volume controls backed by `assets/sound/` (no `assets/sound/` directory in supplied ZIP).
 - [x] Persisted timezone selection and retro neon split-flap clock UI.
 
 **Current exit status: PARTIAL.**
@@ -1185,11 +1356,11 @@ Each table uses stable IDs, timestamps, explicit relationships, indexes.
 ### Phase 4B — Camp Rank, rewards, challenges, leaderboards, and analytics
 - [ ] EXP events, rank calculation, streak day boundary, Night Owl award rules defined.
 - [ ] Camp Rank profile display and server-validated activity tracking.
-- [ ] Daily Campfire check-in and append-only Ember ledger.
+- [ ] Daily Campfire check-in and append-only Amber ledger.
 - [ ] `assets/badges/` created with 12-rank list and Night Owl naming convention.
-- [ ] Dedicated **Camp Challenge** menu, Author CRUD, Reader flow, server-side completion validation, Ember rewards.
+- [ ] Dedicated **Camp Challenge** menu, Author CRUD, Reader flow, server-side completion validation, Amber rewards.
 - [ ] Dedicated **Leaderboards** menu with Top Theorist, Top Reader, Top Arcade Player.
-- [ ] Monthly archive, Author-controlled leaderboard management (reachable from Leaderboards page), idempotent badge/Ember rewards.
+- [ ] Monthly archive, Author-controlled leaderboard management (reachable from Leaderboards page), idempotent badge/Amber rewards.
 - [ ] Author Analytics Dashboard covering ALL instrumented insights with explicit "not yet instrumented" labels.
 - [ ] RLS, abuse prevention, idempotency, privacy review, concurrency tests for every reward/ranking flow.
 
@@ -1217,6 +1388,18 @@ Each table uses stable IDs, timestamps, explicit relationships, indexes.
 **Current exit status: PARTIAL.**
 
 ---
+
+
+### Phase 5 — Immersion and personalized reader spaces
+- [ ] AI Camp Staff Worker integration, lore retrieval, bounded local conversation history, free-tier quota handling, and optional sound/vibration.
+- [ ] Personal Cabin with slot-based customization, item catalog, Amber unlocks, and public/private view modes.
+- [ ] Ambience Mixer with campfire/rain/forest channels, presets, global mute, and persisted preferences.
+- [ ] Character Relationship Graph with Author management and server-side spoiler filtering.
+- [ ] Digital Letters with Author composer, trigger delivery, unfold modal, and Letter Archive.
+- [ ] Amber currency icon and final asset path convention decided.
+- [ ] RLS, validation, idempotency, accessibility, and mobile behavior tested for all new systems.
+
+**Current exit status: NOT STARTED (requirements documented; implementation not present in supplied ZIP).**
 
 ## 10. Definition of Done
 
@@ -1254,7 +1437,7 @@ A feature is complete only when all relevant conditions are met:
 14. **Clock format:** 24-hour mandatory or user choice? Default proposal: 24-hour.
 15. **EXP schedule:** Amounts per qualifying action; which actions eligible?
 16. **Streak timezone:** Reader's timezone or platform-wide? Prevent retroactive timezone changes from granting extra days.
-17. **Ember economy:** What will Ember unlock? Costs? Rewards expire? Keep undecided until first reward catalog designed.
+17. **Amber economy:** What will Amber unlock? Costs? Rewards expire? Keep undecided until first reward catalog designed.
 18. **Challenge verification:** Which types auto-validated vs Author review?
 19. **Monthly leaderboard settlement:** Timezone, tie-breakers, reward amounts per category?
 20. **Analytics privacy:** Minimum aggregation threshold and retention period for reading-hour and engagement analytics?
@@ -1267,7 +1450,7 @@ A feature is complete only when all relevant conditions are met:
 
 ## 12. Source Audit Notes
 
-Update based on `Hollow-Night-Camp-main (10).zip` and implementation files:
+Update based on `Hollow-Night-Camp-main (12).zip` and implementation files:
 
 - `index.html`, `js/login.js`: login / registration interface and form flow.
 - `js/auth.js`: Supabase Auth, session observation, profile retrieval and updates.
@@ -1305,4 +1488,20 @@ Planned only, not implemented in supplied ZIP: (1) custom logo-led loading anima
 
 ### Camp Rank / gamification requirements recorded on 2026-10-21
 
-Planned only, not implemented in supplied ZIP: **12-tier Camp Rank** (Wanderer → Camper → Story Seeker → Clue Hunter → Night Reader → Theorist → Hollow Investigator → Fire Watcher → Hollow Watcher → Hollow Flame → The UnderReader → Hollow Legend), EXP and levels, three-day Night Owl streak badge, daily Campfire check-in and **Ember as the primary in-platform currency**, **dedicated Camp Challenge menu** with Author-managed challenges and Ember rewards, **dedicated Leaderboards menu** with Top Theorist / Top Reader / Top Arcade Player categories, monthly period settlement, Author-controlled leaderboard management, and **Author Analytics Dashboard** surfacing all instrumented insights. Custom badge art planned for `assets/badges/` with kebab-case naming. Requirements, controls, acceptance criteria, and data entities in §5.22–§5.26. Do not mark complete until implementation and backend policies verified.
+Planned only, not implemented in supplied ZIP: **12-tier Camp Rank** (Wanderer → Camper → Story Seeker → Clue Hunter → Night Reader → Theorist → Hollow Investigator → Fire Watcher → Hollow Watcher → Hollow Flame → The UnderReader → Hollow Legend), EXP and levels, three-day Night Owl streak badge, daily Campfire check-in and **Amber as the primary in-platform currency**, **dedicated Camp Challenge menu** with Author-managed challenges and Amber rewards, **dedicated Leaderboards menu** with Top Theorist / Top Reader / Top Arcade Player categories, monthly period settlement, Author-controlled leaderboard management, and **Author Analytics Dashboard** surfacing all instrumented insights. Custom badge art planned for `assets/badges/` with kebab-case naming. Requirements, controls, acceptance criteria, and data entities in §5.22–§5.26. Do not mark complete until implementation and backend policies verified.
+
+### Additional requirements recorded on 2026-10-22
+
+Planned only, not implemented in the supplied ZIP:
+- **AI Camp Staff** using a lore-aware server-side `systemPrompt` in a Cloudflare Worker, bounded 5–10-turn browser-local history, optional crackling-fire/whisper response sounds, and optional supported-device vibration. Target a free-first deployment, but respect provider quotas and do not promise unlimited free access or allow paid fallback without approval.
+- **Currency correction:** the official currency name is **Amber**, inspired by ancient tree resin. Replace all previous "Ember" currency references with "Amber". Keep "Ember" only when describing fire embers as an environmental visual/audio motif, not as the currency. The currency icon is planned for `assets/icon/`; note the current repo convention is `assets/icons/` (plural), so decide whether to preserve the requested singular path or align it with existing assets before implementation.
+- **Personal Cabin**, an SVG-based customizable, shareable room with wallpaper, lighting, bookshelf, floor, and decorative slots; catalog and ownership records; unlocks via Amber, challenges, badges, or Author grants.
+- **Ambience Mixer**, three independent campfire/rain/forest audio channels, presets, global mute, Web Audio API gain nodes, and persisted preferences.
+- **Character Relationship Graph**, Author-managed relationship edges with chapter reveal metadata and spoiler filtering enforced before data reaches the client.
+- **Digital Letters**, Author-authored in-universe letters delivered by chapter completion or scheduled events, with an animated letter modal and profile Letter Archive.
+
+### Updated repository audit summary — 2026-10-22
+
+The supplied ZIP contains 96 archive entries and includes `assets/loader/` frames, `css/loader.css`, `js/loader.js`, `js/status-widget.js`, `settings-clock.html`, `settings-history.html`, `js/reading.js`, `js/history.js`, world-building pages (`characters.html`, `maps.html`, `locations.html`), and the existing theories/rating/novel/chapter workflows. The clock and online-reader Presence widget are present in source and should be treated as **implemented in source, external verification pending**, not as missing. The repository does **not** contain an `assets/sound/` directory or a Cloudflare Worker source file, and it does not contain implementation files for AI Camp Staff, Personal Cabin, Ambience Mixer, Character Relationship Graph, or Digital Letters. These are roadmap features, not existing functionality.
+
+**Currency terminology rule:** use **Amber** for the currency in all new UI, schema, documentation, and rewards. Proposed ledger name: `amber_ledger`. Keep fire embers as ordinary atmospheric imagery only.
