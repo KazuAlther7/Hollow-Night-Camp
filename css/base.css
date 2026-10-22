@@ -125,3 +125,32 @@ button:disabled {
     transition-duration: .01ms !important;
   }
 }
+
+
+/* Display preferences: light-theme overrides. Theme defaults to the existing dark camp palette. */
+:root[data-theme-resolved="light"] {
+  color-scheme: light;
+  --night: #f2ecdc;
+  --night-deep: #e7dfcb;
+  --forest: #dbe4d2;
+  --forest-light: #c8d5ba;
+  --moss: #657d55;
+  --paper: #27362a;
+  --paper-dark: #485744;
+  --ink: #f8f2e5;
+  --orange: #b96a2f;
+  --fire: #a95625;
+  --red: #b94f38;
+  --muted: #596455;
+  --line: rgba(39, 54, 42, .22);
+}
+:root[data-theme-resolved="light"] body {
+  background: var(--night);
+  color: var(--paper);
+}
+:root[data-theme-resolved="light"] body.camp-body {
+  background:
+    radial-gradient(ellipse 70% 38% at 50% -6%, rgba(242,163,75,.18), transparent 70%),
+    linear-gradient(180deg, #f7f0df 0%, #e9e4d3 55%, #dfe5d5 100%);
+  background-attachment: fixed;
+}
