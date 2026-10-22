@@ -432,3 +432,25 @@ body.bar-sidebar .notification-dot { top: 50%; right: 14px; margin-top: -4px; }
   body:not(.bar-sidebar) .bar-brand { flex-shrink: 0; }
   body:not(.bar-sidebar) .bar-to-side { flex-shrink: 0; }
 }
+
+
+/* Display preferences — light navigation and shared overlays. */
+:root[data-theme-resolved="light"] .main-bar,
+:root[data-theme-resolved="light"] .editor-menu-button,
+:root[data-theme-resolved="light"] .editor-menu,
+:root[data-theme-resolved="light"] .settings-menu,
+:root[data-theme-resolved="light"] .bar-profile-menu {
+  background: rgba(250,247,237,.94);
+  color: #26352a;
+  border-color: rgba(39,53,42,.22);
+  box-shadow: 0 12px 36px rgba(39,53,42,.14);
+}
+:root[data-theme-resolved="light"] .bar-brand,
+:root[data-theme-resolved="light"] .camp-nav-item,
+:root[data-theme-resolved="light"] .bar-icon-button,
+:root[data-theme-resolved="light"] .bar-profile-menu a,
+:root[data-theme-resolved="light"] .bar-profile-menu button {
+  color: #354533;
+}
+:root[data-theme-resolved="light"] .camp-nav-item.active { color:#8b4d20; background:rgba(185,106,47,.15); }
+:root[data-theme-resolved="light"] .bar-brand { border-color:rgba(39,53,42,.18); }
