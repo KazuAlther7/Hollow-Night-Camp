@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#17251d">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/image/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/image/favicon-192.png">
+  <link rel="shortcut icon" href="assets/image/favicon.ico">
+  <link rel="apple-touch-icon" href="assets/image/apple-touch-icon.png">
+  <title>Display — Hollow Night Camp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Special+Elite&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/loader.css?v=1">
+  <script src="js/loader.js?v=1"></script>
+  <link rel="stylesheet" href="css/base.css?v=5">
+  <link rel="stylesheet" href="css/mainbar.css?v=11">
+  <link rel="stylesheet" href="css/ui.css?v=4">
+  <link rel="stylesheet" href="css/history.css?v=1">
+  <link rel="stylesheet" href="css/display.css?v=2">
+</head>
+
+<body class="camp-body" data-page="settings">
+
+  <main class="camp-app">
+    <section class="camp-page camp-placeholder-page display-page" id="display">
+      <span class="settings-kicker">DISPLAY</span>
+      <h1>Display</h1>
+      <p>Choose how Hollow Night Camp looks and which language it uses.</p>
+
+      <section class="pref-card" aria-labelledby="themeTitle">
+        <div class="pref-head">
+          <span class="pref-icon" aria-hidden="true"><span class="pref-glyph" style="--g:url('assets/icons/theme.png')"></span></span>
+          <div>
+            <h2 id="themeTitle">Theme</h2>
+            <p>How the camp looks</p>
+          </div>
+        </div>
+        <div class="pref-options pref-options-3" role="radiogroup" aria-labelledby="themeTitle">
+          <label class="pref-option">
+            <input type="radio" name="theme" value="system">
+            <span class="pref-body">
+              <span class="theme-swatch swatch-system" aria-hidden="true"><i></i><i></i><i></i></span>
+              <strong>System</strong>
+              <small>Match your device</small>
+            </span>
+          </label>
+          <label class="pref-option">
+            <input type="radio" name="theme" value="light">
+            <span class="pref-body">
+              <span class="theme-swatch swatch-light" aria-hidden="true"><i></i><i></i><i></i></span>
+              <strong>Light</strong>
+              <small>Warm paper tones</small>
+            </span>
+          </label>
+          <label class="pref-option">
+            <input type="radio" name="theme" value="dark">
+            <span class="pref-body">
+              <span class="theme-swatch swatch-dark" aria-hidden="true"><i></i><i></i><i></i></span>
+              <strong>Dark</strong>
+              <small>The classic night camp</small>
+            </span>
+          </label>
+        </div>
+      </section>
+
+      <section class="pref-card" aria-labelledby="languageTitle">
+        <div class="pref-head">
+          <span class="pref-icon" aria-hidden="true"><span class="pref-glyph" style="--g:url('assets/icons/language.png')"></span></span>
+          <div>
+            <h2 id="languageTitle">Language</h2>
+            <p>Language of menus and labels</p>
+          </div>
+        </div>
+        <div class="pref-options pref-options-2" role="radiogroup" aria-labelledby="languageTitle">
+          <label class="pref-option">
+            <input type="radio" name="language" value="en">
+            <span class="pref-body pref-body-row">
+              <span class="lang-badge" data-no-translate aria-hidden="true">EN</span>
+              <strong data-no-translate>English</strong>
+            </span>
+          </label>
+          <label class="pref-option">
+            <input type="radio" name="language" value="id">
+            <span class="pref-body pref-body-row">
+              <span class="lang-badge" data-no-translate aria-hidden="true">ID</span>
+              <strong data-no-translate>Bahasa Indonesia</strong>
+            </span>
+          </label>
+        </div>
+      </section>
+
+      <p class="pref-note">Saved on this device. Changes apply right away.</p>
+      <p class="pref-status" id="displayStatus" role="status" aria-live="polite"></p>
+    </section>
+  </main>
+
+  <script type="module">
+    import { initPage } from './js/shared.js?v=16';
+    import { getTheme, getLanguage, applyTheme, applyLanguage, t, THEME_KEY, LANGUAGE_KEY } from './js/preferences.js?v=2';
+
+    await initPage({ active: 'settings' });
+
+    const status = document.getElementById('displayStatus');
+    const check = (name, value) => {
+      const radio = document.querySelector('input[name="' + name + '"][value="' + value + '"]');
+      if (radio) radio.checked = true;
+    };
+    check('theme', getTheme());
+    check('language', getLanguage());
+
+    const save = (key, value) => { try { localStorage.setItem(key, value); } catch (error) {} };
+
+    document.querySelectorAll('input[name="theme"]').forEach((radio) => radio.addEventListener('change', () => {
+      if (!radio.checked) return;
+      save(THEME_KEY, radio.value);
+      applyTheme(radio.value);
+      status.textContent = t('Theme saved.');
+    }));
+    document.querySelectorAll('input[name="language"]').forEach((radio) => radio.addEventListener('change', () => {
+      if (!radio.checked) return;
+      save(LANGUAGE_KEY, radio.value);
+      applyLanguage(radio.value);
+      status.textContent = t('Language saved.');
+    }));
+  </script>
+</body>
+</html>
