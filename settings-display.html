@@ -18,7 +18,7 @@
   <link rel="stylesheet" href="css/mainbar.css?v=11">
   <link rel="stylesheet" href="css/ui.css?v=4">
   <link rel="stylesheet" href="css/history.css?v=1">
-  <link rel="stylesheet" href="css/display.css?v=2">
+  <link rel="stylesheet" href="css/display.css?v=3">
 </head>
 
 <body class="camp-body" data-page="settings">
@@ -31,7 +31,7 @@
 
       <section class="pref-card" aria-labelledby="themeTitle">
         <div class="pref-head">
-          <span class="pref-icon" aria-hidden="true"><span class="pref-glyph" style="--g:url('assets/icons/theme.png')"></span></span>
+          <span class="pref-icon" aria-hidden="true"><span class="pref-glyph glyph-display"></span></span>
           <div>
             <h2 id="themeTitle">Theme</h2>
             <p>How the camp looks</p>
@@ -67,7 +67,7 @@
 
       <section class="pref-card" aria-labelledby="languageTitle">
         <div class="pref-head">
-          <span class="pref-icon" aria-hidden="true"><span class="pref-glyph" style="--g:url('assets/icons/language.png')"></span></span>
+          <span class="pref-icon" aria-hidden="true"><span class="pref-glyph glyph-language"></span></span>
           <div>
             <h2 id="languageTitle">Language</h2>
             <p>Language of menus and labels</p>
@@ -97,7 +97,7 @@
   </main>
 
   <script type="module">
-    import { initPage } from './js/shared.js?v=16';
+    import { initPage } from './js/shared.js?v=17';
     import { getTheme, getLanguage, applyTheme, applyLanguage, t, THEME_KEY, LANGUAGE_KEY } from './js/preferences.js?v=2';
 
     await initPage({ active: 'settings' });
