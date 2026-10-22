@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#17251d">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/image/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/image/favicon-192.png">
+  <link rel="shortcut icon" href="assets/image/favicon.ico">
+  <link rel="apple-touch-icon" href="assets/image/apple-touch-icon.png">
+  <title>Support & Feedback — Hollow Night Camp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Special+Elite&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/loader.css?v=1">
+  <script src="js/loader.js?v=1"></script>
+  <link rel="stylesheet" href="css/base.css?v=5">
+  <link rel="stylesheet" href="css/mainbar.css?v=11">
+  <link rel="stylesheet" href="css/ui.css?v=4">
+  <link rel="stylesheet" href="css/history.css?v=1">
+  <link rel="stylesheet" href="css/info.css?v=1">
+</head>
+
+<body class="camp-body" data-page="settings">
+
+  <main class="camp-app">
+    <section class="camp-page camp-placeholder-page info-page" id="support">
+      <span class="settings-kicker">SUPPORT &amp; FEEDBACK</span>
+      <h1>Need Help?</h1>
+      <p>Even the quietest camp has someone ready to help.</p>
+      <p class="info-lead">Encountered an issue, have an idea, or need assistance? This section provides a straightforward way to report problems, suggest improvements, and find answers to common questions.</p>
+      <p class="info-lead">Your feedback helps make Hollow Night Camp a better experience for everyone.</p>
+      <ul class="info-jump" aria-label="On this page">
+        <li><a href="#bug">Bug Report</a></li>
+        <li><a href="#suggestion">Feature Suggestion</a></li>
+        <li><a href="#help">Help Center</a></li>
+        <li><a href="#contact">Contact Support</a></li>
+      </ul>
+
+      <section class="info-section" id="bug" aria-labelledby="bugTitle">
+        <h2 id="bugTitle">Bug &amp; Error Report</h2>
+        <p class="info-tagline">Something doesn't seem right? Let us know.</p>
+        <p>Report technical issues, unexpected behavior, broken features, or display problems. Include enough information to help us understand and reproduce the issue.</p>
+        <form class="support-form" id="bugForm">
+        <label class="hn-field"><span>Issue Title</span><input type="text" id="bugTitleInput" required></label>
+        <label class="hn-field"><span>Issue Category</span><span class="hn-select"><select id="bugCategory" required><option>Reading &amp; Chapters</option><option>Account &amp; Profile</option><option>Display &amp; Settings</option><option>Notifications</option><option>Community</option><option>Performance</option><option>Other</option></select></span></label>
+        <label class="hn-field"><span>Description</span><textarea id="bugDescription" rows="3" required></textarea></label>
+        <label class="hn-field"><span>Steps to Reproduce</span><textarea id="bugSteps" rows="3" required></textarea></label>
+        <label class="hn-field"><span>Expected Result</span><textarea id="bugExpected" rows="3" required></textarea></label>
+        <label class="hn-field"><span>Actual Result</span><textarea id="bugActual" rows="3" required></textarea></label>
+        <label class="hn-field"><span>Browser or Device (optional)</span><input type="text" id="bugDevice"></label>
+          <div class="support-actions">
+            <button class="hn-btn" type="submit">Submit Bug Report</button>
+            <p class="support-status" id="bugStatus" role="status" aria-live="polite"></p>
+          </div>
+        </form>
+        <p class="info-note">Submitting opens your email app with the report prepared. You can review and edit it before sending. If nothing opens, write to <a class="mail-link" href="mailto:juliandoniel07@gmail.com">juliandoniel07@gmail.com</a>.</p>
+      </section>
+
+      <section class="info-section" id="suggestion" aria-labelledby="suggestionTitle">
+        <h2 id="suggestionTitle">Feature Suggestion</h2>
+        <p class="info-tagline">Have an idea for the camp?</p>
+        <p>We welcome thoughtful suggestions that could improve the reading experience, introduce useful features, or make the community more engaging.</p>
+        <p>Tell us what you would like to see, why it would be helpful, and how you imagine it working.</p>
+        <form class="support-form" id="suggestionForm">
+        <label class="hn-field"><span>Suggestion Title</span><input type="text" id="sugTitleInput" required></label>
+        <label class="hn-field"><span>Feature Category</span><span class="hn-select"><select id="sugCategory" required><option>Reading Experience</option><option>Community</option><option>Arcade</option><option>Author Tools</option><option>Display &amp; Settings</option><option>Other</option></select></span></label>
+        <label class="hn-field"><span>Description</span><textarea id="sugDescription" rows="3" required></textarea></label>
+        <label class="hn-field"><span>Expected Benefits</span><textarea id="sugBenefits" rows="3" required></textarea></label>
+          <div class="support-actions">
+            <button class="hn-btn" type="submit">Submit Suggestion</button>
+            <p class="support-status" id="sugStatus" role="status" aria-live="polite"></p>
+          </div>
+        </form>
+        <p class="info-note">Submitting opens your email app with the suggestion prepared. You can review and edit it before sending.</p>
+      </section>
+
+      <section class="info-section" id="help" aria-labelledby="helpTitle">
+        <h2 id="helpTitle">FAQ / Help Center</h2>
+        <p class="info-tagline">Looking for answers? Start here.</p>
+        <p>Find guidance on common questions about reading chapters, managing your preferences, using community features, understanding progression systems, and troubleshooting technical issues.</p>
+        <div class="faq-list">
+          <details class="faq-item"><summary>Getting Started</summary><div class="faq-body"><p>Sign in with your camp account, then use the Main Bar to move around: Campfire for the latest chapter, Novels to browse stories, Theories for community discussion, and Arcade for games.</p></div></details>
+          <details class="faq-item"><summary>Reading &amp; Chapters</summary><div class="faq-body"><p>Open a novel and pick a chapter to start reading. Your progress and bookmarks are kept under Settings › History &amp; Bookmarks, so you can resume where you left off.</p></div></details>
+          <details class="faq-item"><summary>Account &amp; Profile</summary><div class="faq-body"><p>Change your nickname, bio and profile picture under Settings › Profile.</p></div></details>
+          <details class="faq-item"><summary>Display Settings</summary><div class="faq-body"><p>Choose the theme (System, Light or Dark) and the language (English or Indonesian) under Settings › Display. Both are saved on your device.</p></div></details>
+          <details class="faq-item"><summary>EXP, Levels &amp; Camp Rank</summary><div class="faq-body"><p>Progression systems are still being built. Details will appear here once they go live.</p></div></details>
+          <details class="faq-item"><summary>Daily Check-In &amp; Reading Streaks</summary><div class="faq-body"><p>Daily check-ins and reading streaks are still being built. Details will appear here once they go live.</p></div></details>
+          <details class="faq-item"><summary>Arcade &amp; Leaderboards</summary><div class="faq-body"><p>The Arcade is still being built. Details will appear here once it goes live.</p></div></details>
+          <details class="faq-item"><summary>Technical Issues</summary><div class="faq-body"><p>Try refreshing the page first, then sign out and back in. If the problem remains, send a Bug &amp; Error Report below with the steps that led to it.</p></div></details>
+        </div>
+        <p class="info-closing">Can't find the answer you're looking for? Contact our support email for further assistance.</p>
+      </section>
+
+      <section class="info-section" id="contact" aria-labelledby="contactTitle">
+        <h2 id="contactTitle">Contact Support</h2>
+        <p class="info-tagline">We're listening.</p>
+        <p>For questions, feedback, or assistance that cannot be resolved through the Help Center, contact us by email.</p>
+        <p><strong>Contact Email:</strong> <a class="mail-link" href="mailto:juliandoniel07@gmail.com">juliandoniel07@gmail.com</a></p>
+        <form class="support-form" id="contactForm">
+        <label class="hn-field"><span>Your Email Address</span><input type="email" id="contactEmail" required></label>
+        <label class="hn-field"><span>Subject</span><span class="hn-select"><select id="contactSubject" required><option>General Inquiry</option><option>Technical Support</option><option>Bug Report</option><option>Feature Suggestion</option><option>Privacy Inquiry</option><option>Other</option></select></span></label>
+        <label class="hn-field"><span>Message</span><textarea id="contactMessage" rows="3" required></textarea></label>
+          <div class="support-actions">
+            <button class="hn-btn" type="submit">Prepare Email</button>
+            <p class="support-status" id="contactStatus" role="status" aria-live="polite"></p>
+          </div>
+        </form>
+        <p class="info-note">Selecting this option will open your default email application with the subject and message prepared for you. You can review and edit the email before sending.</p>
+        <p class="info-note">If your email application does not open, you can contact us directly at <a class="mail-link" href="mailto:juliandoniel07@gmail.com">juliandoniel07@gmail.com</a>.</p>
+      </section>
+    </section>
+  </main>
+
+  <script type="module">
+    import { initPage } from './js/shared.js?v=19';
+    const ctx = await initPage({ active: 'settings' });
+
+    const EMAIL = 'juliandoniel07@gmail.com';
+    const val = (id) => document.getElementById(id).value.trim();
+    const optionText = (id) => document.getElementById(id).selectedOptions[0].textContent;
+
+    // every submit button ends in the same place: the support inbox, via the visitor's own email app
+    const openMail = (subject, sections) => {
+      const body = sections.filter(([, value]) => value).map(([label, value]) => `${label}:\n${value}`).join('\n\n');
+      window.location.href = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    };
+    const done = (id, message) => {
+      const status = document.getElementById(id);
+      status.textContent = message;
+      status.classList.add('ok');
+    };
+
+    document.getElementById('bugForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      openMail(`[Bug Report] ${val('bugTitleInput')}`, [
+        ['Category', optionText('bugCategory')],
+        ['Description', val('bugDescription')],
+        ['Steps to Reproduce', val('bugSteps')],
+        ['Expected Result', val('bugExpected')],
+        ['Actual Result', val('bugActual')],
+        ['Browser or Device', val('bugDevice')]
+      ]);
+      done('bugStatus', 'Thank you for helping us improve Hollow Night Camp. Your report has been prepared for review.');
+    });
+
+    document.getElementById('suggestionForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      openMail(`[Feature Suggestion] ${val('sugTitleInput')}`, [
+        ['Category', optionText('sugCategory')],
+        ['Description', val('sugDescription')],
+        ['Expected Benefits', val('sugBenefits')]
+      ]);
+      done('sugStatus', 'Thank you for sharing your idea. Every suggestion helps us explore new possibilities for Hollow Night Camp.');
+    });
+
+    const emailBox = document.getElementById('contactEmail');
+    if (!emailBox.value && ctx.user?.email) emailBox.value = ctx.user.email;
+    document.getElementById('contactForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      openMail(`[${optionText('contactSubject')}] Hollow Night Camp`, [
+        ['From', val('contactEmail')],
+        ['Message', val('contactMessage')]
+      ]);
+      done('contactStatus', 'Your email is ready. Review it in your email app and press send.');
+    });
+
+    if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView();
+  </script>
+</body>
+</html>

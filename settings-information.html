@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#17251d">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/image/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/image/favicon-192.png">
+  <link rel="shortcut icon" href="assets/image/favicon.ico">
+  <link rel="apple-touch-icon" href="assets/image/apple-touch-icon.png">
+  <title>Information — Hollow Night Camp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Special+Elite&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/loader.css?v=1">
+  <script src="js/loader.js?v=1"></script>
+  <link rel="stylesheet" href="css/base.css?v=5">
+  <link rel="stylesheet" href="css/mainbar.css?v=11">
+  <link rel="stylesheet" href="css/ui.css?v=4">
+  <link rel="stylesheet" href="css/history.css?v=1">
+  <link rel="stylesheet" href="css/info.css?v=1">
+</head>
+
+<body class="camp-body" data-page="settings">
+
+  <main class="camp-app">
+    <section class="camp-page camp-placeholder-page info-page" id="information">
+      <span class="settings-kicker">INFORMATION</span>
+      <h1>Information</h1>
+      <p class="info-lead">Everything about the camp, in one place.</p>
+      <ul class="info-jump" aria-label="On this page">
+        <li><a href="#about">About</a></li>
+        <li><a href="#version">Version</a></li>
+        <li><a href="#credits">Credits</a></li>
+        <li><a href="#privacy">Privacy</a></li>
+        <li><a href="#terms">Terms &amp; Guidelines</a></li>
+      </ul>
+
+      <section class="info-section" id="about" aria-labelledby="aboutTitle">
+        <h2 id="aboutTitle">About Hollow Night Camp</h2>
+        <p class="info-tagline">A place where stories unfold after dark.</p>
+        <p>Hollow Night Camp is a web-based storytelling experience built for readers who enjoy immersive narratives, hidden mysteries, and a distinctive atmosphere. Beyond reading, the platform aims to create a space where readers can explore, participate, and become part of a growing community.</p>
+      </section>
+
+      <section class="info-section" id="version" aria-labelledby="versionTitle">
+        <h2 id="versionTitle">Version &amp; Release Information</h2>
+        <p class="info-tagline">What's new at the camp?</p>
+        <p>Find the current version of Hollow Night Camp, review release information, and discover improvements introduced in each update.</p>
+        <dl class="release-grid" id="releaseGrid"></dl>
+        <h3>Changelog</h3>
+        <div id="changelog"></div>
+      </section>
+
+      <section class="info-section" id="credits" aria-labelledby="creditsTitle">
+        <h2 id="creditsTitle">Credits</h2>
+        <p class="info-tagline">Every detail has a story behind it.</p>
+        <p>Hollow Night Camp is made possible through the time, creativity, and contributions of the people and resources behind the project.</p>
+        <p>This section acknowledges the creators, contributors, tools, libraries, audio assets, visual assets, and other resources used to build and maintain the platform.</p>
+        <div class="credit-grid">
+          <div class="credit-row"><h3>Project Creator</h3><p>Kazu Alther</p></div>
+          <div class="credit-row"><h3>Development</h3><p>Kazu Alther</p></div>
+          <div class="credit-row"><h3>Design &amp; Visual Assets</h3><p>Credits for visual assets will be listed here as they are finalized.</p></div>
+          <div class="credit-row"><h3>Audio &amp; Sound Design</h3><p>Audio assets will be credited here once they are added.</p></div>
+          <div class="credit-row"><h3>Third-Party Libraries</h3><p>Supabase (accounts and data) · Google Fonts: DM Sans, Special Elite, Fredoka</p></div>
+          <div class="credit-row"><h3>Special Thanks</h3><p>Every reader, tester, and storyteller who has gathered around the camp.</p></div>
+        </div>
+        <p class="info-note">All third-party assets and resources should be credited according to their respective licenses and attribution requirements.</p>
+      </section>
+
+      <section class="info-section" id="privacy" aria-labelledby="privacyTitle">
+        <h2 id="privacyTitle">Privacy Information</h2>
+        <p class="info-tagline">Your privacy matters.</p>
+        <p>This section explains what information Hollow Night Camp collects, how it is used, where it is stored, and what choices are available to users.</p>
+        <p>It covers:</p>
+        <ul class="info-list">
+          <li>Account information</li>
+          <li>Gameplay and reading-related data</li>
+          <li>Preferences, cookies or local storage</li>
+          <li>Third-party services</li>
+          <li>Relevant data-retention practices</li>
+        </ul>
+      </section>
+
+      <section class="info-section" id="terms" aria-labelledby="termsTitle">
+        <h2 id="termsTitle">Terms &amp; Community Guidelines</h2>
+        <p class="info-tagline">Help keep the camp welcoming for everyone.</p>
+        <p>By using Hollow Night Camp, users are expected to respect other readers, follow applicable platform rules, and use community features responsibly.</p>
+        <p>Our community guidelines encourage:</p>
+        <ul class="info-list">
+          <li>Respectful and constructive discussions.</li>
+          <li>No harassment, hate speech, or targeted abuse.</li>
+          <li>No spam, scams, or malicious links.</li>
+          <li>Respect for creators and intellectual property.</li>
+          <li>Responsible use of platform features.</li>
+          <li>Appropriate reporting of harmful content or technical issues.</li>
+        </ul>
+      </section>
+    </section>
+  </main>
+
+  <script type="module">
+    import { initPage } from './js/shared.js?v=19';
+    import { RELEASE } from './js/release.js?v=1';
+    await initPage({ active: 'settings' });
+
+    const LABELS = { new: 'New Features', improved: 'Improvements', fixed: 'Bug Fixes', known: 'Known Issues' };
+    const esc = (value) => String(value).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+    document.getElementById('releaseGrid').innerHTML = [
+      ['Current Version', RELEASE.version],
+      ['Release Date', RELEASE.releaseDate],
+      ['Latest Update', RELEASE.latestUpdate],
+      ['Development Status', RELEASE.status]
+    ].map(([label, value]) => `<div><dt>${label}</dt><dd>${esc(value)}</dd></div>`).join('');
+
+    document.getElementById('changelog').innerHTML = RELEASE.changelog.map((entry) => {
+      const groups = Object.keys(LABELS).map((type) => {
+        const items = entry.items.filter((item) => item.type === type);
+        return items.length
+          ? `<div class="change-group"><span class="change-label ${type}">${LABELS[type]}</span><ul>${items.map((item) => `<li>${esc(item.text)}</li>`).join('')}</ul></div>`
+          : '';
+      }).join('');
+      return `<article class="changelog-entry"><header><strong>Version ${esc(entry.version)}</strong><span>${esc(entry.date)}</span></header>${groups}</article>`;
+    }).join('');
+
+    if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView();
+  </script>
+</body>
+</html>
