@@ -46,9 +46,11 @@ const translations = {
     "Announcements about camp events":"Announcements about camp events",
     "Turning off a type stops new notifications of that type. Ones that already arrived stay in the bell until you read or delete them.":"Turning off a type stops new notifications of that type. Ones that already arrived stay in the bell until you read or delete them.",
     "Preferences saved.":"Preferences saved.",
+    'Community':'Community', 'Information':'Information', 'Support':'Support',
     "Could not save your preferences.":"Could not save your preferences."
   },
   id: {
+    'Community':'Komunitas', 'Information':'Informasi', 'Support':'Dukungan',
     'Campfire':'Api Unggun', 'Novels':'Novel', 'Theories':'Teori', 'Arcade':'Arkade',
     'Settings':'Pengaturan', 'Profile':'Profil', 'History & Bookmarks':'Riwayat & Penanda',
     'Clock & timezone':'Jam & Zona Waktu', 'Author Studio':'Studio Penulis',

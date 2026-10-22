@@ -1,7 +1,7 @@
 // HOLLOW NIGHT CAMP — shared by every page after login:
 // session guard, role check, Main Bar / ⋮ menu rendering, sign out.
 
-import { initPreferences, t } from './preferences.js?v=2';
+import { initPreferences, t } from './preferences.js?v=3';
 
 import {
   getCurrentSession,
@@ -247,7 +247,10 @@ const SETTINGS_MENU = [
   { href: 'settings-display.html', label: t('Display'), icon: 'display' },
   { href: 'settings-preferences.html', label: t('Preferences'), icon: 'notification' },
   { href: 'settings-history.html', label: t('History & Bookmarks'), icon: 'bookmark' },
-  { href: 'settings-clock.html',   label: t('Clock & timezone'), icon: 'clock' }
+  { href: 'settings-clock.html',   label: t('Clock & timezone'), icon: 'clock' },
+  { href: 'settings-community.html', label: t('Community'), icon: 'campfire' },
+  { href: 'settings-information.html', label: t('Information'), icon: 'chapters' },
+  { href: 'settings-support.html', label: t('Support'), icon: 'theories' }
 ];
 
 function mountSettingsMenu() {
@@ -402,6 +405,11 @@ export async function initPage(options = {}) {
   }
 
   mountSubNav();
+
+  // footer on every camp page except the editor and the reader
+  if (!editor && document.body.dataset.page !== 'read') {
+    import('./footer.js?v=1').then((module) => module.mountFooter()).catch((error) => console.warn('Footer unavailable:', error));
+  }
 
   // top-right status widget (flip clock + online readers); never allowed to break the page
   import('./status-widget.js?v=3').then((module) => module.mountStatusWidget()).catch((error) => console.warn('Status widget unavailable:', error));
