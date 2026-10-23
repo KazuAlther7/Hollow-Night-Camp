@@ -1,0 +1,25 @@
+.arc { max-width: 1100px; margin: 0 auto; padding: 24px 0 48px; }
+.arc-head h1 { margin: 0 0 8px; font-family: var(--heading); font-size: clamp(32px, 5vw, 50px); }
+.arc-head p { margin: 0 0 18px; max-width: 640px; color: var(--muted); line-height: 1.6; }
+.arc-stage {
+  position: relative; height: clamp(380px, 68vh, 660px); overflow: hidden;
+  border: 1px solid var(--line); border-radius: var(--radius);
+  background: radial-gradient(ellipse at 50% 25%, #2d4435 0%, #101a16 78%);
+}
+.arc-stage canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+.arc-result {
+  position: absolute; top: 14px; left: 16px; max-width: 70%; pointer-events: none;
+  font: 600 clamp(22px, 4vw, 34px)/1.2 var(--heading); color: #f3e7c9; text-shadow: 0 2px 10px rgba(0,0,0,.6);
+}
+.arc-result.is-nat20 { color: #ffce72; text-shadow: 0 0 18px rgba(255,206,114,.8); }
+.arc-result.is-nat1 { color: #ff8a6a; }
+.arc-controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 14px; }
+.arc-count { display: inline-flex; align-items: center; gap: 8px; padding: 4px 10px; border: 1.5px solid var(--line); border-radius: 999px; color: var(--paper); font: 600 15px var(--heading); }
+.arc-count button { width: 34px; height: 34px; border: 0; border-radius: 50%; background: rgba(242,163,75,.18); color: var(--orange); font-size: 20px; cursor: pointer; }
+.arc-count output { min-width: 1.2em; text-align: center; }
+.arc-btn { min-height: 44px; padding: 0 22px; border: 2px solid var(--line); border-radius: 999px; background: transparent; color: var(--paper); font: 600 15px var(--heading); cursor: pointer; transition: transform .18s ease, border-color .18s ease; }
+.arc-btn:hover { transform: translateY(-1px); border-color: var(--orange); }
+.arc-btn:focus-visible, .arc-count button:focus-visible { outline: 3px solid var(--fire); outline-offset: 3px; }
+.arc-primary { background: var(--orange); border-color: var(--orange); color: var(--ink); }
+.arc-history { margin: 16px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
+.arc-history li { padding: 4px 12px; border-radius: 999px; background: rgba(243,231,201,.08); color: var(--muted); font: 500 13px var(--body); }
