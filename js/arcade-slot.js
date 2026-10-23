@@ -1,4 +1,4 @@
-/* Corners Arcade: Amber Slot Machine. Server (sql/arcade_slot.sql) decides reels, prize, cost and spin limit. */
+/* Corners Arcade: Amber Gacha Machine. Server (sql/arcade_slot.sql) decides reels, prize, cost and spin limit. */
 import { supabase } from '../config/supabase.js';
 
 const SYM = ['amber', 'eye', 'fire', 'radio', 'pine', 'stone', 'binocular', 'd20', 'sword'];
@@ -8,6 +8,18 @@ const fast = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const rnd = () => SYM[Math.floor(Math.random() * SYM.length)];
 const reels = [...document.querySelectorAll('.slot-reel')];
 let busy = false, state = null, cell = 0;
+
+/* ---------- odds note (mirrors the weights in sql/arcade_slot.sql: Amber 6, others 12) ---------- */
+function renderOdds() {
+  const w = SYM.map((k) => (k === 'amber' ? 6 : 12)), T = w.reduce((a, b) => a + b, 0), p = w.map((x) => x / T);
+  const pct = (x) => (x * 100).toFixed(2) + '%';
+  const p3a = p[0] ** 3, p3o = p.slice(1).reduce((s, x) => s + x ** 3, 0);
+  const pair = p.reduce((s, x) => s + 3 * x * x * (1 - x), 0), none = 1 - p3a - p3o - pair;
+  $('oddsReel').innerHTML = SYM.map((k, i) => `<li><img src="assets/arcade/${k}.png" alt="" width="22" height="22"><span>${NAME[k]}</span><b>${pct(p[i])}</b></li>`).join('');
+  $('oddsPrize').innerHTML = [['3× Amber', p3a], ['3× any other', p3o], ['2 the same', pair], ['No match', none]].map(([n, x]) => `<li><span>${n}</span><b>${pct(x)}</b></li>`).join('');
+  $('oddsAvg').textContent = `Average return ≈ ${(p3a * 1000 + p3o * 500 + pair * 100 + none * 25).toFixed(0)} coin per 50 spent`;
+}
+renderOdds();
 
 /* ---------- sfx (WebAudio synth, no files) ---------- */
 let actx = null, muted = localStorage.getItem('slotMute') === '1';
