@@ -90,7 +90,7 @@ The statuses below describe what is evidenced by the supplied ZIP's source code.
 | D&D-style dice roll and games | **NOT STARTED** | No playable dice simulation or arcade game present. |
 | Camp Rank, EXP and levels | **NOT STARTED** | 12-tier progression system (§5.22). |
 | Reading streak and Night Owl badge | **NOT STARTED** | Three consecutive reading days → Night Owl badge (§5.22). |
-| Daily Campfire check-in and Amber wallet | **NOT STARTED** | Amber is the primary in-platform currency (§5.22). |
+| Daily Campfire check-in and Amber wallet | **IMPLEMENTED IN SOURCE / VERIFY** | `sql/amber_wallet.sql` (append-only `amber_ledger`, `daily_checkins`, RPCs `wallet_state` / `daily_checkin`, RLS read-own, Asia/Jakarta day, 20 Amber/check-in), `js/wallet.js`, `css/wallet.css`; balance row in account menu, check-in card on `home.html`. Run SQL in Supabase and verify. Arcade slot balance not yet moved onto the ledger. Amber is the primary in-platform currency (§5.22). |
 | Camp Challenge author menu | **NOT STARTED** | Dedicated Main Bar menu + Author CRUD + Amber rewards (§5.23). |
 | Category leaderboards and monthly reset | **NOT STARTED** | Top Theorist / Top Reader / Top Arcade Player (§5.24). |
 | Author Analytics Dashboard | **NOT STARTED** | All instrumented insights (§5.25). |
@@ -99,7 +99,7 @@ The statuses below describe what is evidenced by the supplied ZIP's source code.
 | Ambience Mixer | **NOT STARTED** | No `assets/sound/ambience/` assets or mixer implementation found; §5.29. |
 | Character Relationship Graph | **NOT STARTED** | Character pages exist, but no relationship graph/schema with spoiler-aware reveal filtering found; §5.30. |
 | Digital Letters | **NOT STARTED** | No letter authoring, delivery, inbox, or archive workflow found; §5.31. |
-| Amber currency icon | **NOT STARTED** | No Amber currency asset found; requested future path `assets/icon/` differs from current `assets/icons/` convention. |
+| Amber currency icon | **PARTIAL** | Small flame glyph is inline SVG (no file). Final asset file and path (`assets/icon/` vs `assets/icons/`) still undecided. |
 | Badge assets | **NOT STARTED** | 12 Camp Rank + Night Owl badges under `assets/badges/` (§5.22). |
 | Settings: profile details | **DONE (core profile) / VERIFY** | Profile form and save feedback exist. |
 | Settings: theme and language | **IMPLEMENTED IN SOURCE** | System / Light / Dark + EN / ID on its own page `settings-display.html` (logic in `js/preferences.js`, stored in localStorage). Only strings in the dictionary are translated; live verification required. |
