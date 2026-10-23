@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Leaderboard">
+  <defs>
+    <linearGradient id="lb-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffd98a"/>
+      <stop offset="1" stop-color="#f2a34b"/>
+    </linearGradient>
+    <linearGradient id="lb-bar" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2f4a3a"/>
+      <stop offset="1" stop-color="#17251d"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#lb-bg)"/>
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="none" stroke="#fff3cf" stroke-opacity=".55" stroke-width="1.5"/>
+  <!-- podium: 2nd, 1st, 3rd -->
+  <rect x="10" y="33" width="14" height="21" rx="4" fill="url(#lb-bar)"/>
+  <rect x="25" y="25" width="14" height="29" rx="4" fill="url(#lb-bar)"/>
+  <rect x="40" y="39" width="14" height="15" rx="4" fill="url(#lb-bar)"/>
+  <!-- rank marks -->
+  <circle cx="17" cy="40" r="1.8" fill="#ffd98a"/>
+  <circle cx="32" cy="32" r="1.8" fill="#ffd98a"/>
+  <circle cx="47" cy="46" r="1.8" fill="#ffd98a"/>
+  <!-- winner star -->
+  <path d="M32 9.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L32 22.7l-5.2 2.8 1-5.8-4.2-4.1 5.8-.8z" fill="#17251d" stroke="#17251d" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M32 9.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L32 22.7l-5.2 2.8 1-5.8-4.2-4.1 5.8-.8z" fill="#fff3cf"/>
+</svg>
