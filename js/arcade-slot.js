@@ -9,15 +9,11 @@ const rnd = () => SYM[Math.floor(Math.random() * SYM.length)];
 const reels = [...document.querySelectorAll('.slot-reel')];
 let busy = false, state = null, cell = 0;
 
-/* ---------- odds note (mirrors the weights in sql/arcade_slot.sql: Amber 6, others 12) ---------- */
+/* ---------- odds note (mirrors the tier odds in sql/arcade_slot.sql) ---------- */
 function renderOdds() {
-  const w = SYM.map((k) => (k === 'amber' ? 6 : 12)), T = w.reduce((a, b) => a + b, 0), p = w.map((x) => x / T);
-  const pct = (x) => (x * 100).toFixed(2) + '%';
-  const p3a = p[0] ** 3, p3o = p.slice(1).reduce((s, x) => s + x ** 3, 0);
-  const pair = p.reduce((s, x) => s + 3 * x * x * (1 - x), 0), none = 1 - p3a - p3o - pair;
-  $('oddsReel').innerHTML = SYM.map((k, i) => `<li><img src="assets/arcade/${k}.png" alt="" width="22" height="22"><span>${NAME[k]}</span><b>${pct(p[i])}</b></li>`).join('');
-  $('oddsPrize').innerHTML = [['3× Amber', p3a], ['3× any other', p3o], ['2 the same', pair], ['No match', none]].map(([n, x]) => `<li><span>${n}</span><b>${pct(x)}</b></li>`).join('');
-  $('oddsAvg').textContent = `Average return ≈ ${(p3a * 1000 + p3o * 500 + pair * 100 + none * 25).toFixed(0)} coin per 50 spent`;
+  const rows = [['3× Amber', 1, 1000], ['3× any other', 2.5, 500], ['2 the same', 20, 100], ['No match', 76.5, 25]];
+  $('oddsPrize').innerHTML = rows.map(([n, p]) => `<li><span>${n}</span><b>${p.toFixed(2)}%</b></li>`).join('');
+  $('oddsAvg').textContent = `Average return ≈ ${rows.reduce((s, [, p, v]) => s + (p / 100) * v, 0).toFixed(0)} coin per 50 spent`;
 }
 renderOdds();
 
@@ -70,15 +66,9 @@ function spinTo(reel, i, target, ms) {
     a.onfinish = () => { a.cancel(); s.style.filter = ''; setStrip(reel, ids.slice(N)); done(); };
   });
 }
-function untilReset(iso) {
-  const m = Math.max(0, Math.round((new Date(iso) - Date.now()) / 60000));
-  return `${Math.floor(m / 60)}h ${m % 60}m`;
-}
 function render() {
   $('bal').textContent = state.balance.toLocaleString();
-  const unl = state.spins_left === null;
-  $('spinsLeft').textContent = unl ? 'Author: unlimited spins' : `${state.spins_left} / 10 spins left · resets in ${untilReset(state.resets_at)}`;
-  const ok = (unl || state.spins_left > 0) && state.balance >= 50 && !busy;
+  const ok = state.balance >= 50 && !busy;
   $('pull').disabled = !ok; $('lever').disabled = !ok;
 }
 function msg(t, cls = '') { const m = $('slotMsg'); m.textContent = t; m.className = cls; }
@@ -103,7 +93,7 @@ async function pull() {
   await Promise.all(reels.map((r, i) => spinTo(r, i, data.reels[i], 1100 + i * 450).then(sfx.stop)));
   clearInterval(tick); sfx.win(data.prize);
   $('machine').classList.remove('is-pulling');
-  state = { ...state, balance: data.balance, spins_left: data.spins_left, resets_at: data.resets_at, total_won: (state.total_won || 0) + data.prize };
+  state = { ...state, balance: data.balance, total_won: (state.total_won || 0) + data.prize };
   busy = false; render();
   const jack = data.prize === 1000;
   msg(jack ? `JACKPOT! +1000 Amber Coin` : data.prize === 500 ? `Triple! +500 Amber Coin` : data.prize === 100 ? `Pair! +100 Amber Coin` : `+25 Amber Coin`, jack ? 'is-jackpot' : data.prize >= 100 ? 'is-win' : '');
