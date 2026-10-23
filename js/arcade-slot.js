@@ -9,6 +9,35 @@ const rnd = () => SYM[Math.floor(Math.random() * SYM.length)];
 const reels = [...document.querySelectorAll('.slot-reel')];
 let busy = false, state = null, cell = 0;
 
+/* ---------- sfx (WebAudio synth, no files) ---------- */
+let actx = null, muted = localStorage.getItem('slotMute') === '1';
+const ac = () => (actx ??= new (window.AudioContext || window.webkitAudioContext)());
+function tone(f, d, type = 'sine', v = 0.12, at = 0, to) {
+  if (muted) return; const c = ac(), t = c.currentTime + at, o = c.createOscillator(), g = c.createGain();
+  o.type = type; o.frequency.setValueAtTime(f, t); if (to) o.frequency.exponentialRampToValueAtTime(to, t + d);
+  g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+  o.connect(g).connect(c.destination); o.start(t); o.stop(t + d + 0.02);
+}
+function noise(d, v = 0.1) {
+  if (muted) return; const c = ac(), n = Math.floor(c.sampleRate * d), b = c.createBuffer(1, n, c.sampleRate), x = b.getChannelData(0);
+  for (let i = 0; i < n; i++) x[i] = (Math.random() * 2 - 1) * (1 - i / n);
+  const s = c.createBufferSource(), g = c.createGain(); s.buffer = b; g.gain.value = v; s.connect(g).connect(c.destination); s.start();
+}
+const sfx = {
+  pull() { noise(0.08, 0.15); tone(120, 0.18, 'square', 0.1, 0, 60); tone(900, 0.04, 'square', 0.05, 0.12); },
+  tick() { tone(700 + Math.random() * 200, 0.025, 'square', 0.03); },
+  stop() { tone(160, 0.1, 'triangle', 0.18, 0, 70); noise(0.04, 0.08); },
+  win(p) {
+    const seq = p >= 1000 ? [523, 659, 784, 1047, 784, 1047, 1319] : p >= 500 ? [523, 659, 784, 1047] : p >= 100 ? [523, 784] : [660];
+    seq.forEach((f, i) => tone(f, 0.18, 'triangle', 0.14, i * 0.1));
+    if (p >= 1000) for (let i = 0; i < 8; i++) tone(1500 + Math.random() * 1500, 0.08, 'sine', 0.05, 0.7 + i * 0.06);
+  },
+};
+const muteBtn = $('mute');
+const paintMute = () => { muteBtn.textContent = muted ? 'Sound: off' : 'Sound: on'; };
+muteBtn.onclick = () => { muted = !muted; localStorage.setItem('slotMute', muted ? '1' : '0'); paintMute(); if (!muted) sfx.stop(); };
+paintMute();
+
 function cellEl(id) {
   const d = document.createElement('div'); d.className = 'slot-cell'; d.style.height = cell + 'px';
   const i = new Image(); i.src = `assets/arcade/${id}.png`; i.alt = NAME[id]; i.draggable = false; d.appendChild(i); return d;
@@ -26,7 +55,7 @@ function spinTo(reel, i, target, ms) {
   const s = reel.firstElementChild; s.replaceChildren(...ids.map(cellEl)); s.style.filter = 'blur(1.5px)';
   return new Promise((done) => {
     const a = s.animate([{ transform: 'translateY(0)' }, { transform: `translateY(${-N * cell}px)` }], { duration: fast ? 300 : ms, easing: 'cubic-bezier(.15,.75,.2,1)', fill: 'forwards' });
-    a.onfinish = () => { s.style.filter = ''; setStrip(reel, ids.slice(N)); done(); };
+    a.onfinish = () => { a.cancel(); s.style.filter = ''; setStrip(reel, ids.slice(N)); done(); };
   });
 }
 function untilReset(iso) {
@@ -50,12 +79,16 @@ async function loadState() {
 async function pull() {
   if (busy || !state) return;
   busy = true; render(); msg(''); $('machine').classList.add('is-pulling');
+  if (!muted) ac().resume?.();
+  sfx.pull();
   const { data, error } = await supabase.rpc('slot_spin');
   if (error) {
     const k = Object.keys(ERR).find((x) => error.message.includes(x));
     msg(ERR[k] || 'Spin failed. Try again.', 'is-error'); $('machine').classList.remove('is-pulling'); busy = false; await loadState(); return;
   }
-  await Promise.all(reels.map((r, i) => spinTo(r, i, data.reels[i], 1100 + i * 450)));
+  const tick = setInterval(sfx.tick, 85);
+  await Promise.all(reels.map((r, i) => spinTo(r, i, data.reels[i], 1100 + i * 450).then(sfx.stop)));
+  clearInterval(tick); sfx.win(data.prize);
   $('machine').classList.remove('is-pulling');
   state = { ...state, balance: data.balance, spins_left: data.spins_left, resets_at: data.resets_at, total_won: (state.total_won || 0) + data.prize };
   busy = false; render();
