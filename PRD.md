@@ -90,7 +90,7 @@ The statuses below describe what is evidenced by the supplied ZIP's source code.
 | D&D-style dice roll and games | **NOT STARTED** | No playable dice simulation or arcade game present. |
 | Camp Rank, EXP and levels | **NOT STARTED** | 12-tier progression system (§5.22). |
 | Reading streak and Night Owl badge | **NOT STARTED** | Three consecutive reading days → Night Owl badge (§5.22). |
-| Daily Campfire check-in and Amber wallet | **IMPLEMENTED IN SOURCE / VERIFY** | `sql/amber_wallet.sql` (append-only `amber_ledger`, `daily_checkins`, RPCs `wallet_state` / `daily_checkin`, RLS read-own, Asia/Jakarta day, 20 Amber/check-in), `js/wallet.js`, `css/wallet.css`; balance row in account menu, check-in card on `home.html`. Run SQL in Supabase and verify. Arcade slot balance not yet moved onto the ledger. Amber is the primary in-platform currency (§5.22). |
+| Daily Campfire check-in and Amber wallet | **IMPLEMENTED IN SOURCE / VERIFY** | `sql/amber_wallet.sql` (append-only `amber_ledger`, `daily_checkins`, RPCs `wallet_state` / `daily_checkin`, RLS read-own, Asia/Jakarta day, 20 Amber/check-in), `js/wallet.js`, `css/wallet.css`; balance row in account menu, check-in card on `home.html`. Run SQL in Supabase and verify. Amber Gacha Machine now spends/wins via the ledger (`sql/arcade_slot.sql`, run after `sql/amber_wallet.sql`; legacy `arcade_wallets.balance` migrated once). Amber is the primary in-platform currency (§5.22). |
 | Camp Challenge author menu | **NOT STARTED** | Dedicated Main Bar menu + Author CRUD + Amber rewards (§5.23). |
 | Category leaderboards and monthly reset | **NOT STARTED** | Top Theorist / Top Reader / Top Arcade Player (§5.24). |
 | Author Analytics Dashboard | **NOT STARTED** | All instrumented insights (§5.25). |

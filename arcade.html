@@ -27,9 +27,9 @@
       <div data-view="hub">
         <header class="arc-head">
           <h1 class="neon-sign" aria-label="Corners Arcade"><span class="neon-word is-pink" aria-hidden="true"><span class="neon-ch" style="--i:0">C</span><span class="neon-ch" style="--i:1">o</span><span class="neon-ch" style="--i:2">r</span><span class="neon-ch" style="--i:3">n</span><span class="neon-ch" style="--i:4">e</span><span class="neon-ch" style="--i:5">r</span><span class="neon-ch" style="--i:6">s</span></span> <span class="neon-word is-cyan" aria-hidden="true"><span class="neon-ch" style="--i:7">A</span><span class="neon-ch" style="--i:8">r</span><span class="neon-ch" style="--i:9">c</span><span class="neon-ch" style="--i:10">a</span><span class="neon-ch" style="--i:11">d</span><span class="neon-ch" style="--i:12">e</span></span></h1>
-          <p>Pick a game. Win Amber Coin and climb the leaderboard.</p>
+          <p>Pick a game. Win Amber and climb the leaderboard.</p>
         </header>
-        <a class="arc-board-btn" href="#leaderboard"><img class="arc-board-icon" src="assets/arcade/leaderboard.svg" alt="" width="40" height="40"><span>Leaderboard</span><small>Top Amber Coin winners</small></a>
+        <a class="arc-board-btn" href="#leaderboard"><img class="arc-board-icon" src="assets/arcade/leaderboard.svg" alt="" width="40" height="40"><span>Leaderboard</span><small>Top Amber winners</small></a>
         <div class="arc-cards">
           <a class="arc-card" href="#slot"><img class="arc-card-logo" src="assets/arcade/logo-amber-gacha.webp" alt="" width="149" height="120"><strong>Amber Gacha Machine</strong><small>Pull the lever, match the icons, climb the board.</small></a>
           <a class="arc-card" href="#dice"><img class="arc-card-logo arc-card-logo-d20" src="assets/arcade/logo-d20-rolls.webp" alt="" width="150" height="145"><strong>D20 Rolls</strong><small>Roll d20s through a tower. Just for fun.</small></a>
@@ -56,8 +56,8 @@
             <button type="button" class="slot-lever" id="lever" aria-label="Pull the lever"></button>
           </div>
           <div class="slot-side">
-            <div class="slot-wallet"><img src="assets/arcade/amber-coin.png" alt="" width="40" height="40"><strong id="bal">…</strong><span>Amber Coin</span></div>
-                        <button type="button" class="arc-btn arc-primary" id="pull">Pull lever · 50 Amber Coin</button>
+            <div class="slot-wallet"><img src="assets/arcade/amber-coin.png" alt="" width="40" height="40"><strong id="bal">…</strong><span>Amber</span></div>
+                        <button type="button" class="arc-btn arc-primary" id="pull">Pull lever · 50 Amber</button>
             <button type="button" class="arc-btn" id="mute">Sound: on</button>
             <p id="slotMsg" aria-live="polite"></p>
             <ul class="slot-pay">
@@ -73,7 +73,7 @@
       <div data-view="board" hidden>
         <a class="arc-back" href="#">← Arcade</a>
         <h2 class="arc-title">Leaderboard</h2>
-        <p class="arc-sub">Amber Gacha Machine · total Amber Coin won</p>
+        <p class="arc-sub">Amber Gacha Machine · total Amber won</p>
         <ol class="arc-board" id="boardList"></ol>
       </div>
 
@@ -111,8 +111,8 @@
       window.scrollTo(0, 0);
       try {
         if (v === 'dice') await load('dice', './js/arcade-dice.js?v=1');
-        if (v === 'slot') (await load('slot', './js/arcade-slot.js?v=6')).openSlot();
-        if (v === 'board') (await load('slot', './js/arcade-slot.js?v=6')).openBoard();
+        if (v === 'slot') (await load('slot', './js/arcade-slot.js?v=7')).openSlot();
+        if (v === 'board') (await load('slot', './js/arcade-slot.js?v=7')).openBoard();
       } catch (e) { console.error(e); HNLoader.fail('This game could not load.', () => location.reload()); }
     }
     addEventListener('hashchange', route);
