@@ -1,0 +1,71 @@
+/* HOLLOW NIGHT CAMP — Amber wallet: account-menu row + Campfire check-in card. Loaded by js/wallet.js. */
+
+.amber-flame { flex: none; color: var(--orange); }
+
+/* Main Bar account menu row */
+.amber-row {
+  display: flex; align-items: center; gap: 7px;
+  margin-top: 10px; padding: 7px 10px;
+  border: 1px solid rgba(242,163,75,.35); border-radius: 12px;
+  background: rgba(242,163,75,.1);
+  font-size: 13px; color: var(--paper);
+}
+.amber-row[hidden] { display: none; }
+.amber-row .amber-label { color: var(--muted); }
+.amber-row strong { margin-left: auto; display: inline; font-size: 14px; color: var(--fire); font-variant-numeric: tabular-nums; }
+
+/* Campfire check-in card */
+.checkin-card[hidden] { display: none; }
+.checkin-card {
+  display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 18px;
+  max-width: 760px; margin: 0 0 30px; padding: 16px 20px;
+  border: 1px solid var(--line); border-radius: 16px;
+  background: rgba(16,26,22,.55); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 12px 28px rgba(0,0,0,.28);
+}
+.checkin-flame {
+  display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%;
+  color: var(--orange); background: rgba(242,163,75,.16);
+}
+.checkin-flame .amber-flame { width: 24px; height: 24px; }
+.checkin-text h2 { margin: 0; font-family: var(--heading); font-size: 19px; color: var(--paper); }
+.checkin-text p { margin: 4px 0 0; font-size: 14px; line-height: 1.5; color: var(--muted); }
+.checkin-balance { display: grid; text-align: right; line-height: 1.1; }
+.checkin-balance strong { font-family: var(--heading); font-size: 26px; color: var(--fire); font-variant-numeric: tabular-nums; }
+.checkin-balance span { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.checkin-button {
+  padding: 11px 18px; border: 0; border-radius: 999px; cursor: pointer;
+  font: 700 14px var(--body); color: var(--ink); background: var(--orange);
+  transition: transform .2s var(--ease), filter .2s ease;
+}
+.checkin-button:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.08); }
+.checkin-button:focus-visible { outline: 2px solid var(--fire); outline-offset: 3px; }
+.checkin-button:disabled { cursor: default; color: var(--muted); background: rgba(243,231,201,.12); }
+.checkin-status { grid-column: 1 / -1; min-height: 0; margin: 0; font-size: 13px; color: var(--fire); }
+.checkin-status:empty { display: none; }
+.checkin-status.is-error { color: #ffb69b; }
+.checkin-card.is-pop .checkin-flame { animation: checkinPop .8s var(--ease); }
+@keyframes checkinPop {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(242,163,75,.55); }
+  40% { transform: scale(1.18); box-shadow: 0 0 0 14px rgba(242,163,75,0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(242,163,75,0); }
+}
+@media (max-width: 620px) {
+  .checkin-card { grid-template-columns: auto 1fr; }
+  .checkin-balance { text-align: left; }
+  .checkin-button { grid-column: 1 / -1; }
+}
+@media (prefers-reduced-motion: reduce) { .checkin-card.is-pop .checkin-flame { animation: none; } }
+
+:root[data-theme-resolved="light"] .checkin-card { background: rgba(243,231,201,.7); border-color: rgba(39,54,42,.22); }
+:root[data-theme-resolved="light"] .checkin-text h2 { color: var(--ink); }
+:root[data-theme-resolved="light"] .checkin-text p,
+:root[data-theme-resolved="light"] .checkin-balance span { color: #4d5a49; }
+:root[data-theme-resolved="light"] .checkin-balance strong,
+:root[data-theme-resolved="light"] .amber-row strong { color: #a85d12; }
+:root[data-theme-resolved="light"] .amber-flame,
+:root[data-theme-resolved="light"] .checkin-flame { color: #c26b14; }
+:root[data-theme-resolved="light"] .checkin-button:disabled { color: #4d5a49; background: rgba(39,54,42,.12); }
+:root[data-theme-resolved="light"] .checkin-status { color: #8a4a0c; }
+:root[data-theme-resolved="light"] .amber-row { color: var(--ink); background: rgba(194,107,20,.1); border-color: rgba(194,107,20,.4); }
+:root[data-theme-resolved="light"] .amber-row .amber-label { color: #4d5a49; }
