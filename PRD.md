@@ -1505,3 +1505,156 @@ Planned only, not implemented in the supplied ZIP:
 The supplied ZIP contains 96 archive entries and includes `assets/loader/` frames, `css/loader.css`, `js/loader.js`, `js/status-widget.js`, `settings-clock.html`, `settings-history.html`, `js/reading.js`, `js/history.js`, world-building pages (`characters.html`, `maps.html`, `locations.html`), and the existing theories/rating/novel/chapter workflows. The clock and online-reader Presence widget are present in source and should be treated as **implemented in source, external verification pending**, not as missing. The repository does **not** contain an `assets/sound/` directory or a Cloudflare Worker source file, and it does not contain implementation files for AI Camp Staff, Personal Cabin, Ambience Mixer, Character Relationship Graph, or Digital Letters. These are roadmap features, not existing functionality.
 
 **Currency terminology rule:** use **Amber** for the currency in all new UI, schema, documentation, and rewards. Proposed ledger name: `amber_ledger`. Keep fire embers as ordinary atmospheric imagery only.
+
+
+---
+
+## 13. Additional Product Requirements — World Building, Reading UX, Seasonal Collectibles, Shop & Profile
+**Recorded:** 2026-10-23  
+**Status:** Planned — requirements only; do not mark implemented until source code and backend behavior are verified.
+
+### 13.1 World Building spoiler warning
+**Priority: P1**
+
+When a reader opens the World Building area (including Characters, Maps, Locations, and any future lore/reference pages), show an animated warning popup before exposing spoiler-sensitive content.
+
+- Visual treatment: a textured paper note / pinned sticky-note aesthetic, consistent with the hand-crafted mystery-camp visual identity.
+- Motion: a short paper-like entrance (slight rotation/scale or unfold), subtle shadow, and restrained exit transition. Respect `prefers-reduced-motion`.
+- Suggested copy:
+  - Heading: **A Note Before You Enter**
+  - Body: **The records ahead may reveal secrets, hidden connections, and events from later chapters. Continue only if you're comfortable with spoilers.**
+  - Primary action: **I Understand — Continue**
+  - Secondary action: **Take Me Back**
+- Do not reveal protected lore behind the popup until the reader confirms.
+- Persist the reader's acknowledgement only for the current browsing session by default. Provide a way to reopen the warning; do not permanently suppress warnings unless a future preference is explicitly designed.
+- Author preview/editing should remain usable without accidentally publishing spoiler content.
+- Future-proof spoiler metadata by allowing lore entries, characters, locations, maps, and relationship edges to declare a reveal threshold (chapter/volume). Enforce spoiler filtering before sensitive content is sent to the client; a frontend blur or popup alone is not security.
+- Accessibility: focus trap while open, keyboard support, accessible title/description, sensible focus restoration, and readable contrast.
+
+**Acceptance criteria**
+- Opening World Building triggers the warning before spoiler content appears.
+- Continue opens the selected section; Back dismisses it and returns to the prior safe view.
+- Popup works on narrow mobile and desktop layouts.
+- Reduced-motion mode removes or minimizes entrance/exit movement.
+- Any future chapter-gated lore is filtered server-side or through a trusted data query before rendering.
+
+### 13.2 d20 Sheet Page Number and reading separators
+**Priority: P1**
+
+Add a **Sheet Page Number** feature to the reader so readers can resume reading quickly and refer to the same reading position.
+
+- Use the project's d20 visual motif as the page marker icon.
+- Divide long chapter content into readable sheets/pages using explicit page-break separators. Page breaks should be author-controlled in the editor or inserted through a predictable content format; avoid arbitrary page splits that change unpredictably across screen sizes.
+- Number sheets sequentially within each chapter, starting at 1. Display the d20 icon beside the current sheet number (for example, d20 **03**).
+- Page numbers must not be confused with chapter numbers, volume numbers, browser page count, or physical book pages.
+- Add a visible separator at each page break, with a subtle in-world document/sheet treatment that does not interrupt the prose.
+- Store reader progress as chapter ID + sheet/page number (and, if needed for precise restoration, a stable block/paragraph anchor). Resume should restore the closest valid position if the chapter has changed.
+- On responsive layouts, page breaks remain author-defined; text may reflow inside a sheet without silently renumbering the authored sheets.
+- Include keyboard/screen-reader-friendly progress text; the icon cannot be the only indication of page number.
+- If a chapter has no explicit breaks yet, show a graceful continuous-reading fallback and do not fabricate stable page numbers.
+
+**Acceptance criteria**
+- A reader can see the current sheet number and d20 marker while reading.
+- Advancing past a page break updates the number consistently.
+- Closing and reopening a chapter restores the saved sheet/anchor when available.
+- Editing chapter text does not cause an invalid anchor to crash the reader.
+- Page-break markers are represented safely in stored chapter content and survive save/load/import workflows.
+
+### 13.3 Seasonal / major-holiday greeting cards and collectible themes
+**Priority: P2**
+
+Extend the existing notification center with event-based greeting cards for configured major celebration days.
+
+- The site should support an Author-managed event configuration: event name, date or date range, timezone, notification copy, card artwork, theme/collectible identifier, and optional availability window.
+- When an event becomes active, eligible readers receive an in-site notification containing or opening an animated greeting card. Avoid duplicate notifications across refreshes or multiple devices.
+- Greeting-card visuals should feel like a collectible keepsake and match the specific celebration's theme while remaining within Hollow Night Camp's visual identity.
+- Some events may grant a limited-time **Collectible Theme**. The user can claim it during its availability window; after claiming, it remains in their collection unless the event's terms explicitly say otherwise.
+- Add a Collectibles / Themes collection view to display owned themes, preview them, and apply an owned theme. Do not overwrite the user's existing theme preference without consent.
+- If a reward is claimable, show clear states: available, claimed, expired, and unavailable. Use server-side validation and idempotent reward claims.
+- Notification preferences should let readers control promotional/event notifications independently of essential account/security notifications.
+- Event schedule, timezone, eligibility, and copy must be configurable rather than hard-coded only to a single locale. Provide an appropriate empty state when no event is active.
+- Do not assume a particular list of holidays is final; maintain an editable event catalog.
+
+**Acceptance criteria**
+- An authorized Author can configure an event and its collectible theme.
+- Eligible users receive at most one notification per event.
+- Claiming a collectible twice never duplicates ownership or rewards.
+- Claimed themes persist across devices and can be previewed/applied from the collection.
+- Expired events cannot be newly claimed unless explicitly configured otherwise.
+- Event notifications respect user preferences and timezone rules.
+
+### 13.4 Amber Shop
+**Priority: P2**
+
+Add a Shop where readers can spend **Amber**, the site's in-platform currency, on eligible digital items such as profile-card decorations, themes, collectible cosmetics, and future Personal Cabin items.
+
+- Use **Amber** consistently; do not use “Amber Coin” as a separate currency name. “Amber” is the currency name; “Amber balance” may be used in UI. This maintains the existing currency terminology rule in this PRD.
+- Shop catalog items need: stable ID, title, description, item category, preview asset, Amber price, availability, stock/claim limits if applicable, and whether the item is permanent or time-limited.
+- Show the current Amber balance, item preview, price, ownership state, and a clear purchase confirmation dialog.
+- A purchase must be atomic and validated on the trusted backend: verify item availability and balance, deduct Amber once, record the ledger transaction, and grant ownership once. Prevent double-click/retry duplication and negative balances.
+- Use the append-only `amber_ledger` as the auditable currency history and add a purchase/ownership record (for example, `shop_items`, `shop_purchases`, and `user_collectibles` or a normalized equivalent).
+- Never allow the browser to set its own balance, price, purchase result, or reward. Use an RPC/database transaction or trusted server function and enforce RLS.
+- Include category filters, owned-item state, empty/loading/error states, and mobile-friendly layout.
+- No real-money checkout is part of this requirement; Amber is an internal earned currency unless the owner explicitly defines a separate compliant payment system later.
+
+**Acceptance criteria**
+- The shop displays catalog items and Amber prices.
+- A valid purchase atomically deducts the correct amount and grants the item.
+- Insufficient balance, unavailable item, or repeated requests do not result in partial or duplicate transactions.
+- Readers can see purchase history and owned items.
+- Author-only catalog management is protected by backend authorization.
+
+### 13.5 Profile quick card and full profile
+**Priority: P2**
+
+Support two profile entry modes from the Account/Profile control:
+
+1. **Quick Profile Card:** clicking the profile control opens a compact overlay/popover inspired by the existing in-place Settings dropdown. It should feel like an identity card and avoid navigating away from the current page.
+2. **Full Profile:** provide a clear action from the card to open a dedicated full profile page.
+
+The quick card should be designed as an extensible identity card that can later be decorated with owned cosmetics.
+
+- Initial card fields: avatar, nickname, Camp Rank/level when implemented, Amber balance, and a compact selection of badges or collectible decorations when available.
+- Actions may include **View Full Profile**, **Edit Profile**, **Collectibles**, and **Sign Out**, subject to existing account and role rules.
+- Use a small anchored overlay on desktop and a compact bottom sheet/dialog on mobile where appropriate. Dismiss on Escape, outside click, or selecting a destination; manage keyboard focus and restore focus on close.
+- The card should not expose private profile data or another user's editable controls.
+- Decoration slots should be extensible (frame, background, badge accent, nameplate, seasonal decoration), but unavailable until the corresponding collectible is owned/unlocked.
+- Keep the existing Settings profile editor intact; the quick card is a shortcut/preview, not a replacement.
+
+**Acceptance criteria**
+- Opening the profile card does not navigate away from the current page.
+- The full-profile action opens a dedicated profile route/page.
+- Card and full profile display consistent profile data.
+- The quick card works on mobile, desktop, keyboard, and screen readers.
+- Cosmetic slots never grant an item the user does not own.
+
+### 13.6 Data model and security additions
+Treat the following as proposed schema entities, not proof that tables already exist:
+- `worldbuilding spoiler/reveal metadata` on lore records, with trusted filtering by chapter/volume.
+- `reading_progress` extension for stable sheet/page number and content anchor.
+- `seasonal_events` and `event_claims` for event schedules, notification idempotency, and collectible claims.
+- `collectible_themes` and `user_collectibles` for theme definitions and user ownership.
+- `shop_items` and `shop_purchases` for catalog and purchase history.
+- Reuse `amber_ledger` for auditable Amber deductions and grants.
+- Extend `profiles` only with non-sensitive public profile presentation fields; keep private settings separate.
+- Use database constraints, RLS, and trusted transactions/functions for currency, ownership, event claims, and spoiler gating.
+
+### 13.7 Delivery plan additions and current step
+These are roadmap additions; no implementation is implied by this PRD update.
+
+- [ ] **Step A — World Building spoiler warning:** textured sticky-note popup, acknowledgement flow, accessibility, and future-safe spoiler metadata.
+- [ ] **Step B — Sheet Page Number:** author-defined page breaks, d20 page marker, and stable reading resume.
+- [ ] **Step C — Greeting cards & Collectible Themes:** configurable event calendar, notification delivery, one-time claims, collection view.
+- [ ] **Step D — Amber Shop:** catalog, Amber balance display, atomic purchases, ledger and ownership records.
+- [ ] **Step E — Profile quick card & full profile:** in-place identity card, dedicated full-profile route, extensible cosmetic slots.
+- [ ] **Step F — Integration & QA:** database migrations/RLS, duplicate-action tests, accessibility, mobile layout, regression and deployed verification.
+
+**Current step after this PRD update: Planning / specification (before Step A).** This task updates requirements documentation only; it does not implement these features in application code.
+
+### 13.8 Open decisions for these additions
+25. Which celebration days and event timezone(s) should be enabled first?
+26. Should collectible themes be permanent after claim, or can specific event themes expire? Default proposal: permanent ownership after claim.
+27. What exact content format should authors use to insert sheet page breaks in chapter text? Decide before implementing Step B.
+28. Which item categories and initial prices should launch in the Amber Shop? Default proposal: cosmetics/themes first; no real-money checkout.
+29. Should profile quick cards be available only for the signed-in user's own profile initially, or also when clicking other readers' public profiles?
+30. Should the World Building spoiler acknowledgement persist per session, per novel, or always appear? Default proposal: once per browser session, with a way to reopen it.
