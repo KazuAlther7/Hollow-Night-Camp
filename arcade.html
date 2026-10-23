@@ -16,7 +16,7 @@
   <script src="js/loader.js?v=2"></script>
   <link rel="stylesheet" href="css/base.css?v=4">
   <link rel="stylesheet" href="css/mainbar.css?v=7">
-  <link rel="stylesheet" href="css/arcade.css?v=3">
+  <link rel="stylesheet" href="css/arcade.css?v=4">
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","cannon-es":"https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js"}}</script>
 </head>
 
@@ -31,15 +31,23 @@
         </header>
         <a class="arc-board-btn" href="#leaderboard"><img src="assets/arcade/amber-coin.png" alt="" width="32" height="32"><span>Leaderboard</span><small>Top Amber Coin winners</small></a>
         <div class="arc-cards">
-          <a class="arc-card" href="#slot"><img src="assets/arcade/amber.png" alt="" width="72" height="72"><strong>Amber Slot Machine</strong><small>Pull the lever, match the icons. Competitive.</small></a>
+          <a class="arc-card" href="#slot"><img src="assets/arcade/amber.png" alt="" width="72" height="72"><strong>Amber Gacha Machine</strong><small>Pull the lever, match the icons, climb the board.</small></a>
           <a class="arc-card" href="#dice"><img src="assets/arcade/d20.png" alt="" width="72" height="72"><strong>Dice Tower</strong><small>Roll d20s through a tower. Just for fun.</small></a>
         </div>
       </div>
 
       <div data-view="slot" hidden>
         <a class="arc-back" href="#">← Arcade</a>
-        <h2 class="arc-title">Amber Slot Machine</h2>
+        <h2 class="slot-logo"><img src="assets/arcade/logo-amber-gacha.webp" alt="Amber Gacha Machine" width="460" height="371" draggable="false"></h2>
         <div class="slot-layout">
+          <aside class="slot-note" aria-label="Gacha odds">
+            <h3>Gacha Odds</h3>
+            <p class="note-sub">Chance per reel</p>
+            <ul id="oddsReel"></ul>
+            <p class="note-sub">Chance per pull</p>
+            <ul id="oddsPrize"></ul>
+            <p class="note-avg" id="oddsAvg"></p>
+          </aside>
           <div class="slot-machine" id="machine">
             <img class="slot-img" src="assets/arcade/slot-machine.webp?v=2" alt="" draggable="false">
             <div class="slot-window">
@@ -68,7 +76,7 @@
       <div data-view="board" hidden>
         <a class="arc-back" href="#">← Arcade</a>
         <h2 class="arc-title">Leaderboard</h2>
-        <p class="arc-sub">Amber Slot Machine · total Amber Coin won</p>
+        <p class="arc-sub">Amber Gacha Machine · total Amber Coin won</p>
         <ol class="arc-board" id="boardList"></ol>
       </div>
 
@@ -106,8 +114,8 @@
       window.scrollTo(0, 0);
       try {
         if (v === 'dice') await load('dice', './js/arcade-dice.js?v=1');
-        if (v === 'slot') (await load('slot', './js/arcade-slot.js?v=3')).openSlot();
-        if (v === 'board') (await load('slot', './js/arcade-slot.js?v=3')).openBoard();
+        if (v === 'slot') (await load('slot', './js/arcade-slot.js?v=4')).openSlot();
+        if (v === 'board') (await load('slot', './js/arcade-slot.js?v=4')).openBoard();
       } catch (e) { console.error(e); HNLoader.fail('This game could not load.', () => location.reload()); }
     }
     addEventListener('hashchange', route);
