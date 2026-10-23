@@ -2,8 +2,9 @@
 
 import { supabase } from '../config/supabase.js';
 import { readingTime } from './dom.js?v=2';
-import { initPage, ENTERED_KEY, getAuthorMode, setAuthorMode } from './shared.js?v=19';
+import { initPage, ENTERED_KEY, getAuthorMode, setAuthorMode } from './shared.js?v=20';
 import { createParallax } from './parallax.js';
+import { initCheckin } from './wallet.js?v=1';
 
 const welcomeScreen = document.getElementById('welcomeScreen');
 const enterCampButton = document.getElementById('enterCampButton');
@@ -116,6 +117,9 @@ enterCampButton.addEventListener('click', () => {
 });
 
 homeNickname.textContent = ctx.profile?.nickname || 'camper';
+
+// Amber wallet: daily Campfire check-in (card stays hidden until sql/amber_wallet.sql is installed)
+initCheckin().catch((error) => console.warn('Check-in unavailable:', error));
 
 if (wantsStudio) setAuthorMode(true);
 

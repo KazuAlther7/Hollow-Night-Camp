@@ -406,6 +406,9 @@ export async function initPage(options = {}) {
 
   mountSubNav();
 
+  // Amber balance row in the account menu; never allowed to break the page
+  if (!editor) import('./wallet.js?v=1').then((module) => module.mountWalletMenu()).catch((error) => console.warn('Amber wallet unavailable:', error));
+
   // footer on every camp page except the editor and the reader
   if (!editor && document.body.dataset.page !== 'read') {
     import('./footer.js?v=1').then((module) => module.mountFooter()).catch((error) => console.warn('Footer unavailable:', error));
