@@ -98,7 +98,7 @@
 
   function check() {
     if (!S || S.exiting || S.leaving) return;
-    if (!shellReady || holds > 0) return;
+    if (!shellReady || holds > 0 || S.el.classList.contains('is-error')) return;
     var wait = S.minAt - Date.now();
     clearTimeout(checkTimer);
     if (wait > 0) { checkTimer = setTimeout(check, wait + 10); return; }
