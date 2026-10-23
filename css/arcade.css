@@ -1,4 +1,4 @@
-.arc { max-width: 1100px; margin: 0 auto; padding: 24px 0 48px; }
+.arc { max-width: 1100px; margin: 0 auto; padding: 48px 0 48px; }
 .arc-head h1 { margin: 0 0 8px; font-family: var(--heading); font-size: clamp(32px, 5vw, 50px); }
 .arc-head p { margin: 0 0 18px; max-width: 640px; color: var(--muted); line-height: 1.6; }
 .arc-stage {
