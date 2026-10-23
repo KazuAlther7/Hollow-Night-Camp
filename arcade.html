@@ -16,7 +16,7 @@
   <script src="js/loader.js?v=2"></script>
   <link rel="stylesheet" href="css/base.css?v=4">
   <link rel="stylesheet" href="css/mainbar.css?v=7">
-  <link rel="stylesheet" href="css/arcade.css?v=5">
+  <link rel="stylesheet" href="css/arcade.css?v=6">
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","cannon-es":"https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js"}}</script>
 </head>
 
@@ -26,13 +26,13 @@
     <section class="camp-page arc">
       <div data-view="hub">
         <header class="arc-head">
-          <h1>Corners Arcade</h1>
+          <h1 class="neon-sign" aria-label="Corners Arcade"><span class="neon-word is-pink" aria-hidden="true"><span class="neon-ch" style="--i:0">C</span><span class="neon-ch" style="--i:1">o</span><span class="neon-ch" style="--i:2">r</span><span class="neon-ch" style="--i:3">n</span><span class="neon-ch" style="--i:4">e</span><span class="neon-ch" style="--i:5">r</span><span class="neon-ch" style="--i:6">s</span></span> <span class="neon-word is-cyan" aria-hidden="true"><span class="neon-ch" style="--i:7">A</span><span class="neon-ch" style="--i:8">r</span><span class="neon-ch" style="--i:9">c</span><span class="neon-ch" style="--i:10">a</span><span class="neon-ch" style="--i:11">d</span><span class="neon-ch" style="--i:12">e</span></span></h1>
           <p>Pick a game. Win Amber Coin and climb the leaderboard.</p>
         </header>
-        <a class="arc-board-btn" href="#leaderboard"><img src="assets/arcade/amber-coin.png" alt="" width="32" height="32"><span>Leaderboard</span><small>Top Amber Coin winners</small></a>
+        <a class="arc-board-btn" href="#leaderboard"><img class="arc-board-icon" src="assets/arcade/leaderboard.svg" alt="" width="40" height="40"><span>Leaderboard</span><small>Top Amber Coin winners</small></a>
         <div class="arc-cards">
           <a class="arc-card" href="#slot"><img class="arc-card-logo" src="assets/arcade/logo-amber-gacha.webp" alt="" width="149" height="120"><strong>Amber Gacha Machine</strong><small>Pull the lever, match the icons, climb the board.</small></a>
-          <a class="arc-card" href="#dice"><img src="assets/arcade/d20.png" alt="" width="72" height="72"><strong>Dice Tower</strong><small>Roll d20s through a tower. Just for fun.</small></a>
+          <a class="arc-card" href="#dice"><img class="arc-card-logo arc-card-logo-d20" src="assets/arcade/logo-d20-rolls.webp" alt="" width="150" height="145"><strong>D20 Rolls</strong><small>Roll d20s through a tower. Just for fun.</small></a>
         </div>
       </div>
 
@@ -79,9 +79,9 @@
 
       <div data-view="dice" hidden>
         <a class="arc-back" href="#">← Arcade</a>
-        <h2 class="arc-title">Dice Tower</h2>
+        <h2 class="slot-logo dice-logo"><img src="assets/arcade/logo-d20-rolls.webp" alt="D20 Rolls" width="320" height="310" draggable="false"></h2>
         <div class="arc-stage" id="stage">
-        <canvas id="cv" aria-label="3D dice tower"></canvas>
+        <canvas id="cv" aria-label="D20 Rolls 3D dice"></canvas>
         <div class="arc-result" id="result" aria-live="polite">Roll the dice…</div>
       </div>
       <div class="arc-controls">
