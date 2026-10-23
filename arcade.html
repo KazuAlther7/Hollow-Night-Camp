@@ -16,7 +16,7 @@
   <script src="js/loader.js?v=2"></script>
   <link rel="stylesheet" href="css/base.css?v=4">
   <link rel="stylesheet" href="css/mainbar.css?v=7">
-  <link rel="stylesheet" href="css/arcade.css?v=4">
+  <link rel="stylesheet" href="css/arcade.css?v=5">
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","cannon-es":"https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js"}}</script>
 </head>
 
@@ -31,7 +31,7 @@
         </header>
         <a class="arc-board-btn" href="#leaderboard"><img src="assets/arcade/amber-coin.png" alt="" width="32" height="32"><span>Leaderboard</span><small>Top Amber Coin winners</small></a>
         <div class="arc-cards">
-          <a class="arc-card" href="#slot"><img src="assets/arcade/amber.png" alt="" width="72" height="72"><strong>Amber Gacha Machine</strong><small>Pull the lever, match the icons, climb the board.</small></a>
+          <a class="arc-card" href="#slot"><img class="arc-card-logo" src="assets/arcade/logo-amber-gacha.webp" alt="" width="149" height="120"><strong>Amber Gacha Machine</strong><small>Pull the lever, match the icons, climb the board.</small></a>
           <a class="arc-card" href="#dice"><img src="assets/arcade/d20.png" alt="" width="72" height="72"><strong>Dice Tower</strong><small>Roll d20s through a tower. Just for fun.</small></a>
         </div>
       </div>
@@ -42,8 +42,6 @@
         <div class="slot-layout">
           <aside class="slot-note" aria-label="Gacha odds">
             <h3>Gacha Odds</h3>
-            <p class="note-sub">Chance per reel</p>
-            <ul id="oddsReel"></ul>
             <p class="note-sub">Chance per pull</p>
             <ul id="oddsPrize"></ul>
             <p class="note-avg" id="oddsAvg"></p>
@@ -59,8 +57,7 @@
           </div>
           <div class="slot-side">
             <div class="slot-wallet"><img src="assets/arcade/amber-coin.png" alt="" width="40" height="40"><strong id="bal">…</strong><span>Amber Coin</span></div>
-            <p class="slot-left" id="spinsLeft"></p>
-            <button type="button" class="arc-btn arc-primary" id="pull">Pull lever · 50 Amber Coin</button>
+                        <button type="button" class="arc-btn arc-primary" id="pull">Pull lever · 50 Amber Coin</button>
             <button type="button" class="arc-btn" id="mute">Sound: on</button>
             <p id="slotMsg" aria-live="polite"></p>
             <ul class="slot-pay">
@@ -114,8 +111,8 @@
       window.scrollTo(0, 0);
       try {
         if (v === 'dice') await load('dice', './js/arcade-dice.js?v=1');
-        if (v === 'slot') (await load('slot', './js/arcade-slot.js?v=4')).openSlot();
-        if (v === 'board') (await load('slot', './js/arcade-slot.js?v=4')).openBoard();
+        if (v === 'slot') (await load('slot', './js/arcade-slot.js?v=6')).openSlot();
+        if (v === 'board') (await load('slot', './js/arcade-slot.js?v=6')).openBoard();
       } catch (e) { console.error(e); HNLoader.fail('This game could not load.', () => location.reload()); }
     }
     addEventListener('hashchange', route);
