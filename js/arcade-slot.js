@@ -64,8 +64,9 @@ function untilReset(iso) {
 }
 function render() {
   $('bal').textContent = state.balance.toLocaleString();
-  $('spinsLeft').textContent = `${state.spins_left} / 10 spins left · resets in ${untilReset(state.resets_at)}`;
-  const ok = state.spins_left > 0 && state.balance >= 50 && !busy;
+  const unl = state.spins_left === null;
+  $('spinsLeft').textContent = unl ? 'Author: unlimited spins' : `${state.spins_left} / 10 spins left · resets in ${untilReset(state.resets_at)}`;
+  const ok = (unl || state.spins_left > 0) && state.balance >= 50 && !busy;
   $('pull').disabled = !ok; $('lever').disabled = !ok;
 }
 function msg(t, cls = '') { const m = $('slotMsg'); m.textContent = t; m.className = cls; }
