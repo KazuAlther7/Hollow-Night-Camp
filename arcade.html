@@ -16,20 +16,41 @@
   <script src="js/loader.js?v=2"></script>
   <link rel="stylesheet" href="css/base.css?v=4">
   <link rel="stylesheet" href="css/mainbar.css?v=7">
+  <link rel="stylesheet" href="css/arcade.css?v=1">
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","cannon-es":"https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js"}}</script>
 </head>
 
 <body class="camp-body" data-page="arcade">
 
   <main class="camp-app">
-    <section class="camp-page camp-placeholder-page">
-      <h1>Corners Arcade</h1>
-      <p>Dice, games, and a little bit of luck. Coming soon.</p>
+    <section class="camp-page arc">
+      <header class="arc-head">
+        <h1>Corners Arcade</h1>
+        <p>Dice Tower. Roll through the tower, throw into the tray, or drag a die anywhere (even onto the tower top) and let it go.</p>
+      </header>
+      <div class="arc-stage" id="stage">
+        <canvas id="cv" aria-label="3D dice tower"></canvas>
+        <div class="arc-result" id="result" aria-live="polite">Roll the dice…</div>
+      </div>
+      <div class="arc-controls">
+        <div class="arc-count" role="group" aria-label="Number of d20">
+          <button type="button" id="minus" aria-label="Fewer dice">−</button>
+          <output id="count">1</output><span>d20</span>
+          <button type="button" id="plus" aria-label="More dice">+</button>
+        </div>
+        <button type="button" class="arc-btn arc-primary" id="roll">Roll in tower</button>
+        <button type="button" class="arc-btn" id="throw">Throw</button>
+        <button type="button" class="arc-btn" id="clear">Clear</button>
+      </div>
+      <ol class="arc-history" id="history" aria-label="Roll history"></ol>
     </section>
   </main>
 
   <script type="module">
     import { initPage } from './js/shared.js?v=19';
     await initPage({ active: 'arcade' });
+    try { await HNLoader.track(import('./js/arcade-dice.js?v=1')); }
+    catch (e) { console.error(e); HNLoader.fail('The dice tower could not load.', () => location.reload()); }
   </script>
 
 </body>
