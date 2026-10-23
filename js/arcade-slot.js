@@ -1,5 +1,6 @@
 /* Corners Arcade: Amber Gacha Machine. Server (sql/arcade_slot.sql) decides reels, prize, cost and spin limit. */
 import { supabase } from '../config/supabase.js';
+import { setBalance } from './wallet.js?v=1';
 
 const SYM = ['amber', 'eye', 'fire', 'radio', 'pine', 'stone', 'binocular', 'd20', 'sword'];
 const NAME = { amber: 'Amber', eye: 'Eye', fire: 'Fire', radio: 'Walkie Talkie', pine: 'Pinecone', stone: 'Rune Stone', binocular: 'Binoculars', d20: 'D20', sword: 'Sword' };
@@ -13,7 +14,7 @@ let busy = false, state = null, cell = 0;
 function renderOdds() {
   const rows = [['3× Amber', 1, 1000], ['3× any other', 2.5, 500], ['2 the same', 20, 100], ['No match', 76.5, 25]];
   $('oddsPrize').innerHTML = rows.map(([n, p]) => `<li><span>${n}</span><b>${p.toFixed(2)}%</b></li>`).join('');
-  $('oddsAvg').textContent = `Average return ≈ ${rows.reduce((s, [, p, v]) => s + (p / 100) * v, 0).toFixed(0)} coin per 50 spent`;
+  $('oddsAvg').textContent = `Average return ≈ ${rows.reduce((s, [, p, v]) => s + (p / 100) * v, 0).toFixed(0)} Amber per 50 spent`;
 }
 renderOdds();
 
@@ -72,12 +73,12 @@ function render() {
   $('pull').disabled = !ok; $('lever').disabled = !ok;
 }
 function msg(t, cls = '') { const m = $('slotMsg'); m.textContent = t; m.className = cls; }
-const ERR = { spin_limit: 'No spins left in this half-day. Come back later.', insufficient_balance: 'Not enough Amber Coin (50 needed).', not_authenticated: 'Please sign in again.' };
+const ERR = { spin_limit: 'No spins left in this half-day. Come back later.', insufficient_balance: 'Not enough Amber (50 needed).', not_authenticated: 'Please sign in again.' };
 
 async function loadState() {
   const { data, error } = await supabase.rpc('slot_state');
-  if (error) { msg('Slot machine is not set up yet (run sql/arcade_slot.sql).', 'is-error'); console.error(error); return false; }
-  state = data; render(); return true;
+  if (error) { msg('Slot machine is not set up yet (run sql/amber_wallet.sql, then sql/arcade_slot.sql).', 'is-error'); console.error(error); return false; }
+  state = data; setBalance(data.balance); render(); return true;
 }
 async function pull() {
   if (busy || !state) return;
@@ -94,9 +95,10 @@ async function pull() {
   clearInterval(tick); sfx.win(data.prize);
   $('machine').classList.remove('is-pulling');
   state = { ...state, balance: data.balance, total_won: (state.total_won || 0) + data.prize };
+  setBalance(data.balance);
   busy = false; render();
   const jack = data.prize === 1000;
-  msg(jack ? `JACKPOT! +1000 Amber Coin` : data.prize === 500 ? `Triple! +500 Amber Coin` : data.prize === 100 ? `Pair! +100 Amber Coin` : `+25 Amber Coin`, jack ? 'is-jackpot' : data.prize >= 100 ? 'is-win' : '');
+  msg(jack ? `JACKPOT! +1000 Amber` : data.prize === 500 ? `Triple! +500 Amber` : data.prize === 100 ? `Pair! +100 Amber` : `+25 Amber`, jack ? 'is-jackpot' : data.prize >= 100 ? 'is-win' : '');
   if (data.prize >= 100) { $('machine').classList.add('is-win'); setTimeout(() => $('machine').classList.remove('is-win'), 1600); }
 }
 $('pull').onclick = pull; $('lever').onclick = pull;
