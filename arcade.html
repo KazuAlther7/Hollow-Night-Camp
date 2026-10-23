@@ -106,8 +106,8 @@
       window.scrollTo(0, 0);
       try {
         if (v === 'dice') await load('dice', './js/arcade-dice.js?v=1');
-        if (v === 'slot') (await load('slot', './js/arcade-slot.js?v=2')).openSlot();
-        if (v === 'board') (await load('slot', './js/arcade-slot.js?v=2')).openBoard();
+        if (v === 'slot') (await load('slot', './js/arcade-slot.js?v=3')).openSlot();
+        if (v === 'board') (await load('slot', './js/arcade-slot.js?v=3')).openBoard();
       } catch (e) { console.error(e); HNLoader.fail('This game could not load.', () => location.reload()); }
     }
     addEventListener('hashchange', route);
