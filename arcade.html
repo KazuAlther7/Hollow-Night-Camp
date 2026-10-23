@@ -16,7 +16,7 @@
   <script src="js/loader.js?v=2"></script>
   <link rel="stylesheet" href="css/base.css?v=4">
   <link rel="stylesheet" href="css/mainbar.css?v=7">
-  <link rel="stylesheet" href="css/arcade.css?v=1">
+  <link rel="stylesheet" href="css/arcade.css?v=2">
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","cannon-es":"https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js"}}</script>
 </head>
 
@@ -24,11 +24,57 @@
 
   <main class="camp-app">
     <section class="camp-page arc">
-      <header class="arc-head">
-        <h1>Corners Arcade</h1>
-        <p>Dice Tower. Roll through the tower, throw into the tray, or drag a die anywhere (even onto the tower top) and let it go.</p>
-      </header>
-      <div class="arc-stage" id="stage">
+      <div data-view="hub">
+        <header class="arc-head">
+          <h1>Corners Arcade</h1>
+          <p>Pick a game. Win Amber Coin and climb the leaderboard.</p>
+        </header>
+        <a class="arc-board-btn" href="#leaderboard"><img src="assets/arcade/amber-coin.png" alt="" width="32" height="32"><span>Leaderboard</span><small>Top Amber Coin winners</small></a>
+        <div class="arc-cards">
+          <a class="arc-card" href="#slot"><img src="assets/arcade/amber.png" alt="" width="72" height="72"><strong>Amber Slot Machine</strong><small>Pull the lever, match the icons. Competitive.</small></a>
+          <a class="arc-card" href="#dice"><img src="assets/arcade/d20.png" alt="" width="72" height="72"><strong>Dice Tower</strong><small>Roll d20s through a tower. Just for fun.</small></a>
+        </div>
+      </div>
+
+      <div data-view="slot" hidden>
+        <a class="arc-back" href="#">← Arcade</a>
+        <h2 class="arc-title">Amber Slot Machine</h2>
+        <div class="slot-layout">
+          <div class="slot-machine" id="machine">
+            <img class="slot-img" src="assets/arcade/slot-machine.webp" alt="" draggable="false">
+            <div class="slot-window">
+              <div class="slot-reel"><div class="slot-strip"></div></div>
+              <div class="slot-reel"><div class="slot-strip"></div></div>
+              <div class="slot-reel"><div class="slot-strip"></div></div>
+            </div>
+            <button type="button" class="slot-lever" id="lever" aria-label="Pull the lever"></button>
+          </div>
+          <div class="slot-side">
+            <div class="slot-wallet"><img src="assets/arcade/amber-coin.png" alt="" width="40" height="40"><strong id="bal">…</strong><span>Amber Coin</span></div>
+            <p class="slot-left" id="spinsLeft"></p>
+            <button type="button" class="arc-btn arc-primary" id="pull">Pull lever · 50 Amber Coin</button>
+            <p id="slotMsg" aria-live="polite"></p>
+            <ul class="slot-pay">
+              <li><b>3× Amber</b><span>+1000</span></li>
+              <li><b>3× any other</b><span>+500</span></li>
+              <li><b>2 the same</b><span>+100</span></li>
+              <li><b>No match</b><span>+25</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div data-view="board" hidden>
+        <a class="arc-back" href="#">← Arcade</a>
+        <h2 class="arc-title">Leaderboard</h2>
+        <p class="arc-sub">Amber Slot Machine · total Amber Coin won</p>
+        <ol class="arc-board" id="boardList"></ol>
+      </div>
+
+      <div data-view="dice" hidden>
+        <a class="arc-back" href="#">← Arcade</a>
+        <h2 class="arc-title">Dice Tower</h2>
+        <div class="arc-stage" id="stage">
         <canvas id="cv" aria-label="3D dice tower"></canvas>
         <div class="arc-result" id="result" aria-live="polite">Roll the dice…</div>
       </div>
@@ -43,14 +89,28 @@
         <button type="button" class="arc-btn" id="clear">Clear</button>
       </div>
       <ol class="arc-history" id="history" aria-label="Roll history"></ol>
+      </div>
     </section>
   </main>
 
   <script type="module">
     import { initPage } from './js/shared.js?v=19';
     await initPage({ active: 'arcade' });
-    try { await HNLoader.track(import('./js/arcade-dice.js?v=1')); }
-    catch (e) { console.error(e); HNLoader.fail('The dice tower could not load.', () => location.reload()); }
+    const names = { '': 'hub', slot: 'slot', dice: 'dice', leaderboard: 'board' };
+    const mods = {};
+    const load = (k, src) => (mods[k] ??= import(src));
+    async function route() {
+      const v = names[location.hash.slice(1)] ?? 'hub';
+      document.querySelectorAll('[data-view]').forEach((el) => { el.hidden = el.dataset.view !== v; });
+      window.scrollTo(0, 0);
+      try {
+        if (v === 'dice') await load('dice', './js/arcade-dice.js?v=1');
+        if (v === 'slot') (await load('slot', './js/arcade-slot.js?v=1')).openSlot();
+        if (v === 'board') (await load('slot', './js/arcade-slot.js?v=1')).openBoard();
+      } catch (e) { console.error(e); HNLoader.fail('This game could not load.', () => location.reload()); }
+    }
+    addEventListener('hashchange', route);
+    route();
   </script>
 
 </body>
