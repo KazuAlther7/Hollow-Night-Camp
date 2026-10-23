@@ -32,13 +32,7 @@
   flex-shrink: 0; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px;
   background: rgba(242,163,75,.16); border: 1.5px solid rgba(242,163,75,.4); color: var(--orange); font: 700 14px var(--body);
 }
-.social-badge i { display: block; width: 24px; height: 24px; background: currentColor;
-  -webkit-mask: var(--ico) center / contain no-repeat; mask: var(--ico) center / contain no-repeat; }
-.social-instagram { --ico: url("../assets/icons/social/instagram.png"); }
-.social-x { --ico: url("../assets/icons/social/x.png"); }
-.social-tiktok { --ico: url("../assets/icons/social/tiktok.png"); }
-.social-youtube { --ico: url("../assets/icons/social/youtube.png"); }
-.social-discord { --ico: url("../assets/icons/social/discord.png"); }
+.social-badge img { display: block; width: 24px; height: 24px; object-fit: contain; }
 .social-text { display: grid; gap: 2px; min-width: 0; }
 .social-text strong { font-size: 16px; }
 .social-text small { color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
