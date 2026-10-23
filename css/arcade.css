@@ -111,3 +111,61 @@ body[data-page="arcade"] .camp-app { position: relative; z-index: 1; }
 .slot-note img { flex: none; }
 .note-avg { margin: 10px 0 0; font-size: 12px; color: #7a5a2a; }
 @media (max-width: 900px) { .slot-note { order: 3; } }
+
+/* ---------- neon sign: Corners Arcade ---------- */
+.arc-head h1.neon-sign {
+  display: flex; flex-wrap: wrap; gap: 0 .32em; margin: 0 0 10px;
+  font: 700 clamp(38px, 7vw, 72px)/1.1 var(--heading); letter-spacing: .02em; text-transform: none;
+}
+.neon-word { display: inline-flex; }
+.neon-ch {
+  --glow: #ff3fa4; --core: #ffe3f3;
+  display: inline-block; color: var(--core);
+  text-shadow: 0 0 2px var(--core), 0 0 7px var(--glow), 0 0 16px var(--glow), 0 0 34px var(--glow), 0 0 62px var(--glow);
+  animation:
+    neon-ignite 1.15s steps(1, end) calc(var(--i) * .22s + .3s) both,
+    neon-hum 3.6s ease-in-out calc(var(--i) * .22s + 2.2s) infinite;
+}
+.neon-word.is-cyan .neon-ch { --glow: #2fe6ff; --core: #e0fbff; }
+/* a few tubes flicker on their own rhythm, like a worn sign */
+.neon-ch:nth-child(3n+2) { animation:
+    neon-ignite 1.15s steps(1, end) calc(var(--i) * .22s + .3s) both,
+    neon-hum 3.6s ease-in-out calc(var(--i) * .22s + 2.2s) infinite,
+    neon-flicker 5.3s linear calc(var(--i) * .22s + 3s) infinite; }
+.neon-word.is-cyan .neon-ch:nth-child(2n) { animation:
+    neon-ignite 1.15s steps(1, end) calc(var(--i) * .22s + .3s) both,
+    neon-hum 3.6s ease-in-out calc(var(--i) * .22s + 2.2s) infinite,
+    neon-flicker 7.1s linear calc(var(--i) * .22s + 3.4s) infinite; }
+/* switch on: dark, stutter, then full glow */
+@keyframes neon-ignite {
+  0%   { color: #3a2a36; text-shadow: none; opacity: .55; }
+  12%  { color: var(--core); text-shadow: 0 0 2px var(--core), 0 0 8px var(--glow); opacity: 1; }
+  22%  { color: #3a2a36; text-shadow: none; opacity: .55; }
+  34%  { color: var(--core); text-shadow: 0 0 2px var(--core), 0 0 12px var(--glow), 0 0 26px var(--glow); opacity: 1; }
+  46%  { color: #3a2a36; text-shadow: none; opacity: .55; }
+  58%  { color: var(--core); text-shadow: 0 0 2px var(--core), 0 0 10px var(--glow); opacity: 1; }
+  70%  { color: #3a2a36; text-shadow: none; opacity: .6; }
+  82%, 100% { color: var(--core); text-shadow: 0 0 2px var(--core), 0 0 7px var(--glow), 0 0 16px var(--glow), 0 0 34px var(--glow), 0 0 62px var(--glow); opacity: 1; }
+}
+/* soft breathing glow */
+@keyframes neon-hum {
+  0%, 100% { text-shadow: 0 0 2px var(--core), 0 0 7px var(--glow), 0 0 16px var(--glow), 0 0 34px var(--glow), 0 0 62px var(--glow); }
+  50%      { text-shadow: 0 0 2px var(--core), 0 0 5px var(--glow), 0 0 11px var(--glow), 0 0 22px var(--glow), 0 0 40px var(--glow); }
+}
+/* brief blink-out */
+@keyframes neon-flicker {
+  0%, 91%, 94%, 97%, 100% { opacity: 1; }
+  92%, 96% { opacity: .25; color: #5a3a50; }
+  93%, 98% { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) { .neon-ch { animation: none !important; } }
+
+/* ---------- leaderboard icon ---------- */
+.arc-board-icon { flex: none; width: 40px; height: 40px; border-radius: 12px; filter: drop-shadow(0 3px 6px rgba(0,0,0,.45)); transition: transform .25s ease; }
+.arc-board-btn:hover .arc-board-icon, .arc-board-btn:focus-visible .arc-board-icon { transform: rotate(-6deg) scale(1.08); }
+
+/* ---------- D20 Rolls logo ---------- */
+.arc-card-logo-d20 { width: 150px; height: auto; filter: drop-shadow(0 6px 12px rgba(0,0,0,.5)); }
+.arc-card:hover .arc-card-logo-d20 { animation: logo-bob 1.6s ease-in-out infinite; }
+.dice-logo img { width: min(70vw, 300px); height: auto; }
+@media (prefers-reduced-motion: reduce) { .arc-card:hover .arc-card-logo-d20 { animation: none; } }
