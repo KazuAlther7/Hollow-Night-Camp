@@ -15,6 +15,7 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
 function resize() {
   const w = stage.clientWidth, h = stage.clientHeight;
+  if (!w || !h) return;
   renderer.setSize(w, h, false);
   camera.aspect = w / h;
   const k = Math.max(1, 1.3 / camera.aspect);
@@ -193,6 +194,7 @@ function finish() {
 let last = performance.now();
 function loop(now) {
   requestAnimationFrame(loop);
+  if (!stage.clientWidth) { last = now; return; }
   const dt = Math.min((now - last) / 1000, 0.05); last = now;
   if (drag) {
     const b = drag.d.body, v = new CANNON.Vec3(drag.target.x - b.position.x, drag.target.y - b.position.y, drag.target.z - b.position.z).scale(14);
