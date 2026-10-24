@@ -16,7 +16,7 @@ const money = n => Number(n || 0).toLocaleString();
 function injectStyles() {
   if (document.querySelector('link[data-daily-login-css]')) return;
   const link = document.createElement('link');
-  link.rel = 'stylesheet'; link.href = 'css/daily-login.css?v=5';
+  link.rel = 'stylesheet'; link.href = 'css/daily-login.css?v=6';
   link.dataset.dailyLoginCss = ''; document.head.append(link);
 }
 
@@ -35,6 +35,12 @@ function createUI() {
     <div class="amber-currency-card" id="amberCurrencyCard" hidden>
       <div class="amber-currency-card-head"><div><span class="amber-eyebrow">YOUR WALLET</span><h2>Amber Coin</h2><p>Little treasures for your journey.</p></div><img src="${COIN}" alt="" class="amber-currency-large-coin"></div>
       <div class="amber-currency-balance"><span>Available balance</span><strong><img src="${COIN}" alt=""><b data-amber-balance>—</b><small>AMBER</small></strong></div>
+      <div class="amber-newreader" id="amberNewReader" hidden>
+        <img src="${COIN}" alt="" draggable="false">
+        <span><strong>New Reader</strong><small>A welcome gift for joining the camp</small></span>
+        <button class="amber-newreader-claim" id="amberNewReaderClaim" type="button">Claim +500</button>
+      </div>
+      <p class="amber-newreader-msg" id="amberNewReaderMsg" role="status" aria-live="polite"></p>
       <button class="daily-login-open" id="dailyLoginOpen" type="button"><span><img src="${COIN}" alt="" draggable="false"></span><span><strong>Daily Login</strong><small>Claim your 7-day camp rewards</small></span><b class="daily-login-open-arrow" aria-hidden="true"></b></button>
       <p class="amber-currency-note">Days 1–6: 25 Amber · Day 7: 50 Amber.</p>
       <p class="amber-currency-note amber-timezone-note">Resets at midnight in <b id="amberTimezoneName">—</b> · <a href="settings-clock.html">Clock &amp; timezone</a></p>
@@ -43,6 +49,7 @@ function createUI() {
   const trigger = widget.querySelector('#amberCurrencyTrigger'); const card = widget.querySelector('#amberCurrencyCard');
   trigger.addEventListener('click', () => { const open = card.hidden; card.hidden = !open; trigger.setAttribute('aria-expanded', String(open)); });
   widget.querySelector('#dailyLoginOpen').addEventListener('click', openDailyLogin);
+  widget.querySelector('#amberNewReaderClaim').addEventListener('click', claimNewReader);
   document.addEventListener('click', e => { if (!widget.contains(e.target)) { card.hidden = true; trigger.setAttribute('aria-expanded', 'false'); } });
 }
 
@@ -64,16 +71,35 @@ async function syncTimezoneFromSettings() {
 }
 window.addEventListener('hnc:timezone', () => { tzFailed = ''; syncTimezoneFromSettings(); });
 
+// New Reader gift: 500 Amber, once. Visible only while the server says it is still unclaimed.
+function paintNewReader() {
+  const open = walletState?.new_reader_claimed === false;   // undefined = SQL not installed yet -> stay hidden
+  const box = document.getElementById('amberNewReader'); if (box) box.hidden = !open;
+  document.getElementById('amberCurrencyTrigger')?.classList.toggle('has-gift', open);
+}
+let newReaderBusy = false;
+async function claimNewReader(event) {
+  if (newReaderBusy) return; newReaderBusy = true;
+  const button = event.currentTarget, msg = document.getElementById('amberNewReaderMsg'); button.disabled = true;
+  try {
+    const { data, error } = await supabase.rpc('claim_new_reader'); if (error) throw error;
+    await refreshWallet();
+    if (msg) msg.textContent = data?.claimed ? `✓ ${money(data.amount)} Amber added to your wallet!` : 'Already claimed.';
+    setTimeout(() => { if (msg) msg.textContent = ''; }, 5000);
+  } catch (err) { if (msg) msg.textContent = 'Could not claim the gift. Please try again.'; button.disabled = false; console.warn('New Reader claim failed:', err); }
+  finally { newReaderBusy = false; }
+}
+
 async function refreshWallet() {
   const data = await syncWallet();
   if (!data) { document.querySelectorAll('[data-amber-balance]').forEach(el => el.textContent = '—'); throw new Error('wallet_state returned no data'); }
-  walletState = data; paintTimezone();
+  walletState = data; paintTimezone(); paintNewReader();
   return data;
 }
 
 // live updates (realtime / other tab / focus): keep the open Daily Login board in step
 document.addEventListener('amber:wallet', e => {
-  walletState = e.detail; paintTimezone(); syncTimezoneFromSettings();
+  walletState = e.detail; paintTimezone(); paintNewReader(); syncTimezoneFromSettings();
   if (document.getElementById('dailyLoginGrid')) renderDays().catch(() => {});
 });
 
