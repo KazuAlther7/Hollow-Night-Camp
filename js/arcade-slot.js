@@ -1,6 +1,6 @@
 /* Corners Arcade: Amber Gacha Machine. Server (sql/arcade_slot.sql) decides reels, prize, cost and spin limit. */
 import { supabase } from '../config/supabase.js';
-import { setBalance } from './wallet.js?v=1';
+import { setBalance } from './wallet.js?v=2';
 
 const SYM = ['amber', 'eye', 'fire', 'radio', 'pine', 'stone', 'binocular', 'd20', 'sword'];
 const NAME = { amber: 'Amber', eye: 'Eye', fire: 'Fire', radio: 'Walkie Talkie', pine: 'Pinecone', stone: 'Rune Stone', binocular: 'Binoculars', d20: 'D20', sword: 'Sword' };

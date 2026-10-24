@@ -1,12 +1,12 @@
 // HOLLOW NIGHT CAMP — Amber Coin wallet + timezone-aware 7-day daily login.
 // Uses server RPCs only: wallet_state, daily_checkin, set_camp_timezone.
 import { supabase } from '../config/supabase.js';
+import { setBalance, refreshWallet as syncWallet, startLive } from './wallet.js?v=2';
 
 const COIN = 'assets/arcade/amber-coin.png';
 const BOARD = 'assets/daily-login/daily-login-board.webp';
 // blank paper slots on the board art, in % of the image: left, top, width, height
 const SLOTS = [[15.3,43.1,14.6,18.4],[33.7,43.1,14.3,18.5],[52.0,43.2,14.7,18.3],[70.9,43.0,14.7,19.1],[15.3,66.6,14.6,19.1],[33.4,66.8,15.0,18.3],[68.6,68.5,16.0,18.4]];
-const STORAGE_KEY = 'hnc-daily-login-popup-camp-date-v2';
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 let walletState = null;
 let busy = false;
@@ -15,7 +15,7 @@ const money = n => Number(n || 0).toLocaleString();
 function injectStyles() {
   if (document.querySelector('link[data-daily-login-css]')) return;
   const link = document.createElement('link');
-  link.rel = 'stylesheet'; link.href = 'css/daily-login.css?v=3';
+  link.rel = 'stylesheet'; link.href = 'css/daily-login.css?v=4';
   link.dataset.dailyLoginCss = ''; document.head.append(link);
 }
 
@@ -28,18 +28,18 @@ function createUI() {
     <button class="amber-currency-trigger" id="amberCurrencyTrigger" type="button" aria-expanded="false" aria-controls="amberCurrencyCard" aria-label="Amber Coin">
       <img class="amber-currency-coin" src="${COIN}" alt="">
       <span class="amber-currency-name">Amber Coin</span>
-      <strong class="amber-currency-total" data-daily-amber-balance>—</strong>
+      <strong class="amber-currency-total" data-amber-balance>—</strong>
       <i class="amber-currency-chevron" aria-hidden="true"></i>
     </button>
     <div class="amber-currency-card" id="amberCurrencyCard" hidden>
       <div class="amber-currency-card-head"><div><span class="amber-eyebrow">YOUR WALLET</span><h2>Amber Coin</h2><p>Little treasures for your journey.</p></div><img src="${COIN}" alt="" class="amber-currency-large-coin"></div>
-      <div class="amber-currency-balance"><span>Available balance</span><strong><img src="${COIN}" alt=""><b data-daily-amber-balance>—</b><small>AMBER</small></strong></div>
+      <div class="amber-currency-balance"><span>Available balance</span><strong><img src="${COIN}" alt=""><b data-amber-balance>—</b><small>AMBER</small></strong></div>
       <label class="amber-timezone-label" for="amberTimezoneSelect">Daily reset timezone</label>
       <select class="amber-timezone-select" id="amberTimezoneSelect">
         <option value="Asia/Jakarta">WIB — Asia/Jakarta</option><option value="Asia/Makassar">WITA — Asia/Makassar</option><option value="Asia/Jayapura">WIT — Asia/Jayapura</option>
         <option value="Asia/Singapore">Asia/Singapore</option><option value="Asia/Kuala_Lumpur">Asia/Kuala_Lumpur</option><option value="Asia/Tokyo">Asia/Tokyo</option><option value="UTC">UTC</option><option value="America/Los_Angeles">America/Los_Angeles</option><option value="America/New_York">America/New_York</option><option value="Europe/London">Europe/London</option>
       </select>
-      <button class="daily-login-open" id="dailyLoginOpen" type="button"><span>▦</span><span><strong>Daily Login</strong><small>Claim your 7-day camp rewards</small></span><b aria-hidden="true">→</b></button>
+      <button class="daily-login-open" id="dailyLoginOpen" type="button"><span><img src="${COIN}" alt="" draggable="false"></span><span><strong>Daily Login</strong><small>Claim your 7-day camp rewards</small></span><b aria-hidden="true">→</b></button>
       <p class="amber-currency-note">Daily rewards reset at midnight in your selected timezone. Days 1–6: 25 Amber · Day 7: 50 Amber.</p>
       <p class="amber-timezone-feedback" id="amberTimezoneFeedback" role="status"></p>
     </div>`;
@@ -51,19 +51,23 @@ function createUI() {
   document.addEventListener('click', e => { if (!widget.contains(e.target)) { card.hidden = true; trigger.setAttribute('aria-expanded', 'false'); } });
 }
 
-function setBalance(balance) {
-  document.querySelectorAll('[data-daily-amber-balance]').forEach(el => el.textContent = money(balance));
-  document.dispatchEvent(new CustomEvent('amber:balance', { detail: { balance } }));
+function syncTimezone(data) {
+  const timezone = document.getElementById('amberTimezoneSelect');
+  if (timezone && data?.timezone_name && [...timezone.options].some(o => o.value === data.timezone_name)) timezone.value = data.timezone_name;
 }
 
 async function refreshWallet() {
-  const { data, error } = await supabase.rpc('wallet_state');
-  if (error || !data) { document.querySelectorAll('[data-daily-amber-balance]').forEach(el => el.textContent = '—'); throw error || new Error('wallet_state returned no data'); }
-  walletState = data; setBalance(data.balance);
-  const timezone = document.getElementById('amberTimezoneSelect');
-  if (timezone && data.timezone_name && [...timezone.options].some(o => o.value === data.timezone_name)) timezone.value = data.timezone_name;
+  const data = await syncWallet();
+  if (!data) { document.querySelectorAll('[data-amber-balance]').forEach(el => el.textContent = '—'); throw new Error('wallet_state returned no data'); }
+  walletState = data; syncTimezone(data);
   return data;
 }
+
+// live updates (realtime / other tab / focus): keep the open Daily Login board in step
+document.addEventListener('amber:wallet', e => {
+  walletState = e.detail; syncTimezone(e.detail);
+  if (document.getElementById('dailyLoginGrid')) renderDays().catch(() => {});
+});
 
 async function changeTimezone(event) {
   const select = event.currentTarget; const feedback = document.getElementById('amberTimezoneFeedback');
@@ -80,6 +84,7 @@ async function changeTimezone(event) {
 }
 
 function openDailyLogin() {
+  if (document.getElementById('dailyLoginOverlay')) return;
   if (document.getElementById('dailyLoginOverlay')) return;
   const overlay = document.createElement('div'); overlay.id = 'dailyLoginOverlay'; overlay.className = 'daily-login-overlay';
   overlay.innerHTML = `<section class="daily-login-board" role="dialog" aria-modal="true" aria-label="Daily Login — 7 days rewards">
@@ -145,26 +150,18 @@ function placeWidget() {
 function queuePlace() { if (!placeQueued) { placeQueued = true; requestAnimationFrame(placeWidget); } }
 function mountWidget() { createUI(); queuePlace(); }
 
-function maybeAutoPopup() {
-  const today = walletState?.camp_date;
-  if (!today) return; // server date is authoritative; do not guess the user's reset day in the browser.
-  try { if (localStorage.getItem(STORAGE_KEY) === today) return; localStorage.setItem(STORAGE_KEY, today); } catch (_) {}
-  const show = () => {
-    const welcome = document.getElementById('welcomeScreen');
-    if (document.body.classList.contains('stage-home') || !welcome || welcome.hidden) { openDailyLogin(); return true; }
-    return false;
-  };
-  if (show()) return;
-  const observer = new MutationObserver(() => { if (show()) observer.disconnect(); });
-  observer.observe(document.body, { attributes: true, attributeFilter: ['class'], childList: true, subtree: true });
-  document.getElementById('enterCampButton')?.addEventListener('click', () => setTimeout(show, 50), { once: true });
+// The board opens every time the reader comes through the Welcome transition ("ENTER THE CAMP"), never on plain page loads.
+function popupAfterWelcome() {
+  document.getElementById('enterCampButton')?.addEventListener('click', () => setTimeout(openDailyLogin, 450));
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
+async function boot() {
   mountWidget();
+  popupAfterWelcome();
   window.addEventListener('resize', queuePlace);
   new MutationObserver(queuePlace).observe(document.body, { attributes: true, attributeFilter: ['class'] });
   const finder = new MutationObserver(queuePlace); finder.observe(document.body, { childList: true, subtree: true }); setTimeout(() => finder.disconnect(), 10000);
-  try { await refreshWallet(); } catch (err) { console.warn('Amber wallet unavailable:', err); }
-  maybeAutoPopup();
-});
+  try { await refreshWallet(); startLive(); } catch (err) { console.warn('Amber wallet unavailable:', err); }
+}
+// this module is also loaded late by shared.js, after DOMContentLoaded has already fired
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();

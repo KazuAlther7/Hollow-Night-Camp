@@ -407,7 +407,7 @@ export async function initPage(options = {}) {
   mountSubNav();
 
   // Amber balance row in the account menu; never allowed to break the page
-  if (!editor) import('./wallet.js?v=1').then((module) => module.mountWalletMenu()).catch((error) => console.warn('Amber wallet unavailable:', error));
+  if (!editor) import('./wallet.js?v=2').then((module) => module.mountWalletMenu()).catch((error) => console.warn('Amber wallet unavailable:', error));
 
   // footer on every camp page except the editor and the reader
   if (!editor && document.body.dataset.page !== 'read') {
@@ -416,6 +416,9 @@ export async function initPage(options = {}) {
 
   // top-right status widget (flip clock + online readers); never allowed to break the page
   import('./status-widget.js?v=3').then((module) => module.mountStatusWidget()).catch((error) => console.warn('Status widget unavailable:', error));
+
+  // Amber Coin widget (under the clock/online widget) + Daily Login board, on every camp page except the editor
+  if (!editor) import('./daily-login.js?v=4').catch((error) => console.warn('Amber Coin widget unavailable:', error));
 
   observeAuthState((event) => {
     if (event === 'SIGNED_OUT' && !signingOut) {
