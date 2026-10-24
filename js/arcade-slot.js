@@ -73,7 +73,7 @@ function render() {
   const b = bal ?? state.balance;
   $('bal').textContent = Number(b).toLocaleString();
   const ok = b >= 50 && !busy;
-  $('pull').disabled = !ok; $('lever').disabled = !ok;
+  $('pull').disabled = !ok; $('lever').disabled = !ok; $('pull5').disabled = !(b >= 250 && !busy);
 }
 document.addEventListener('amber:balance', (e) => { bal = e.detail.balance; if (state) render(); });
 function msg(t, cls = '') { const m = $('slotMsg'); m.textContent = t; m.className = cls; }
@@ -86,31 +86,44 @@ async function loadState() {
   const w = await refreshWallet(); if (!w) setBalance(data.balance);
   render(); return true;
 }
-async function pull() {
+const COST = 50;
+const label = (p) => (p === 1000 ? 'JACKPOT! +1000 Amber' : p === 500 ? 'Triple! +500 Amber' : p === 100 ? 'Pair! +100 Amber' : '+25 Amber');
+// n pulls in a row: each one is its own server spin (server still decides reels, prize and cost), animated back to back.
+async function pull(n = 1) {
   if (busy || !state) return;
+  if ((bal ?? state.balance) < COST * n) { msg(`Not enough Amber (${COST * n} needed).`, 'is-error'); return; }
   busy = true; render(); msg(''); $('machine').classList.add('is-pulling');
   if (!muted) ac().resume?.();
-  sfx.pull();
-  const release = holdBalance();   // keep the number steady until the reels stop
-  const { data, error } = await supabase.rpc('slot_spin');
-  if (error) {
-    release();
-    const k = Object.keys(ERR).find((x) => error.message.includes(x));
-    msg(ERR[k] || 'Spin failed. Try again.', 'is-error'); $('machine').classList.remove('is-pulling'); busy = false; await loadState(); return;
+  const release = holdBalance();   // keep the number steady until the last reel stops
+  const quick = n > 1;
+  let won = 0, jackpots = 0, done = 0, last = null, failed = null;
+  for (let k = 0; k < n; k++) {
+    if (n > 1) msg(`Pull ${k + 1} of ${n}…`);
+    sfx.pull();
+    const { data, error } = await supabase.rpc('slot_spin');
+    if (error) { failed = error; break; }
+    const tick = setInterval(sfx.tick, 85);
+    await Promise.all(reels.map((r, i) => spinTo(r, i, data.reels[i], quick ? 620 + i * 220 : 1100 + i * 450).then(sfx.stop)));
+    clearInterval(tick); sfx.win(data.prize);
+    won += data.prize; done++; last = data; if (data.prize === 1000) jackpots++;
+    state = { ...state, balance: data.balance, total_won: (state.total_won || 0) + data.prize };
+    if (data.prize >= 100) { $('machine').classList.add('is-win'); setTimeout(() => $('machine').classList.remove('is-win'), quick ? 500 : 1600); }
+    if (quick && k < n - 1) await new Promise((r) => setTimeout(r, fast ? 0 : 250));
   }
-  const tick = setInterval(sfx.tick, 85);
-  await Promise.all(reels.map((r, i) => spinTo(r, i, data.reels[i], 1100 + i * 450).then(sfx.stop)));
-  clearInterval(tick); sfx.win(data.prize);
   $('machine').classList.remove('is-pulling');
-  state = { ...state, balance: data.balance, total_won: (state.total_won || 0) + data.prize };
   release();
-  const w = await refreshWallet(); if (!w) setBalance(data.balance);
+  if (last) { const w = await refreshWallet(); if (!w) setBalance(last.balance); }
   busy = false; render();
-  const jack = data.prize === 1000;
-  msg(jack ? `JACKPOT! +1000 Amber` : data.prize === 500 ? `Triple! +500 Amber` : data.prize === 100 ? `Pair! +100 Amber` : `+25 Amber`, jack ? 'is-jackpot' : data.prize >= 100 ? 'is-win' : '');
-  if (data.prize >= 100) { $('machine').classList.add('is-win'); setTimeout(() => $('machine').classList.remove('is-win'), 1600); }
+  if (failed) {
+    const k = Object.keys(ERR).find((x) => failed.message.includes(x));
+    msg((ERR[k] || 'Spin failed. Try again.') + (done ? ` ${done} of ${n} pulls done, +${won.toLocaleString()} Amber.` : ''), 'is-error');
+    await loadState(); return;
+  }
+  if (n === 1) { msg(label(last.prize), jackpots ? 'is-jackpot' : last.prize >= 100 ? 'is-win' : ''); return; }
+  const net = won - COST * n;
+  msg(`${n} pulls: +${won.toLocaleString()} Amber (${net >= 0 ? '+' : '−'}${Math.abs(net).toLocaleString()} net)${jackpots ? ` · ${jackpots}× JACKPOT!` : ''}`, jackpots ? 'is-jackpot' : won > COST * n ? 'is-win' : '');
 }
-$('pull').onclick = pull; $('lever').onclick = pull;
+$('pull').onclick = () => pull(1); $('lever').onclick = () => pull(1); $('pull5').onclick = () => pull(5);
 
 let ready = false;
 export async function openSlot() {
