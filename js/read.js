@@ -4,7 +4,8 @@ import { initPage } from './shared.js?v=24';
 import { supabase } from '../config/supabase.js';
 import { el } from './dom.js?v=2';
 import { mountChapterRating } from './rating.js?v=1';
-import { mountReadingTools } from './reading.js?v=1';
+import { mountReadingTools } from './reading.js?v=2';
+import { renderSheets } from './sheets.js?v=1';
 import { loadVolumes, sortChapters } from './volumes.js?v=1';
 
 const ctx = await initPage({ active: 'novels' });
@@ -47,16 +48,14 @@ if (!chapterId) {
     }
 
     const body = (chapter.body || '').trim();
-    bodyEl.replaceChildren(
-      ...(body
-        ? body.split(/\n{2,}/).map((paragraph) => el('p', { text: paragraph.trim() }))
-        : [el('p', { class: 'reader-empty', text: 'This chapter is empty.' })])
-    );
+    let sheets = null;
+    if (body) sheets = renderSheets(bodyEl, body);
+    else bodyEl.replaceChildren(el('p', { class: 'reader-empty', text: 'This chapter is empty.' }));
 
     if (chapter.status === 'published') {
       mountChapterRating(document.getElementById('readerRating'), chapter.id, ctx.user.id);
       mountReadingTools({
-        chapter, userId: ctx.user.id, body: bodyEl, tools: document.getElementById('readerTools'),
+        chapter, userId: ctx.user.id, body: bodyEl, sheets, tools: document.getElementById('readerTools'),
         resume: new URLSearchParams(window.location.search).get('resume') === '1'
       });
     }

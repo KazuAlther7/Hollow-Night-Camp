@@ -24,7 +24,7 @@ function saveProgress({ userId, chapter, progress }) {
 }
 
 // Bookmark button, "Resume" button and scroll tracking for one published chapter.
-export async function mountReadingTools({ chapter, userId, body, tools, resume }) {
+export async function mountReadingTools({ chapter, userId, body, tools, resume, sheets }) {
   const state = await loadState(chapter.id);
   if (!state) return;
 
@@ -57,12 +57,16 @@ export async function mountReadingTools({ chapter, userId, body, tools, resume }
     window.scrollTo({ top: Math.max(0, top), behavior: 'auto' });
   };
   const saved = state.progress;
+  // With sheets (js/sheets.js) resume lands on the start of the sheet that holds the saved percent: stable on every screen.
+  const paged = sheets && sheets.count > 1;
+  const goTo = (percent) => (paged ? sheets.scrollTo(sheets.sheetFor(percent)) : scrollToProgress(percent));
   if (saved != null && saved > 0 && saved < 100) {
     if (resume) {
-      requestAnimationFrame(() => scrollToProgress(saved));
-      window.addEventListener('load', () => scrollToProgress(saved), { once: true });
+      requestAnimationFrame(() => goTo(saved));
+      window.addEventListener('load', () => goTo(saved), { once: true });
     } else if (saved >= 3) {
-      tools.append(el('button', { class: 'hn-btn ghost small', type: 'button', text: 'Resume from ' + saved + '%', onclick: () => scrollToProgress(saved) }));
+      const where = paged ? 'Sheet ' + String(sheets.sheetFor(saved)).padStart(2, '0') + ' · ' + saved + '%' : saved + '%';
+      tools.append(el('button', { class: 'hn-btn ghost small', type: 'button', text: 'Resume from ' + where, onclick: () => goTo(saved) }));
     }
   }
 
