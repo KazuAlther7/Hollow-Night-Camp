@@ -58,6 +58,7 @@
           <div class="slot-side">
             <div class="slot-wallet"><img src="assets/arcade/amber-coin.png" alt="" width="40" height="40"><strong id="bal">…</strong><span>Amber</span></div>
                         <button type="button" class="arc-btn arc-primary" id="pull">Pull lever · 50 Amber</button>
+            <button type="button" class="arc-btn arc-primary" id="pull5">Pull ×5 · 250 Amber</button>
             <button type="button" class="arc-btn" id="mute">Sound: on</button>
             <p id="slotMsg" aria-live="polite"></p>
             <ul class="slot-pay">
@@ -111,8 +112,8 @@
       window.scrollTo(0, 0);
       try {
         if (v === 'dice') await load('dice', './js/arcade-dice.js?v=1');
-        if (v === 'slot') (await load('slot', './js/arcade-slot.js?v=9')).openSlot();
-        if (v === 'board') (await load('slot', './js/arcade-slot.js?v=9')).openBoard();
+        if (v === 'slot') (await load('slot', './js/arcade-slot.js?v=10')).openSlot();
+        if (v === 'board') (await load('slot', './js/arcade-slot.js?v=10')).openBoard();
       } catch (e) { console.error(e); HNLoader.fail('This game could not load.', () => location.reload()); }
     }
     addEventListener('hashchange', route);
