@@ -1,8 +1,11 @@
-// HOLLOW NIGHT CAMP — Amber wallet + timezone-aware 7-day daily login.
+// HOLLOW NIGHT CAMP — Amber Coin wallet + timezone-aware 7-day daily login.
 // Uses server RPCs only: wallet_state, daily_checkin, set_camp_timezone.
 import { supabase } from '../config/supabase.js';
 
 const COIN = 'assets/arcade/amber-coin.png';
+const BOARD = 'assets/daily-login/daily-login-board.webp';
+// blank paper slots on the board art, in % of the image: left, top, width, height
+const SLOTS = [[15.3,43.1,14.6,18.4],[33.7,43.1,14.3,18.5],[52.0,43.2,14.7,18.3],[70.9,43.0,14.7,19.1],[15.3,66.6,14.6,19.1],[33.4,66.8,15.0,18.3],[68.6,68.5,16.0,18.4]];
 const STORAGE_KEY = 'hnc-daily-login-popup-camp-date-v2';
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 let walletState = null;
@@ -12,7 +15,7 @@ const money = n => Number(n || 0).toLocaleString();
 function injectStyles() {
   if (document.querySelector('link[data-daily-login-css]')) return;
   const link = document.createElement('link');
-  link.rel = 'stylesheet'; link.href = 'css/daily-login.css?v=2';
+  link.rel = 'stylesheet'; link.href = 'css/daily-login.css?v=3';
   link.dataset.dailyLoginCss = ''; document.head.append(link);
 }
 
@@ -22,10 +25,11 @@ function createUI() {
   const widget = document.createElement('section');
   widget.id = 'amberCurrencyWidget'; widget.className = 'amber-currency-widget';
   widget.innerHTML = `
-    <button class="amber-currency-trigger" id="amberCurrencyTrigger" type="button" aria-expanded="false" aria-controls="amberCurrencyCard">
-      <span class="amber-currency-coin"><img src="${COIN}" alt=""></span>
-      <span class="amber-currency-trigger-copy"><strong>Amber Currency</strong><small>Your camp wallet & daily rewards</small></span>
-      <strong class="amber-currency-total" data-daily-amber-balance>—</strong><span class="amber-currency-chevron" aria-hidden="true">⌄</span>
+    <button class="amber-currency-trigger" id="amberCurrencyTrigger" type="button" aria-expanded="false" aria-controls="amberCurrencyCard" aria-label="Amber Coin">
+      <img class="amber-currency-coin" src="${COIN}" alt="">
+      <span class="amber-currency-name">Amber Coin</span>
+      <strong class="amber-currency-total" data-daily-amber-balance>—</strong>
+      <i class="amber-currency-chevron" aria-hidden="true"></i>
     </button>
     <div class="amber-currency-card" id="amberCurrencyCard" hidden>
       <div class="amber-currency-card-head"><div><span class="amber-eyebrow">YOUR WALLET</span><h2>Amber Coin</h2><p>Little treasures for your journey.</p></div><img src="${COIN}" alt="" class="amber-currency-large-coin"></div>
@@ -78,12 +82,9 @@ async function changeTimezone(event) {
 function openDailyLogin() {
   if (document.getElementById('dailyLoginOverlay')) return;
   const overlay = document.createElement('div'); overlay.id = 'dailyLoginOverlay'; overlay.className = 'daily-login-overlay';
-  overlay.innerHTML = `<section class="daily-login-board" role="dialog" aria-modal="true" aria-labelledby="dailyLoginTitle">
+  overlay.innerHTML = `<section class="daily-login-board" role="dialog" aria-modal="true" aria-label="Daily Login — 7 days rewards">
     <button class="daily-login-close" type="button" aria-label="Close daily login">×</button>
-    <header class="daily-login-header"><div class="daily-login-title-art"><span id="dailyLoginTitle">DAILY LOGIN</span><b>7 DAYS REWARDS</b></div></header>
-    <p class="daily-login-subtitle">A little gift for every day you return to the camp.</p>
-    <div class="daily-login-grid" id="dailyLoginGrid" aria-live="polite"></div><p class="daily-login-feedback" id="dailyLoginFeedback" role="status" aria-live="polite"></p>
-    <footer class="daily-login-footer"><img src="${COIN}" alt=""><span>Keep the campfire burning.</span></footer></section>`;
+    <div class="daily-login-art"><img src="${BOARD}" alt="Daily Login — 7 days rewards" draggable="false"><div class="daily-login-grid" id="dailyLoginGrid" aria-live="polite"></div><p class="daily-login-feedback" id="dailyLoginFeedback" role="status" aria-live="polite"></p></div></section>`;
   document.body.append(overlay);
   const close = () => overlay.remove();
   overlay.querySelector('.daily-login-close').addEventListener('click', close);
@@ -97,20 +98,26 @@ async function renderDays() {
   const grid = document.getElementById('dailyLoginGrid'); if (!grid) return;
   if (!walletState) await refreshWallet();
   const currentDay = Math.min(7, Math.max(1, Number(walletState?.streak_day || 1)));
-  const claimed = Boolean(walletState?.claimed_today);
+  const claimedToday = Boolean(walletState?.claimed_today);
   grid.innerHTML = '';
   for (let day = 1; day <= 7; day++) {
-    const item = document.createElement('article');
-    item.className = 'daily-login-day' + (day === currentDay ? ' is-today' : '') + (claimed && day === currentDay ? ' is-claimed' : '');
+    const done = day < currentDay || (claimedToday && day === currentDay); // earlier days of the streak count as claimed
+    const claimable = day === currentDay && !claimedToday;
+    const item = document.createElement(claimable ? 'button' : 'article');
+    if (claimable) item.type = 'button';
+    item.className = 'daily-login-day' + (day === 7 ? ' is-day7' : '') + (done ? ' is-claimed' : '') + (claimable ? ' is-claimable' : '');
+    const [l, t, w, h] = SLOTS[day - 1];
+    item.style.cssText = `left:${l}%;top:${t}%;width:${w}%;height:${h}%`;
     const reward = day === 7 ? 50 : 25;
-    item.innerHTML = `<span class="daily-login-day-label">DAY ${day}</span><span class="daily-login-reward-coin"><img src="${COIN}" alt="Amber Coin"><b>${reward}</b></span><span class="daily-login-reward-label">AMBER</span><span class="daily-login-claimed">${claimed && day === currentDay ? '✓ CLAIMED' : day === currentDay ? 'TODAY' : 'DAILY GIFT'}</span>`;
-    if (day === currentDay && !claimed) { const button = document.createElement('button'); button.type = 'button'; button.className = 'daily-login-claim'; button.textContent = 'Claim Reward'; button.addEventListener('click', claimDailyReward); item.append(button); }
+    item.innerHTML = `<span class="daily-login-reward-coin"><img src="${COIN}" alt="Amber Coin"><b>${reward}</b>${done ? '<i class="daily-login-check" aria-hidden="true">✓</i>' : ''}</span><span class="daily-login-reward-label">AMBER</span><span class="daily-login-claimed">${done ? 'CLAIMED' : claimable ? 'CLAIM' : ''}</span>`;
+    if (claimable) { item.setAttribute('aria-label', `Claim day ${day} reward: ${reward} Amber`); item.addEventListener('click', claimDailyReward); }
+    else item.setAttribute('aria-label', `Day ${day}: ${reward} Amber${done ? ', claimed' : ''}`);
     grid.append(item);
   }
 }
 
 async function claimDailyReward(event) {
-  if (busy) return; busy = true; const button = event.currentTarget; button.disabled = true; button.textContent = 'Claiming…';
+  if (busy) return; busy = true; const button = event.currentTarget; button.disabled = true; const label = button.querySelector('.daily-login-claimed'); if (label) label.textContent = '…';
   const feedback = document.getElementById('dailyLoginFeedback');
   try {
     const { data, error } = await supabase.rpc('daily_checkin'); if (error) throw error;
@@ -118,15 +125,25 @@ async function claimDailyReward(event) {
     if (data?.claimed) { walletState.claimed_today = true; walletState.streak_day = data.streak_day ?? walletState.streak_day; walletState.balance = data.balance ?? walletState.balance; setBalance(walletState.balance); }
     if (feedback) { feedback.textContent = data?.claimed === false ? 'Already claimed today — see you after the next midnight.' : `✓ ${money(data?.amount)} Amber added to your wallet!`; feedback.classList.toggle('is-success', data?.claimed !== false); }
     await renderDays(); if (!reduceMotion) document.querySelector('.daily-login-board')?.classList.add('is-celebrating');
-  } catch (err) { if (feedback) feedback.textContent = 'Could not claim your reward. Please try again.'; button.disabled = false; button.textContent = 'Try Again'; console.warn('Daily login claim failed:', err); }
+  } catch (err) { if (feedback) feedback.textContent = 'Could not claim your reward. Please try again.'; button.disabled = false; if (label) label.textContent = 'RETRY'; console.warn('Daily login claim failed:', err); }
   finally { busy = false; }
 }
 
-function mountBelowStatusWidget() {
-  createUI(); const widget = document.getElementById('amberCurrencyWidget');
-  const status = document.querySelector('.status-widget, #statusWidget, .status-widget-shell');
-  if (status?.parentElement && !widget.classList.contains('is-near-status')) { widget.classList.add('is-near-status'); status.insertAdjacentElement('afterend', widget); }
+// Amber Coin sits right under the clock/online widget (.hn-status), aligned to its right edge.
+let placeQueued = false, statusObserved = null;
+function placeWidget() {
+  placeQueued = false;
+  const widget = document.getElementById('amberCurrencyWidget'); if (!widget) return;
+  const status = document.querySelector('.hn-status');
+  if (!status || getComputedStyle(status).display === 'none') { widget.hidden = true; return; }
+  if (statusObserved !== status && 'ResizeObserver' in window) { statusObserved = status; new ResizeObserver(queuePlace).observe(status); }
+  const r = status.getBoundingClientRect();
+  widget.hidden = false;
+  widget.style.top = Math.round(r.bottom + 10) + 'px';
+  widget.style.right = Math.max(8, Math.round(window.innerWidth - r.right)) + 'px';
 }
+function queuePlace() { if (!placeQueued) { placeQueued = true; requestAnimationFrame(placeWidget); } }
+function mountWidget() { createUI(); queuePlace(); }
 
 function maybeAutoPopup() {
   const today = walletState?.camp_date;
@@ -144,8 +161,10 @@ function maybeAutoPopup() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  mountBelowStatusWidget();
+  mountWidget();
+  window.addEventListener('resize', queuePlace);
+  new MutationObserver(queuePlace).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  const finder = new MutationObserver(queuePlace); finder.observe(document.body, { childList: true, subtree: true }); setTimeout(() => finder.disconnect(), 10000);
   try { await refreshWallet(); } catch (err) { console.warn('Amber wallet unavailable:', err); }
-  const observer = new MutationObserver(() => mountBelowStatusWidget()); observer.observe(document.body, { childList: true, subtree: true }); setTimeout(() => observer.disconnect(), 8000);
   maybeAutoPopup();
 });
