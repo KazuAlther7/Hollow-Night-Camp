@@ -1,6 +1,7 @@
 /* HOLLOW NIGHT CAMP — Amber wallet: account-menu row + Campfire check-in card. Loaded by js/wallet.js. */
 
 .amber-flame { flex: none; color: var(--orange); }
+.amber-coin-icon { flex: none; width: 20px; height: 20px; object-fit: contain; filter: drop-shadow(0 1px 1px rgba(0,0,0,.4)); }
 
 /* Main Bar account menu row */
 .amber-row {

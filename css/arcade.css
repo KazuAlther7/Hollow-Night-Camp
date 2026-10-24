@@ -119,14 +119,14 @@ body[data-page="arcade"] .camp-app { position: relative; z-index: 1; }
 }
 .neon-word { display: inline-flex; }
 .neon-ch {
-  --glow: #ff3fa4; --core: #ffe3f3;
+  --glow: #f2a34b; --core: #fff0d2;
   display: inline-block; color: var(--core);
   text-shadow: 0 0 2px var(--core), 0 0 7px var(--glow), 0 0 16px var(--glow), 0 0 34px var(--glow), 0 0 62px var(--glow);
   animation:
     neon-ignite 1.15s steps(1, end) calc(var(--i) * .22s + .3s) both,
     neon-hum 3.6s ease-in-out calc(var(--i) * .22s + 2.2s) infinite;
 }
-.neon-word.is-cyan .neon-ch { --glow: #2fe6ff; --core: #e0fbff; }
+.neon-word.is-cyan .neon-ch { --glow: #ffce72; --core: #fff8e3; }
 /* a few tubes flicker on their own rhythm, like a worn sign */
 .neon-ch:nth-child(3n+2) { animation:
     neon-ignite 1.15s steps(1, end) calc(var(--i) * .22s + .3s) both,
