@@ -100,7 +100,7 @@
   </main>
 
   <script type="module">
-    import { initPage } from './js/shared.js?v=21';
+    import { initPage } from './js/shared.js?v=22';
     await initPage({ active: 'arcade' });
     const names = { '': 'hub', slot: 'slot', dice: 'dice', leaderboard: 'board' };
     const mods = {};
@@ -111,8 +111,8 @@
       window.scrollTo(0, 0);
       try {
         if (v === 'dice') await load('dice', './js/arcade-dice.js?v=1');
-        if (v === 'slot') (await load('slot', './js/arcade-slot.js?v=8')).openSlot();
-        if (v === 'board') (await load('slot', './js/arcade-slot.js?v=8')).openBoard();
+        if (v === 'slot') (await load('slot', './js/arcade-slot.js?v=9')).openSlot();
+        if (v === 'board') (await load('slot', './js/arcade-slot.js?v=9')).openBoard();
       } catch (e) { console.error(e); HNLoader.fail('This game could not load.', () => location.reload()); }
     }
     addEventListener('hashchange', route);
