@@ -5,7 +5,7 @@ import { supabase } from '../config/supabase.js';
 import { el } from './dom.js?v=2';
 import { mountChapterRating } from './rating.js?v=1';
 import { mountReadingTools } from './reading.js?v=2';
-import { renderSheets } from './sheets.js?v=1';
+import { renderSheets } from './sheets.js?v=2';
 import { loadVolumes, sortChapters } from './volumes.js?v=1';
 
 const ctx = await initPage({ active: 'novels' });

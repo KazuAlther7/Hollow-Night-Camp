@@ -27,12 +27,17 @@ export function splitSheets(text) {
   return sheets;
 }
 
-export function d20Icon() {
+// d20 with the sheet number written inside it. Decorative: the number is also given as text (aria-label / sr-only).
+export function d20Icon(n) {
   const s = document.createElementNS(NS, 'svg');
-  s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('class', 'd20-icon'); s.setAttribute('aria-hidden', 'true');
-  s.innerHTML = '<path d="M12 2 21 7v10l-9 5-9-5V7z" fill="currentColor" fill-opacity=".14" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 2 3 17h18zM3 7l9 5 9-5M12 12v10" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>';
+  s.setAttribute('viewBox', '0 0 32 32'); s.setAttribute('class', 'd20-icon'); s.setAttribute('aria-hidden', 'true');
+  s.innerHTML = '<path d="M16 2 28 9v14l-12 7-12-7V9z" class="d20-body" stroke-width="1.8" stroke-linejoin="round"/>'
+    + '<path d="M16 2 4 23h24zM4 9l12 7 12-7M16 16v14" class="d20-edges" fill="none" stroke-width="1" stroke-linejoin="round"/>'
+    + '<circle cx="16" cy="17.5" r="7.2" class="d20-disc"/><text x="16" y="17.8" text-anchor="middle" dominant-baseline="central" class="d20-num"></text>';
+  if (n != null) s.querySelector('text').textContent = pad(n);
   return s;
 }
+export const setD20 = (svg, n) => { svg.querySelector('text').textContent = pad(n); };
 
 // Fills `container` with sheets. One sheet = continuous reading (no separators, no marker).
 export function renderSheets(container, text) {
@@ -44,7 +49,7 @@ export function renderSheets(container, text) {
     const n = i + 1;
     if (count > 1 && n > 1) {
       kids.push(el('div', { class: 'sheet-break', role: 'separator', 'aria-label': `Sheet ${n} of ${count}` },
-        el('span', { class: 'sheet-break-tag', 'aria-hidden': 'true' }, d20Icon(), el('b', { text: pad(n) }))));
+        el('span', { class: 'sheet-break-tag', 'aria-hidden': 'true' }, d20Icon(n))));
     }
     const node = el('section', { class: 'sheet', 'data-sheet': String(n) }, ...sheet.paras.map((p) => el('p', { text: p })));
     nodes.push(node); kids.push(node);
@@ -76,9 +81,9 @@ export function renderSheets(container, text) {
 
 // Floating "d20 03 / 12" marker, with real text for screen readers.
 function mountPill(container, api) {
-  const num = el('b'), tot = el('span');
+  const icon = d20Icon(), tot = el('span');
   const pill = el('div', { class: 'sheet-pill', role: 'status', 'aria-live': 'off' },
-    d20Icon(), num, tot, el('span', { class: 'sr-only', text: ' (sheet number in this chapter)' }));
+    icon, tot, el('span', { class: 'sr-only' }));
   document.body.append(pill);
   let last = 0, raf = 0;
   const paint = () => {
@@ -87,8 +92,9 @@ function mountPill(container, api) {
     pill.hidden = r.bottom < 0 || r.top > window.innerHeight;
     const n = api.current();
     if (n === last) return;
-    last = n; num.textContent = pad(n); tot.textContent = ' / ' + pad(api.count);
+    last = n; setD20(icon, n); tot.textContent = '/ ' + pad(api.count);
     pill.setAttribute('aria-label', `Sheet ${n} of ${api.count}`);
+    pill.lastChild.textContent = `Sheet ${n} of ${api.count}`;
   };
   const tick = () => { if (!raf) raf = requestAnimationFrame(paint); };
   window.addEventListener('scroll', tick, { passive: true });
