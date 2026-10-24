@@ -4,6 +4,7 @@
 import { initPage, trackLoad } from './shared.js?v=24';
 import { supabase } from '../config/supabase.js';
 import { el } from './dom.js?v=2';
+import { spoilerGate, mountReopen } from './spoiler-note.js?v=1';
 
 const page = document.body.dataset.page;
 const ctx = await initPage({ active: 'novels' });
@@ -767,6 +768,8 @@ async function maps() {
 
 // ---------------------------------------------------------------
 const handlers = { characters, maps, locations };
+mountReopen(document.querySelector('.library-head'));
+await spoilerGate({ isAuthor: ctx.isAuthor }); // nothing is fetched or rendered until the reader accepts
 await trackLoad(handlers[page]?.(), 'Gathering the camp');
 // Author toolbar stays hidden on detail pages (they carry their own actions).
 if (entryId) toolbar.hidden = true;
