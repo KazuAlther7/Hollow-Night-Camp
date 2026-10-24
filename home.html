@@ -19,7 +19,7 @@
   <link rel="stylesheet" href="css/mainbar.css?v=10">
   <link rel="stylesheet" href="css/home.css?v=8">
   <link rel="stylesheet" href="css/wallet.css?v=1" data-wallet-css>
-  <link rel="stylesheet" href="css/daily-login.css?v=2" data-daily-login-css>
+  <link rel="stylesheet" href="css/daily-login.css?v=3" data-daily-login-css>
 </head>
 
 <body class="camp-body">
@@ -50,18 +50,6 @@
           <h1>Welcome to the Camp, <em id="homeNickname">camper</em>.</h1>
           <p>Pull up a chair. There's always another story waiting to be told around the fire.</p>
         </div>
-
-        <!-- DAILY CAMPFIRE CHECK-IN: hidden until the Amber wallet RPCs answer (js/wallet.js) -->
-        <section class="checkin-card" id="checkinCard" aria-labelledby="checkinTitle" hidden>
-          <span class="checkin-flame" aria-hidden="true"><svg class="amber-flame" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12.4 2.2c.3 2.6-.9 4-2.3 5.5-1.5 1.6-3.1 3.3-3.1 6.2A5.6 5.6 0 0 0 12.6 21c3.3 0 5.9-2.4 5.9-5.8 0-2.3-1-3.8-2.1-5.1-.4 1-1 1.7-1.8 2.1.5-3.7-.2-7.6-2.2-9.99z"/></svg></span>
-          <div class="checkin-text">
-            <h2 id="checkinTitle">Daily Campfire</h2>
-            <p id="checkinText">Warm your hands by the fire.</p>
-          </div>
-          <div class="checkin-balance"><strong data-amber-balance>—</strong><span>Amber</span></div>
-          <button class="checkin-button" id="checkinButton" type="button">Check in</button>
-          <p class="checkin-status" id="checkinStatus" role="status" aria-live="polite"></p>
-        </section>
 
         <!-- AUTHOR STUDIO: Author only, opened from the Main Bar toggle -->
         <section id="homeAuthorStudio" class="home-author-studio" hidden>
@@ -150,8 +138,8 @@
 
   </main>
 
-  <script type="module" src="js/home.js?v=15"></script>
-  <script type="module" src="js/daily-login.js?v=2"></script>
+  <script type="module" src="js/home.js?v=16"></script>
+  <script type="module" src="js/daily-login.js?v=3"></script>
 
 </body>
 </html>
