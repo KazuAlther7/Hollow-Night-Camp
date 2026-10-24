@@ -19,7 +19,8 @@
   <link rel="stylesheet" href="css/novels.css?v=5">
   <link rel="stylesheet" href="css/ui.css?v=4">
   <link rel="stylesheet" href="css/rating.css?v=1">
-  <link rel="stylesheet" href="css/world.css?v=3">
+  <link rel="stylesheet" href="css/world.css?v=4">
+  <link rel="stylesheet" href="css/spoiler-note.css?v=1">
 </head>
 
 <body class="camp-body" data-page="world">
@@ -32,7 +33,7 @@
       </div>
 
       <nav class="sub-nav" id="subNav" data-active="world" aria-label="Novels sections"></nav>
-      <div class="wb-hub-grid">
+      <div class="wb-hub-grid" hidden>
         <a class="wb-hub-card" href="characters.html"><h3>Characters</h3><p>The faces of the camp, and the ones lurking at its edge.</p></a>
         <a class="wb-hub-card" href="maps.html"><h3>Maps</h3><p>Find your way around the woods.</p></a>
         <a class="wb-hub-card" href="locations.html"><h3>Locations</h3><p>Every place has a story to tell.</p></a>
@@ -42,7 +43,11 @@
 
   <script type="module">
     import { initPage } from './js/shared.js?v=24';
-    await initPage({ active: 'novels' });
+    import { spoilerGate, mountReopen } from './js/spoiler-note.js?v=1';
+    const ctx = await initPage({ active: 'novels' });
+    mountReopen(document.querySelector('.library-head'));
+    await spoilerGate({ isAuthor: ctx.isAuthor });
+    document.querySelector('.wb-hub-grid').hidden = false;
   </script>
 
 </body>
