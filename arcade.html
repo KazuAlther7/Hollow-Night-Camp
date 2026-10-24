@@ -16,7 +16,7 @@
   <script src="js/loader.js?v=2"></script>
   <link rel="stylesheet" href="css/base.css?v=4">
   <link rel="stylesheet" href="css/mainbar.css?v=7">
-  <link rel="stylesheet" href="css/arcade.css?v=6">
+  <link rel="stylesheet" href="css/arcade.css?v=7">
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","cannon-es":"https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js"}}</script>
 </head>
 
@@ -100,7 +100,7 @@
   </main>
 
   <script type="module">
-    import { initPage } from './js/shared.js?v=20';
+    import { initPage } from './js/shared.js?v=21';
     await initPage({ active: 'arcade' });
     const names = { '': 'hub', slot: 'slot', dice: 'dice', leaderboard: 'board' };
     const mods = {};
@@ -111,8 +111,8 @@
       window.scrollTo(0, 0);
       try {
         if (v === 'dice') await load('dice', './js/arcade-dice.js?v=1');
-        if (v === 'slot') (await load('slot', './js/arcade-slot.js?v=7')).openSlot();
-        if (v === 'board') (await load('slot', './js/arcade-slot.js?v=7')).openBoard();
+        if (v === 'slot') (await load('slot', './js/arcade-slot.js?v=8')).openSlot();
+        if (v === 'board') (await load('slot', './js/arcade-slot.js?v=8')).openBoard();
       } catch (e) { console.error(e); HNLoader.fail('This game could not load.', () => location.reload()); }
     }
     addEventListener('hashchange', route);
