@@ -53,3 +53,15 @@ button.daily-login-day:disabled{cursor:wait;opacity:.8}
 :root[data-theme-resolved="light"] .amber-currency-card{background:linear-gradient(145deg,#fff4db,#e6d4ad);color:#29382b}
 .amber-timezone-label{display:block;margin:13px 0 5px;font-size:11px;font-weight:700;color:#c8bda8}.amber-timezone-select{display:block;width:100%;padding:9px 10px;border:1px solid #f2a34b55;border-radius:9px;background:#141a24;color:#f3e7c9;font:12px var(--body,'DM Sans',sans-serif)}.amber-timezone-select:disabled{opacity:.65}.amber-timezone-feedback{min-height:14px;margin:7px 0 0;font-size:10px;color:#b8b5a7}
 .amber-timezone-note{margin-top:6px}.amber-timezone-note b{color:#f3e7c9}.amber-timezone-note a{color:#ffca72}
+.amber-newreader{display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:10px;margin:0 0 10px;padding:10px;border:1px solid #ffca7288;border-radius:12px;background:linear-gradient(135deg,#f2a34b2e,#f2a34b10);box-shadow:0 0 0 3px #f2a34b14}
+.amber-newreader[hidden]{display:none}
+.amber-newreader>img{width:34px;height:34px;object-fit:contain;filter:drop-shadow(0 2px 2px #0006)}
+.amber-newreader strong{display:block;font:700 15px var(--heading,'Fredoka',sans-serif);color:#f3e7c9}.amber-newreader small{display:block;margin-top:2px;font-size:11px;line-height:1.3;color:#c8bda8}
+.amber-newreader-claim{padding:8px 11px;border:2px solid #60341f;border-radius:8px;background:#e99a43;color:#482418;font:700 12px var(--heading,'Fredoka',sans-serif);cursor:pointer;white-space:nowrap}
+.amber-newreader-claim:hover{filter:brightness(1.07)}.amber-newreader-claim:disabled{opacity:.6;cursor:wait}
+.amber-newreader-msg{min-height:0;margin:0 0 8px;font-size:12px;font-weight:700;color:#cdeea4}.amber-newreader-msg:empty{display:none}
+/* gift waiting: small pulsing dot on the closed Amber Coin pill */
+.amber-currency-trigger{position:relative}
+.amber-currency-trigger.has-gift::before{content:"";position:absolute;top:-2px;right:-2px;width:11px;height:11px;border-radius:50%;background:#ff8a2b;border:2px solid #0e1424;animation:amberGift 1.6s ease-in-out infinite}
+@keyframes amberGift{50%{transform:scale(1.35);opacity:.6}}
+@media(prefers-reduced-motion:reduce){.amber-currency-trigger.has-gift::before{animation:none}}
