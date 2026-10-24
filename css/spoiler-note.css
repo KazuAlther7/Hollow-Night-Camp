@@ -1,0 +1,57 @@
+/* HOLLOW NIGHT CAMP — World Building spoiler note (PRD §13.1): pinned paper note on a native <dialog> */
+.spoiler-note {
+  width: min(430px, calc(100vw - 32px)); padding: 0; border: 0; background: transparent; color: var(--ink);
+  overflow: visible; max-height: none;
+}
+.spoiler-note::backdrop { background: rgba(8,14,11,.78); backdrop-filter: blur(3px); }
+
+.sn-paper {
+  position: relative; padding: 38px 30px 26px; border-radius: 3px; transform: rotate(-1.6deg);
+  background:
+    repeating-linear-gradient(0deg, rgba(39,53,42,.045) 0 1px, transparent 1px 29px),
+    radial-gradient(120% 90% at 10% 0%, rgba(255,255,255,.28), transparent 55%),
+    linear-gradient(172deg, #f7e9a8, #f0d884 70%, #e6c76c);
+  box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 26px 50px rgba(0,0,0,.55), inset 0 -14px 24px rgba(160,110,20,.18);
+}
+/* curled bottom-right corner */
+.sn-paper::after {
+  content: ""; position: absolute; right: 0; bottom: 0; width: 34px; height: 34px;
+  background: linear-gradient(315deg, rgba(0,0,0,.22) 0 50%, #d9b95a 50%);
+  border-top-left-radius: 6px; box-shadow: -4px -4px 8px rgba(0,0,0,.12);
+}
+.sn-pin {
+  position: absolute; top: -11px; left: 50%; width: 24px; height: 24px; margin-left: -12px; border-radius: 50%;
+  background: radial-gradient(circle at 34% 30%, #ff9a7a, var(--red) 55%, #8f3a1d);
+  box-shadow: 0 5px 7px rgba(0,0,0,.4);
+}
+.spoiler-note h2 { margin: 0 0 12px; font: 600 26px/1.15 var(--heading); color: var(--ink); text-align: center; }
+.spoiler-note p { margin: 0 0 22px; font: 400 16px/1.65 var(--typewriter); color: #3a4630; }
+.sn-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.sn-btn {
+  padding: 11px 18px; border-radius: 999px; font: 700 15px var(--body); cursor: pointer;
+  border: 2px solid var(--ink); transition: transform .15s var(--ease), background .15s ease;
+}
+.sn-go { background: var(--ink); color: #f8f2e5; }
+.sn-go:hover { background: #1b261e; transform: translateY(-1px); }
+.sn-back { background: transparent; color: var(--ink); }
+.sn-back:hover { background: rgba(39,53,42,.1); }
+.sn-btn:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+
+/* entrance: paper dropping onto the board; exit: slides away */
+.spoiler-note[open] .sn-paper { animation: sn-in .42s var(--ease) both; }
+.spoiler-note.sn-leaving .sn-paper { animation: sn-out .2s ease-in both; }
+@keyframes sn-in { from { opacity: 0; transform: translateY(-26px) rotate(5deg) scale(.94); } to { opacity: 1; transform: rotate(-1.6deg); } }
+@keyframes sn-out { to { opacity: 0; transform: translateY(14px) rotate(-4deg) scale(.96); } }
+@media (prefers-reduced-motion: reduce) {
+  .spoiler-note[open] .sn-paper, .spoiler-note.sn-leaving .sn-paper { animation: none; }
+  .sn-btn { transition: none; }
+}
+@media (max-width: 420px) { .sn-paper { padding: 34px 20px 22px; } .sn-actions { flex-direction: column; } .sn-btn { width: 100%; } }
+
+/* reopen button */
+.sn-reopen {
+  margin: 10px 0 0; padding: 6px 14px; border-radius: 999px; background: transparent; color: var(--muted);
+  font: 600 13px var(--body); cursor: pointer; box-shadow: inset 0 0 0 1.5px var(--line);
+}
+.sn-reopen:hover { color: var(--fire); box-shadow: inset 0 0 0 1.5px rgba(255,206,114,.6); }
+.sn-reopen:focus-visible { outline: 3px solid rgba(255,206,114,.7); outline-offset: 2px; }

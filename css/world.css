@@ -114,3 +114,4 @@
 .wb-hub-card:focus-visible { outline: 3px solid rgba(255,206,114,.7); outline-offset: 3px; }
 .wb-hub-card h3 { margin: 0; font-family: var(--heading); font-size: 24px; font-weight: 600; }
 .wb-hub-card p { margin: 0; font-size: 14px; line-height: 1.5; color: rgba(39,53,42,.82); }
+.wb-hub-grid[hidden] { display: none; }
