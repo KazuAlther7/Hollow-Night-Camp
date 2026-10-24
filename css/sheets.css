@@ -1,22 +1,25 @@
 /* HOLLOW NIGHT CAMP — Sheet Page Number (PRD §13.2): d20 marker + sheet separators in the chapter reader */
 .sheet + .sheet { margin: 0; }
 .sheet { scroll-margin-top: 90px; }
-.sheet-break { position: relative; display: flex; justify-content: center; margin: 2.2em 0 1.8em; height: 26px; }
+.sheet-break { position: relative; display: flex; justify-content: center; margin: 2.2em 0 1.8em; height: 40px; --d20-bg: var(--paper); }
 .sheet-break::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 2px dashed rgba(39,53,42,.35); }
 .sheet-break-tag {
-  position: relative; display: inline-flex; align-items: center; gap: 7px; padding: 0 14px; height: 26px;
-  background: var(--paper); color: #52604f; font: 400 15px var(--typewriter);
+  position: relative; display: inline-flex; align-items: center; padding: 0 14px; height: 40px;
+  background: var(--paper); color: #52604f;
 }
-.sheet-break-tag b { font-weight: 400; letter-spacing: .06em; }
-.d20-icon { width: 20px; height: 20px; flex: none; }
+.sheet-break-tag .d20-icon { width: 40px; height: 40px; }
+.d20-icon { width: 34px; height: 34px; flex: none; }
+.d20-body { fill: var(--d20-bg, var(--paper)); stroke: currentColor; }
+.d20-edges { stroke: currentColor; opacity: .38; }
+.d20-disc { fill: var(--d20-bg, var(--paper)); }
+.d20-num { fill: currentColor; font: 700 9.5px var(--typewriter); }
 
 .sheet-pill {
   position: fixed; left: max(12px, env(safe-area-inset-left)); bottom: max(14px, env(safe-area-inset-bottom)); z-index: 40;
-  display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px 7px 10px; border-radius: 999px;
+  --d20-bg: #17251d; display: inline-flex; align-items: center; gap: 4px; padding: 5px 14px 5px 8px; border-radius: 999px;
   background: rgba(23,37,29,.92); color: var(--fire); box-shadow: 0 6px 18px rgba(0,0,0,.45), inset 0 0 0 1.5px rgba(243,231,201,.28);
   font: 400 15px var(--typewriter); pointer-events: none;
 }
 .sheet-pill[hidden] { display: none; }
-.sheet-pill b { font-weight: 400; color: var(--paper); }
 .sheet-pill span { color: var(--muted); }
 .sheet-pill .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
