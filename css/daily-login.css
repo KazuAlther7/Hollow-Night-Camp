@@ -65,3 +65,11 @@ button.daily-login-day:disabled{cursor:wait;opacity:.8}
 .amber-currency-trigger.has-gift::before{content:"";position:absolute;top:-2px;right:-2px;width:11px;height:11px;border-radius:50%;background:#ff8a2b;border:2px solid #0e1424;animation:amberGift 1.6s ease-in-out infinite}
 @keyframes amberGift{50%{transform:scale(1.35);opacity:.6}}
 @media(prefers-reduced-motion:reduce){.amber-currency-trigger.has-gift::before{animation:none}}
+.amber-author{margin:0 0 10px;padding:10px;border:1px dashed #ffca7266;border-radius:12px;background:#0002}
+.amber-author[hidden]{display:none}
+.amber-author-title{display:block;margin-bottom:7px;font:11px 'Special Elite',monospace;letter-spacing:.13em;text-transform:uppercase;color:#f2a34b}
+.amber-author-row{display:flex;gap:8px}
+.amber-author-row input{flex:1;min-width:0;padding:8px 10px;border:1px solid #f2a34b55;border-radius:9px;background:#141a24;color:#f3e7c9;font:14px var(--body,'DM Sans',sans-serif)}
+.amber-author-row button{padding:8px 11px;border:2px solid #60341f;border-radius:8px;background:#e99a43;color:#482418;font:700 12px var(--heading,'Fredoka',sans-serif);cursor:pointer;white-space:nowrap}
+.amber-author-row button:hover{filter:brightness(1.07)}.amber-author-row button:disabled{opacity:.6;cursor:wait}
+.amber-author .amber-newreader-msg{margin:7px 0 0}
