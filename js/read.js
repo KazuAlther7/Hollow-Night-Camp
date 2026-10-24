@@ -1,6 +1,6 @@
 // HOLLOW NIGHT CAMP — read.html (chapter reader). Drafts are hidden from Readers by RLS.
 
-import { initPage } from './shared.js?v=23';
+import { initPage } from './shared.js?v=24';
 import { supabase } from '../config/supabase.js';
 import { el } from './dom.js?v=2';
 import { mountChapterRating } from './rating.js?v=1';

@@ -16,7 +16,7 @@ const money = n => Number(n || 0).toLocaleString();
 function injectStyles() {
   if (document.querySelector('link[data-daily-login-css]')) return;
   const link = document.createElement('link');
-  link.rel = 'stylesheet'; link.href = 'css/daily-login.css?v=6';
+  link.rel = 'stylesheet'; link.href = 'css/daily-login.css?v=7';
   link.dataset.dailyLoginCss = ''; document.head.append(link);
 }
 
@@ -41,6 +41,11 @@ function createUI() {
         <button class="amber-newreader-claim" id="amberNewReaderClaim" type="button">Claim +500</button>
       </div>
       <p class="amber-newreader-msg" id="amberNewReaderMsg" role="status" aria-live="polite"></p>
+      <div class="amber-author" id="amberAuthor" hidden>
+        <span class="amber-author-title">Author tools</span>
+        <div class="amber-author-row"><input id="amberAuthorAmount" type="number" min="1" max="1000000" step="1" value="100" inputmode="numeric" aria-label="Amber Coin to add"><button id="amberAuthorAdd" type="button">Add Amber Coin</button></div>
+        <p class="amber-newreader-msg" id="amberAuthorMsg" role="status" aria-live="polite"></p>
+      </div>
       <button class="daily-login-open" id="dailyLoginOpen" type="button"><span><img src="${COIN}" alt="" draggable="false"></span><span><strong>Daily Login</strong><small>Claim your 7-day camp rewards</small></span><b class="daily-login-open-arrow" aria-hidden="true"></b></button>
       <p class="amber-currency-note">Days 1–6: 25 Amber · Day 7: 50 Amber.</p>
       <p class="amber-currency-note amber-timezone-note">Resets at midnight in <b id="amberTimezoneName">—</b> · <a href="settings-clock.html">Clock &amp; timezone</a></p>
@@ -50,6 +55,7 @@ function createUI() {
   trigger.addEventListener('click', () => { const open = card.hidden; card.hidden = !open; trigger.setAttribute('aria-expanded', String(open)); });
   widget.querySelector('#dailyLoginOpen').addEventListener('click', openDailyLogin);
   widget.querySelector('#amberNewReaderClaim').addEventListener('click', claimNewReader);
+  widget.querySelector('#amberAuthorAdd').addEventListener('click', authorAddAmber);
   document.addEventListener('click', e => { if (!widget.contains(e.target)) { card.hidden = true; trigger.setAttribute('aria-expanded', 'false'); } });
 }
 
@@ -70,6 +76,28 @@ async function syncTimezoneFromSettings() {
   finally { tzBusy = false; paintTimezone(); }
 }
 window.addEventListener('hnc:timezone', () => { tzFailed = ''; syncTimezoneFromSettings(); });
+
+// Author-only: add Amber Coin to your own wallet (the server re-checks the role).
+async function showAuthorTools() {
+  try {
+    const { data: { session } } = await supabase.auth.getSession(); const uid = session?.user?.id; if (!uid) return;
+    const { data } = await supabase.from('profiles').select('role').eq('id', uid).maybeSingle();
+    if (data?.role === 'author') document.getElementById('amberAuthor').hidden = false;
+  } catch (err) { console.warn('Author tools unavailable:', err); }
+}
+let authorBusy = false;
+async function authorAddAmber(event) {
+  if (authorBusy) return;
+  const input = document.getElementById('amberAuthorAmount'), msg = document.getElementById('amberAuthorMsg'), button = event.currentTarget;
+  const amount = Math.floor(Number(input.value));
+  if (!(amount >= 1 && amount <= 1000000)) { msg.textContent = 'Enter an amount from 1 to 1,000,000.'; return; }
+  authorBusy = true; button.disabled = true; msg.textContent = '';
+  try {
+    const { data, error } = await supabase.rpc('author_add_amber', { p_amount: amount }); if (error) throw error;
+    await refreshWallet(); msg.textContent = `✓ ${money(data?.amount)} Amber added.`;
+  } catch (err) { msg.textContent = String(err?.message || '').includes('not_author') ? 'Only Authors can do this.' : 'Could not add Amber. Run sql/amber_author_tools.sql first.'; console.warn('Author add failed:', err); }
+  finally { authorBusy = false; button.disabled = false; }
+}
 
 // New Reader gift: 500 Amber, once. Visible only while the server says it is still unclaimed.
 function paintNewReader() {
@@ -181,6 +209,7 @@ async function boot() {
   window.addEventListener('resize', queuePlace);
   new MutationObserver(queuePlace).observe(document.body, { attributes: true, attributeFilter: ['class'] });
   const finder = new MutationObserver(queuePlace); finder.observe(document.body, { childList: true, subtree: true }); setTimeout(() => finder.disconnect(), 10000);
+  showAuthorTools();
   try { await refreshWallet(); await syncTimezoneFromSettings(); startLive(); } catch (err) { console.warn('Amber wallet unavailable:', err); }
 }
 // this module is also loaded late by shared.js, after DOMContentLoaded has already fired

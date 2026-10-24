@@ -418,7 +418,7 @@ export async function initPage(options = {}) {
   import('./status-widget.js?v=3').then((module) => module.mountStatusWidget()).catch((error) => console.warn('Status widget unavailable:', error));
 
   // Amber Coin widget (under the clock/online widget) + Daily Login board, on every camp page except the editor
-  if (!editor) import('./daily-login.js?v=6').catch((error) => console.warn('Amber Coin widget unavailable:', error));
+  if (!editor) import('./daily-login.js?v=7').catch((error) => console.warn('Amber Coin widget unavailable:', error));
 
   observeAuthState((event) => {
     if (event === 'SIGNED_OUT' && !signingOut) {
