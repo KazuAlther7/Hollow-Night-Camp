@@ -1,7 +1,8 @@
 // HOLLOW NIGHT CAMP — Amber Coin wallet + timezone-aware 7-day daily login.
 // Uses server RPCs only: wallet_state, daily_checkin, set_camp_timezone.
 import { supabase } from '../config/supabase.js';
-import { setBalance, refreshWallet as syncWallet, startLive } from './wallet.js?v=2';
+import { setBalance, refreshWallet as syncWallet, startLive } from './wallet.js?v=3';
+import { activeTimezone } from './status-widget.js?v=3';
 
 const COIN = 'assets/arcade/amber-coin.png';
 const BOARD = 'assets/daily-login/daily-login-board.webp';
@@ -15,7 +16,7 @@ const money = n => Number(n || 0).toLocaleString();
 function injectStyles() {
   if (document.querySelector('link[data-daily-login-css]')) return;
   const link = document.createElement('link');
-  link.rel = 'stylesheet'; link.href = 'css/daily-login.css?v=4';
+  link.rel = 'stylesheet'; link.href = 'css/daily-login.css?v=5';
   link.dataset.dailyLoginCss = ''; document.head.append(link);
 }
 
@@ -34,54 +35,47 @@ function createUI() {
     <div class="amber-currency-card" id="amberCurrencyCard" hidden>
       <div class="amber-currency-card-head"><div><span class="amber-eyebrow">YOUR WALLET</span><h2>Amber Coin</h2><p>Little treasures for your journey.</p></div><img src="${COIN}" alt="" class="amber-currency-large-coin"></div>
       <div class="amber-currency-balance"><span>Available balance</span><strong><img src="${COIN}" alt=""><b data-amber-balance>—</b><small>AMBER</small></strong></div>
-      <label class="amber-timezone-label" for="amberTimezoneSelect">Daily reset timezone</label>
-      <select class="amber-timezone-select" id="amberTimezoneSelect">
-        <option value="Asia/Jakarta">WIB — Asia/Jakarta</option><option value="Asia/Makassar">WITA — Asia/Makassar</option><option value="Asia/Jayapura">WIT — Asia/Jayapura</option>
-        <option value="Asia/Singapore">Asia/Singapore</option><option value="Asia/Kuala_Lumpur">Asia/Kuala_Lumpur</option><option value="Asia/Tokyo">Asia/Tokyo</option><option value="UTC">UTC</option><option value="America/Los_Angeles">America/Los_Angeles</option><option value="America/New_York">America/New_York</option><option value="Europe/London">Europe/London</option>
-      </select>
-      <button class="daily-login-open" id="dailyLoginOpen" type="button"><span><img src="${COIN}" alt="" draggable="false"></span><span><strong>Daily Login</strong><small>Claim your 7-day camp rewards</small></span><b aria-hidden="true">→</b></button>
-      <p class="amber-currency-note">Daily rewards reset at midnight in your selected timezone. Days 1–6: 25 Amber · Day 7: 50 Amber.</p>
-      <p class="amber-timezone-feedback" id="amberTimezoneFeedback" role="status"></p>
+      <button class="daily-login-open" id="dailyLoginOpen" type="button"><span><img src="${COIN}" alt="" draggable="false"></span><span><strong>Daily Login</strong><small>Claim your 7-day camp rewards</small></span><b class="daily-login-open-arrow" aria-hidden="true"></b></button>
+      <p class="amber-currency-note">Days 1–6: 25 Amber · Day 7: 50 Amber.</p>
+      <p class="amber-currency-note amber-timezone-note">Resets at midnight in <b id="amberTimezoneName">—</b> · <a href="settings-clock.html">Clock &amp; timezone</a></p>
     </div>`;
   document.body.append(widget);
   const trigger = widget.querySelector('#amberCurrencyTrigger'); const card = widget.querySelector('#amberCurrencyCard');
   trigger.addEventListener('click', () => { const open = card.hidden; card.hidden = !open; trigger.setAttribute('aria-expanded', String(open)); });
   widget.querySelector('#dailyLoginOpen').addEventListener('click', openDailyLogin);
-  widget.querySelector('#amberTimezoneSelect').addEventListener('change', changeTimezone);
   document.addEventListener('click', e => { if (!widget.contains(e.target)) { card.hidden = true; trigger.setAttribute('aria-expanded', 'false'); } });
 }
 
-function syncTimezone(data) {
-  const timezone = document.getElementById('amberTimezoneSelect');
-  if (timezone && data?.timezone_name && [...timezone.options].some(o => o.value === data.timezone_name)) timezone.value = data.timezone_name;
+// Daily reset timezone = the Settings › Clock & timezone choice (saved on the account so the server can reset at midnight there).
+let tzBusy = false, tzFailed = '';
+function paintTimezone() {
+  const el = document.getElementById('amberTimezoneName'); if (el) el.textContent = (walletState?.timezone_name || activeTimezone() || '—').replace(/_/g, ' ');
 }
+async function syncTimezoneFromSettings() {
+  if (tzBusy || !walletState) return;
+  const tz = activeTimezone();
+  if (!tz || tz === walletState.timezone_name || tz === tzFailed) { paintTimezone(); return; }
+  tzBusy = true;
+  try {
+    const { error } = await supabase.rpc('set_camp_timezone', { p_timezone: tz }); if (error) throw error;
+    tzFailed = ''; await refreshWallet();
+  } catch (err) { tzFailed = tz; console.warn('Timezone sync failed:', err); }
+  finally { tzBusy = false; paintTimezone(); }
+}
+window.addEventListener('hnc:timezone', () => { tzFailed = ''; syncTimezoneFromSettings(); });
 
 async function refreshWallet() {
   const data = await syncWallet();
   if (!data) { document.querySelectorAll('[data-amber-balance]').forEach(el => el.textContent = '—'); throw new Error('wallet_state returned no data'); }
-  walletState = data; syncTimezone(data);
+  walletState = data; paintTimezone();
   return data;
 }
 
 // live updates (realtime / other tab / focus): keep the open Daily Login board in step
 document.addEventListener('amber:wallet', e => {
-  walletState = e.detail; syncTimezone(e.detail);
+  walletState = e.detail; paintTimezone(); syncTimezoneFromSettings();
   if (document.getElementById('dailyLoginGrid')) renderDays().catch(() => {});
 });
-
-async function changeTimezone(event) {
-  const select = event.currentTarget; const feedback = document.getElementById('amberTimezoneFeedback');
-  select.disabled = true; if (feedback) feedback.textContent = 'Saving timezone…';
-  try {
-    const { data, error } = await supabase.rpc('set_camp_timezone', { p_timezone: select.value });
-    if (error) throw error;
-    await refreshWallet();
-    if (feedback) feedback.textContent = '✓ Timezone saved. Daily reset follows midnight in this timezone.';
-  } catch (err) {
-    if (feedback) feedback.textContent = 'Could not save timezone. Run the included SQL migration and try again.';
-    console.warn('Timezone update failed:', err);
-  } finally { select.disabled = false; }
-}
 
 function openDailyLogin() {
   if (document.getElementById('dailyLoginOverlay')) return;
@@ -161,7 +155,7 @@ async function boot() {
   window.addEventListener('resize', queuePlace);
   new MutationObserver(queuePlace).observe(document.body, { attributes: true, attributeFilter: ['class'] });
   const finder = new MutationObserver(queuePlace); finder.observe(document.body, { childList: true, subtree: true }); setTimeout(() => finder.disconnect(), 10000);
-  try { await refreshWallet(); startLive(); } catch (err) { console.warn('Amber wallet unavailable:', err); }
+  try { await refreshWallet(); await syncTimezoneFromSettings(); startLive(); } catch (err) { console.warn('Amber wallet unavailable:', err); }
 }
 // this module is also loaded late by shared.js, after DOMContentLoaded has already fired
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();

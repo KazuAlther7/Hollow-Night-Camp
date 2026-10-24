@@ -1,6 +1,6 @@
 /* Corners Arcade: Amber Gacha Machine. Server (sql/arcade_slot.sql) decides reels, prize, cost and spin limit. */
 import { supabase } from '../config/supabase.js';
-import { setBalance } from './wallet.js?v=2';
+import { setBalance, refreshWallet, holdBalance } from './wallet.js?v=3';
 
 const SYM = ['amber', 'eye', 'fire', 'radio', 'pine', 'stone', 'binocular', 'd20', 'sword'];
 const NAME = { amber: 'Amber', eye: 'Eye', fire: 'Fire', radio: 'Walkie Talkie', pine: 'Pinecone', stone: 'Rune Stone', binocular: 'Binoculars', d20: 'D20', sword: 'Sword' };
@@ -67,26 +67,34 @@ function spinTo(reel, i, target, ms) {
     a.onfinish = () => { a.cancel(); s.style.filter = ''; setStrip(reel, ids.slice(N)); done(); };
   });
 }
+// The gacha shows the shared Amber Coin balance (same number as the widget and the account menu).
+let bal = null;
 function render() {
-  $('bal').textContent = state.balance.toLocaleString();
-  const ok = state.balance >= 50 && !busy;
+  const b = bal ?? state.balance;
+  $('bal').textContent = Number(b).toLocaleString();
+  const ok = b >= 50 && !busy;
   $('pull').disabled = !ok; $('lever').disabled = !ok;
 }
+document.addEventListener('amber:balance', (e) => { bal = e.detail.balance; if (state) render(); });
 function msg(t, cls = '') { const m = $('slotMsg'); m.textContent = t; m.className = cls; }
 const ERR = { spin_limit: 'No spins left in this half-day. Come back later.', insufficient_balance: 'Not enough Amber (50 needed).', not_authenticated: 'Please sign in again.' };
 
 async function loadState() {
   const { data, error } = await supabase.rpc('slot_state');
   if (error) { msg('Slot machine is not set up yet (run sql/amber_wallet.sql, then sql/arcade_slot.sql).', 'is-error'); console.error(error); return false; }
-  state = data; setBalance(data.balance); render(); return true;
+  state = data;
+  const w = await refreshWallet(); if (!w) setBalance(data.balance);
+  render(); return true;
 }
 async function pull() {
   if (busy || !state) return;
   busy = true; render(); msg(''); $('machine').classList.add('is-pulling');
   if (!muted) ac().resume?.();
   sfx.pull();
+  const release = holdBalance();   // keep the number steady until the reels stop
   const { data, error } = await supabase.rpc('slot_spin');
   if (error) {
+    release();
     const k = Object.keys(ERR).find((x) => error.message.includes(x));
     msg(ERR[k] || 'Spin failed. Try again.', 'is-error'); $('machine').classList.remove('is-pulling'); busy = false; await loadState(); return;
   }
@@ -95,7 +103,8 @@ async function pull() {
   clearInterval(tick); sfx.win(data.prize);
   $('machine').classList.remove('is-pulling');
   state = { ...state, balance: data.balance, total_won: (state.total_won || 0) + data.prize };
-  setBalance(data.balance);
+  release();
+  const w = await refreshWallet(); if (!w) setBalance(data.balance);
   busy = false; render();
   const jack = data.prize === 1000;
   msg(jack ? `JACKPOT! +1000 Amber` : data.prize === 500 ? `Triple! +500 Amber` : data.prize === 100 ? `Pair! +100 Amber` : `+25 Amber`, jack ? 'is-jackpot' : data.prize >= 100 ? 'is-win' : '');

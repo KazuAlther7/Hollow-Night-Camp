@@ -12,7 +12,7 @@ let tab = null;      // BroadcastChannel: keeps other open tabs in sync
 function ensureStyles() {
   if (document.querySelector('link[data-wallet-css]')) return;
   const l = document.createElement('link');
-  l.rel = 'stylesheet'; l.href = 'css/wallet.css?v=2'; l.dataset.walletCss = '';
+  l.rel = 'stylesheet'; l.href = 'css/wallet.css?v=3'; l.dataset.walletCss = '';
   document.head.appendChild(l);
 }
 
@@ -25,7 +25,18 @@ export async function getWallet() {
   return data;
 }
 
+let held = 0, pending = null;
+// Hold the displayed balance while something animates (e.g. the gacha reels), so the number never spoils the result.
+export function holdBalance() {
+  held++; let done = false;
+  return () => {
+    if (done) return; done = true; held = Math.max(0, held - 1);
+    if (!held && pending !== null) { const p = pending; pending = null; paint(p); }
+  };
+}
+
 function paint(balance) {
+  if (held) { pending = balance; return; }
   document.querySelectorAll('[data-amber-balance]').forEach((el) => { el.textContent = formatAmber(balance); });
   document.dispatchEvent(new CustomEvent('amber:balance', { detail: { balance } }));
 }
