@@ -1,0 +1,127 @@
+/* HOLLOW NIGHT CAMP — Camp Profile card (PRD §13.5). Everything sits on a 2254-unit-wide stage; --u = one unit. */
+.pc-dialog {
+  --u: 0px; position: fixed; inset: 78px auto auto 50%; translate: -50% 0; margin: 0; padding: 0; border: 0; background: transparent;
+  width: min(94vw, 900px, calc((100dvh - 96px) / .8563)); max-width: none; max-height: none; overflow: visible; color: #3a2416; font-family: var(--heading);
+}
+.pc-dialog::backdrop { background: rgba(8,14,11,.6); backdrop-filter: blur(2px); animation: pc-fade .25s ease both; }
+.pc-dialog.pc-leaving::backdrop { animation: pc-fade .2s ease reverse both; }
+.pc-wrap { container-type: inline-size; width: 100%; transform-origin: 50% 0; }
+.pc-stage { --u: calc(100cqw / 2254); position: relative; width: 100%; aspect-ratio: 2254 / 1930; }
+.pc-i { position: absolute; left: calc(var(--u) * var(--x)); top: calc(var(--u) * var(--y)); width: calc(var(--u) * var(--w)); height: calc(var(--u) * var(--h)); margin: 0; box-sizing: border-box; user-select: none; }
+img.pc-i { pointer-events: none; }
+.pc-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* chunky outlined game text */
+.pc-tab span, .pc-btn span, .pc-nick span, .pc-manifesto h3 {
+  color: #fff0c8; font-weight: 700; text-transform: uppercase; letter-spacing: .02em;
+  -webkit-text-stroke: calc(var(--u) * 9) #3a1d10; paint-order: stroke fill; text-shadow: 0 calc(var(--u) * 5) 0 #3a1d10;
+}
+
+/* pieces: --x --y --w --h are stage units */
+.pc-title { --x: 621; --y: 0; --w: 1277; --h: 334; transform-origin: 50% 0; }
+.pc-book  { --x: 245; --y: 290; --w: 2002; --h: 1454; }
+.pc-hex   { --x: 384; --y: 398; --w: 209; --h: 253; }
+.pc-owl   { --x: 391; --y: 694; --w: 164; --h: 199; transform-origin: 50% 100%; }
+.pc-silhouette { --x: 600; --y: 600; --w: 450; --h: 760; }
+
+.pc-tab { display: flex; flex-direction: column; align-items: center; height: auto; padding: 0; border: 0; background: none; cursor: pointer; text-decoration: none; transition: transform .18s ease, filter .18s ease; }
+.pc-tab img { width: 100%; display: block; pointer-events: none; }
+.pc-tab span { font-size: calc(var(--u) * 36); line-height: 1; margin-top: calc(var(--u) * 4); }
+.pc-tab-1 { --x: 0;  --y: 480;  --w: 275; }
+.pc-tab-2 { --x: 15; --y: 780;  --w: 278; }
+.pc-tab-3 { --x: 15; --y: 1080; --w: 277; }
+.pc-tab:not([disabled]):not([aria-current]):hover { transform: translateX(calc(var(--u) * 10)); filter: brightness(1.1); }
+.pc-tab[aria-current] { filter: drop-shadow(0 0 calc(var(--u) * 10) rgba(255,206,114,.7)); }
+.pc-tab[disabled] { opacity: .55; cursor: not-allowed; }
+
+.pc-nick { --x: 625; --y: 1425; --w: 420; --h: 90; display: flex; align-items: center; }
+.pc-nick span { font-size: calc(var(--u) * 50); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; padding-top: calc(var(--u) * 6); }
+.pc-nick .pc-pencil { position: absolute; left: calc(var(--u) * 440); top: calc(var(--u) * -8); }
+.pc-pencil { display: block; width: calc(var(--u) * 100); height: calc(var(--u) * 100); transition: transform .15s ease; }
+.pc-pencil img { width: 100%; height: 100%; display: block; }
+.pc-pencil:hover { transform: rotate(-8deg) scale(1.08); }
+
+.pc-ring { --x: 1263; --y: 479; --w: 240; --h: 240; border-radius: 50%; overflow: hidden; display: grid; place-items: center;
+  background: #5b3a22; box-shadow: 0 0 0 calc(var(--u) * 12) #7a5233, 0 0 0 calc(var(--u) * 20) #3a1d10, 0 calc(var(--u) * 10) calc(var(--u) * 18) rgba(0,0,0,.35); }
+.pc-ring img { width: 100%; height: 100%; object-fit: cover; }
+.pc-ring span { font-size: calc(var(--u) * 120); font-weight: 700; color: #fff0c8; }
+.pc-rank { --x: 1535; --y: 498; --w: 440; --h: 60; display: flex; align-items: baseline; gap: calc(var(--u) * 14); font-size: calc(var(--u) * 54); line-height: 1.1; }
+.pc-rank small { font-size: calc(var(--u) * 32); color: #8a6a48; font-weight: 600; }
+.pc-bar { --x: 1535; --y: 566; --w: 440; --h: 50; border-radius: 999px; background: #5a4636; box-shadow: inset 0 0 0 calc(var(--u) * 5) #3a2a20; overflow: hidden; }
+.pc-bar i { display: block; height: 100%; width: 0; background: linear-gradient(#ffb23a, #f08a12); }
+.pc-campid { --x: 1535; --y: 628; --w: 440; --h: 52; font-size: calc(var(--u) * 46); font-weight: 600; letter-spacing: .03em; }
+
+.pc-row { --x: 1263; --w: 716; --h: 74; display: flex; align-items: center; padding: 0 calc(var(--u) * 28); border-radius: calc(var(--u) * 10);
+  background: rgba(168,128,84,.3); font-size: calc(var(--u) * 46); font-weight: 600; white-space: nowrap; gap: calc(var(--u) * 10); }
+.pc-row b { font-weight: 700; }
+.pc-row-0 { --y: 719; } .pc-row-1 { --y: 808; } .pc-row-2 { --y: 897; }
+
+.pc-manifesto { --x: 1263; --y: 1000; --w: 716; --h: 340; border: calc(var(--u) * 5) solid rgba(120,84,50,.55); border-radius: calc(var(--u) * 12); background: rgba(255,244,214,.35); display: flex; flex-direction: column; overflow: hidden; }
+.pc-manifesto header { display: flex; justify-content: space-between; align-items: center; padding: calc(var(--u) * 4) calc(var(--u) * 14) calc(var(--u) * 4) calc(var(--u) * 24); background: rgba(168,128,84,.35); }
+.pc-manifesto h3 { margin: 0; font-size: calc(var(--u) * 42); -webkit-text-stroke: 0; text-shadow: none; color: #3a2416; letter-spacing: .01em; }
+.pc-manifesto .pc-pencil { width: calc(var(--u) * 62); height: calc(var(--u) * 62); }
+.pc-manifesto p { margin: 0; padding: calc(var(--u) * 16) calc(var(--u) * 26); font: 400 calc(var(--u) * 40)/1.4 var(--typewriter); overflow-y: auto; word-break: break-word; scrollbar-width: thin; }
+.pc-manifesto p.is-empty { color: #7a6246; }
+
+.pc-slots { display: contents; }
+.pc-slot { --y: 1384; --w: 235; --h: 206; }
+.pc-slot-0 { --x: 1249; } .pc-slot-1 { --x: 1489; } .pc-slot-2 { --x: 1729; }
+
+.pc-close { --x: 1999; --y: 308; --w: 160; --h: 166; border: 0; border-radius: calc(var(--u) * 28); background: transparent; cursor: pointer; }
+.pc-close:hover { box-shadow: 0 0 calc(var(--u) * 26) calc(var(--u) * 6) rgba(255,120,90,.55); }
+.pc-close:focus-visible, .pc-tab:focus-visible, .pc-btn:focus-visible, .pc-pencil:focus-visible { outline: calc(var(--u) * 7) solid #ffce72; outline-offset: calc(var(--u) * 6); border-radius: calc(var(--u) * 14); }
+
+.pc-btn { --y: 1790; display: grid; place-items: center; padding: 0; border: 0; background: none; cursor: pointer; text-decoration: none; transition: transform .15s ease, filter .15s ease; }
+.pc-btn img { grid-area: 1 / 1; width: 100%; display: block; pointer-events: none; }
+.pc-btn span { grid-area: 1 / 1; font-size: calc(var(--u) * 42); line-height: 1; white-space: nowrap; padding-bottom: calc(var(--u) * 4); }
+.pc-btn-1 { --x: 0;    --w: 561; } .pc-btn-2 { --x: 591;  --w: 529; } .pc-btn-3 { --x: 1149; --w: 543; } .pc-btn-4 { --x: 1722; --w: 532; }
+.pc-btn:not([disabled]):hover { transform: translateY(calc(var(--u) * -6)); filter: brightness(1.08); }
+.pc-btn:not([disabled]):active { transform: translateY(calc(var(--u) * 3)) scale(.985); }
+.pc-btn[disabled] { opacity: .55; cursor: not-allowed; filter: grayscale(.4); }
+
+/* ---- motion: the card drops from the bar and settles like a hanging board ---- */
+.pc-dialog[open] .pc-wrap { animation: pc-drop .66s cubic-bezier(.2,.8,.25,1) both; }
+.pc-dialog.pc-leaving .pc-wrap { animation: pc-lift .2s ease-in both; }
+.pc-dialog[open] .pc-title { animation: pc-sign .8s .2s cubic-bezier(.2,.8,.25,1) both; }
+.pc-dialog[open] .pc-tab { animation: pc-tab-in .5s cubic-bezier(.2,.8,.25,1) both; }
+.pc-tab-1 { animation-delay: .3s !important; } .pc-tab-2 { animation-delay: .38s !important; } .pc-tab-3 { animation-delay: .46s !important; }
+.pc-dialog[open] .pc-hex  { animation: pc-pop .55s .46s cubic-bezier(.3,1.6,.5,1) both; }
+.pc-dialog[open] .pc-owl  { animation: pc-pop .55s .56s cubic-bezier(.3,1.6,.5,1) both, pc-owl 7s 1.4s ease-in-out infinite; }
+.pc-dialog[open] .pc-silhouette { animation: pc-rise .6s .4s ease both; }
+.pc-dialog[open] .pc-row { animation: pc-row-in .45s cubic-bezier(.2,.8,.25,1) both; }
+.pc-row-0 { animation-delay: .44s !important; } .pc-row-1 { animation-delay: .51s !important; } .pc-row-2 { animation-delay: .58s !important; }
+.pc-dialog[open] .pc-manifesto { animation: pc-row-in .45s .65s cubic-bezier(.2,.8,.25,1) both; }
+.pc-dialog[open] .pc-slot { animation: pc-pop .5s cubic-bezier(.3,1.6,.5,1) both; }
+.pc-slot-0 { animation-delay: .7s !important; } .pc-slot-1 { animation-delay: .78s !important; } .pc-slot-2 { animation-delay: .86s !important; }
+.pc-dialog[open] .pc-btn { animation: pc-btn-up .5s cubic-bezier(.2,.8,.25,1) both; }
+.pc-btn-1 { animation-delay: .6s !important; } .pc-btn-2 { animation-delay: .67s !important; } .pc-btn-3 { animation-delay: .74s !important; } .pc-btn-4 { animation-delay: .81s !important; }
+
+@keyframes pc-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pc-drop {
+  0%   { opacity: 0; transform: translateY(-90px) rotate(-3deg) scale(.9); }
+  55%  { opacity: 1; transform: translateY(10px) rotate(1.3deg) scale(1.01); }
+  78%  { transform: translateY(-3px) rotate(-.5deg); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes pc-lift { to { opacity: 0; transform: translateY(-40px) rotate(1.5deg) scale(.96); } }
+@keyframes pc-sign {
+  0%   { opacity: 0; transform: translateY(-40px) rotate(-10deg); }
+  45%  { opacity: 1; transform: translateY(4px) rotate(4deg); }
+  70%  { transform: rotate(-2deg); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes pc-tab-in { from { opacity: 0; transform: translateX(calc(var(--u) * 90)); } to { opacity: 1; transform: none; } }
+@keyframes pc-pop { from { opacity: 0; transform: scale(.3) rotate(-24deg); } to { opacity: 1; transform: none; } }
+@keyframes pc-rise { from { opacity: 0; transform: translateY(calc(var(--u) * 40)); } to { opacity: 1; transform: none; } }
+@keyframes pc-row-in { from { opacity: 0; transform: translateX(calc(var(--u) * 40)); } to { opacity: 1; transform: none; } }
+@keyframes pc-btn-up { from { opacity: 0; transform: translateY(calc(var(--u) * 50)); } to { opacity: 1; transform: none; } }
+@keyframes pc-owl { 0%, 86%, 100% { transform: rotate(0); } 90% { transform: rotate(-5deg); } 94% { transform: rotate(3deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .pc-dialog *, .pc-dialog::backdrop { animation: none !important; transition: none !important; }
+}
+/* narrow phones: keep the card readable by letting it scroll sideways instead of shrinking the text */
+@media (max-width: 640px) {
+  .pc-dialog { inset: 70px 0 auto 0; translate: none; width: 100vw; overflow-x: auto; overflow-y: visible; }
+  .pc-wrap { width: 640px; }
+}
