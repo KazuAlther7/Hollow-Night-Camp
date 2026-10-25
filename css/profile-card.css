@@ -47,7 +47,15 @@ img.pc-i { pointer-events: none; }
 .pc-ring img { width: 100%; height: 100%; object-fit: cover; }
 .pc-ring span { font-size: calc(var(--u) * 120); font-weight: 700; color: #fff0c8; }
 .pc-rank { --x: 1535; --y: 498; --w: 440; --h: 60; display: flex; align-items: baseline; gap: calc(var(--u) * 14); font-size: calc(var(--u) * 54); line-height: 1.1; }
-.pc-rank small { font-size: calc(var(--u) * 32); color: #8a6a48; font-weight: 600; }
+.pc-rank b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: calc(var(--u) * 46); }
+.pc-rank small { flex: none; font-size: calc(var(--u) * 32); color: #8a6a48; font-weight: 600; }
+.pc-bar i { transition: width .9s .4s cubic-bezier(.2,.8,.25,1); }
+.pc-bar span { position: absolute; inset: 0; display: grid; place-items: center; font-size: calc(var(--u) * 30); font-weight: 700; letter-spacing: .03em; color: #fff0c8; -webkit-text-stroke: calc(var(--u) * 6) #3a1d10; paint-order: stroke fill; }
+/* level chip under the rank hex, and the small streak plank under the Night Owl */
+.pc-hexlv, .pc-owlstreak { display: grid; place-items: center; box-sizing: border-box; border: calc(var(--u) * 5) solid #3a1d10; border-radius: calc(var(--u) * 14); background: linear-gradient(#8a5d38, #5b3a22);
+  color: #fff0c8; font-weight: 700; letter-spacing: .03em; white-space: nowrap; box-shadow: 0 calc(var(--u) * 4) 0 rgba(58,29,16,.55), inset 0 calc(var(--u) * 3) 0 rgba(255,214,150,.3); }
+.pc-hexlv { --x: 436; --y: 622; --w: 110; --h: 50; font-size: calc(var(--u) * 32); }
+.pc-owlstreak { --x: 396; --y: 906; --w: 154; --h: 52; font-size: calc(var(--u) * 30); }
 .pc-bar { --x: 1535; --y: 566; --w: 440; --h: 50; border-radius: 999px; background: #5a4636; box-shadow: inset 0 0 0 calc(var(--u) * 5) #3a2a20; overflow: hidden; }
 .pc-bar i { display: block; height: 100%; width: 0; background: linear-gradient(#ffb23a, #f08a12); }
 .pc-campid { --x: 1535; --y: 628; --w: 440; --h: 52; font-size: calc(var(--u) * 46); font-weight: 600; letter-spacing: .03em; }
@@ -130,7 +138,7 @@ img.pc-i { pointer-events: none; }
 @keyframes pc-owl { 0%, 86%, 100% { transform: rotate(0); } 90% { transform: rotate(-5deg); } 94% { transform: rotate(3deg); } }
 
 /* ---- Statistik view: own book + title art, no avatar/rank, records on sticky notes ---- */
-.pc-stage.pc-view-stats :is(.pc-title, .pc-book, .pc-silhouette, .pc-hex, .pc-owl, .pc-nick, .pc-ring, .pc-rank, .pc-bar, .pc-campid, .pc-row, .pc-manifesto, .pc-slots) { display: none; }
+.pc-stage.pc-view-stats :is(.pc-hexlv, .pc-owlstreak, .pc-title, .pc-book, .pc-silhouette, .pc-hex, .pc-owl, .pc-nick, .pc-ring, .pc-rank, .pc-bar, .pc-campid, .pc-row, .pc-manifesto, .pc-slots) { display: none; }
 .pc-stage:not(.pc-view-stats) .pc-st { display: none; }
 .pc-stage.pc-view-stats .pc-st { animation: pc-row-in .5s cubic-bezier(.2,.8,.25,1) both; }
 .pc-st-book, .pc-st-titleimg { animation: none !important; }
