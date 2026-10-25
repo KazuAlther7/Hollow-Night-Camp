@@ -1,6 +1,6 @@
 // HOLLOW NIGHT CAMP — Camp Profile card (PRD §13.5, Step E). Opens from the account button in the main bar.
 // A scaled "stage": every piece is positioned in design units (see css/profile-card.css), so it looks the same at any width.
-// Data shown is real: nickname, avatar, role, bio, join date, live Amber balance. Rank / badges / streak are placeholders for later systems.
+// Data shown is real: nickname, avatar, role, bio, join date, live Amber balance. Rank, streak and badges come from the server (js/rank.js, js/streak.js, js/badges.js).
 
 import { el } from './dom.js?v=2';
 
@@ -12,7 +12,7 @@ let cssReady = null;
 function ensureStyles() {
   if (cssReady) return cssReady;
   cssReady = new Promise((resolve) => {
-    const link = el('link', { rel: 'stylesheet', href: 'css/profile-card.css?v=12' });
+    const link = el('link', { rel: 'stylesheet', href: 'css/profile-card.css?v=13' });
     link.addEventListener('load', resolve); link.addEventListener('error', resolve);
     document.head.append(link);
   });
@@ -24,7 +24,8 @@ const img = (name, cls, extra = {}) => el('img', { class: 'pc-i ' + cls, src: A 
 export const NIGHT_OWL_MIN_STREAK = 3;
 
 // streak: current reading streak in days (number), or null while the streak system is not connected (row and owl stay hidden).
-export async function openProfileCard({ profile, user, isAuthor, streak = null, rank = null, opener, onSignOut }) {
+// badges: { owned, slots } from js/badges.js, or null while the badge system is not connected (slots stay disabled).
+export async function openProfileCard({ profile, user, isAuthor, streak = null, rank = null, badges = null, opener, onSignOut }) {
   if (document.querySelector('dialog.pc-dialog')) return;
   await ensureStyles();
 
@@ -34,7 +35,8 @@ export async function openProfileCard({ profile, user, isAuthor, streak = null, 
   const campId = (user?.id || '').replace(/-/g, '').slice(0, 7).toUpperCase() || '—';
   const bio = (profile?.bio || '').trim();
   const hasStreak = Number.isFinite(streak) && streak >= 0;
-  const nightOwl = hasStreak && streak >= NIGHT_OWL_MIN_STREAK;
+  // Night Owl is permanent once the badge is owned; a live streak of 3+ still shows it before the first sync lands.
+  const nightOwl = (hasStreak && streak >= NIGHT_OWL_MIN_STREAK) || !!badges?.owned?.some((b) => b.key === 'achievement:night-owl');
 
   // EXP bar fills from the current tier's threshold to the next one; the top tier shows full.
   const rankPct = !rank ? 0 : rank.next_min == null ? 100 : Math.max(0, Math.min(100, (rank.exp - rank.tier_min) / (rank.next_min - rank.tier_min) * 100));
@@ -60,11 +62,70 @@ export async function openProfileCard({ profile, user, isAuthor, streak = null, 
   if (hasStreak) rows.push(['Reading Streak', el('b', { text: streak + (streak === 1 ? ' Day' : ' Days') })]);
   rows.push(['Joined', el('b', { text: joined })]);
 
-  const slot = (i) => {
-    const add = el('button', { class: 'pc-slot-add', type: 'button', 'aria-label': 'Add badge (coming soon)', 'aria-disabled': 'true', title: 'Badges are coming soon',
-      onclick: (e) => { const b = e.currentTarget; b.classList.remove('is-nope'); void b.offsetWidth; b.classList.add('is-nope'); } });
-    return el('div', { class: 'pc-i pc-slot pc-slot-' + i }, el('img', { src: A + 'badge-slot.webp', alt: '', 'aria-hidden': 'true', draggable: 'false' }), add);
+  // ---- badge slots: 3 pinned badges; the corner button opens the picker (plus when empty, pencil when filled) ----
+  const mine = { owned: badges?.owned || [], slots: badges?.slots ? [...badges.slots] : [null, null, null] };
+  const slotEls = [];
+  const badgeFace = (b) => {
+    const box = el('div', { class: 'pc-badge', title: b.title });
+    const pill = () => el('span', { class: 'pc-badge-pill', text: b.title });
+    if (b.asset_path) {
+      const im = el('img', { src: b.asset_path, alt: b.title, draggable: 'false' });
+      im.addEventListener('error', () => im.replaceWith(pill())); // art not authored yet: text pill, never a broken image
+      box.append(im);
+    } else box.append(pill());
+    return box;
   };
+  function paintSlot(i) {
+    const { wrap, add } = slotEls[i];
+    wrap.querySelector('.pc-badge')?.remove();
+    const b = mine.slots[i];
+    if (b) add.before(badgeFace(b));
+    add.classList.toggle('is-edit', !!b);
+    const label = !badges ? 'Badges are not available right now' : b ? 'Change badge in slot ' + (i + 1) : 'Add badge to slot ' + (i + 1);
+    add.setAttribute('aria-label', label); add.title = label;
+    if (!badges) add.setAttribute('aria-disabled', 'true');
+  }
+  const slot = (i) => {
+    const add = el('button', { class: 'pc-slot-add', type: 'button', onclick: (e) => openPicker(i, e.currentTarget) });
+    const wrap = el('div', { class: 'pc-i pc-slot pc-slot-' + i }, el('img', { src: A + 'badge-slot.webp', alt: '', 'aria-hidden': 'true', draggable: 'false' }), add);
+    slotEls[i] = { wrap, add };
+    paintSlot(i);
+    return wrap;
+  };
+  function openPicker(i, from) {
+    if (!badges) {
+      from.classList.remove('is-nope'); void from.offsetWidth; from.classList.add('is-nope');
+      say('Badges are not available right now.');
+      return;
+    }
+    const pick = el('dialog', { class: 'pc-pick', 'aria-label': 'Choose a badge for slot ' + (i + 1) });
+    const done = () => { pick.close(); pick.remove(); from.focus(); };
+    const choose = async (key) => {
+      pick.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+      const { setBadgeSlot } = await import('./badges.js?v=1');
+      const err = await setBadgeSlot(i, key);
+      if (err) { say('Could not save the badge. Try again.'); done(); return; }
+      const picked = key ? mine.owned.find((b) => b.key === key) || null : null;
+      if (picked) mine.slots = mine.slots.map((b) => (b && b.key === key ? null : b));
+      mine.slots[i] = picked;
+      mine.slots.forEach((_, n) => paintSlot(n));
+      done();
+    };
+    const item = (b) => el('button', { class: 'pc-pick-item' + (mine.slots[i]?.key === b.key ? ' is-current' : ''), type: 'button', onclick: () => choose(b.key) },
+      badgeFace(b), el('span', { class: 'pc-pick-text' }, el('b', { text: b.title }), el('small', { text: b.description })));
+    pick.append(
+      el('h3', { text: 'Slot ' + (i + 1) + ' — choose a badge' }),
+      mine.owned.length ? el('div', { class: 'pc-pick-list' }, mine.owned.map(item))
+        : el('p', { class: 'pc-pick-empty', text: 'No badges yet. Keep reading around the campfire.' }),
+      el('div', { class: 'pc-pick-actions' },
+        mine.slots[i] && el('button', { type: 'button', onclick: () => choose(null), text: 'Empty this slot' }),
+        el('button', { type: 'button', onclick: done, text: 'Close' })));
+    pick.addEventListener('cancel', (e) => { e.preventDefault(); done(); });
+    pick.addEventListener('click', (e) => { if (e.target === pick) done(); });
+    document.body.append(pick);
+    pick.showModal();
+    pick.querySelector('button')?.focus();
+  }
 
   // ---- inline editing: nickname pencil and Change (avatar) save right here, no trip to the settings page ----
   const me = { nickname: profile?.nickname || '', bio: profile?.bio || '', avatar_url: profile?.avatar_url || null };
@@ -166,7 +227,7 @@ export async function openProfileCard({ profile, user, isAuthor, streak = null, 
     img('rank-hex', 'pc-hex'),
     rank && el('div', { class: 'pc-i pc-hexlv', text: 'LV ' + rank.tier }),
     nightOwl && img('owl', 'pc-owl'),
-    nightOwl && el('div', { class: 'pc-i pc-owlstreak', title: 'Reading streak', text: 'DAY ' + streak }),
+    nightOwl && hasStreak && el('div', { class: 'pc-i pc-owlstreak', title: 'Reading streak', text: 'DAY ' + streak }),
 
     ring,
     plank('pc-btn-chg', 'btn-orange', 'Change', { title: 'Change profile picture', onclick: () => fileInput.click() }),
@@ -184,7 +245,7 @@ export async function openProfileCard({ profile, user, isAuthor, streak = null, 
 
     // right page: badges for now
     el('div', { class: 'pc-i pc-badges-title', text: 'Badges' }),
-    el('div', { class: 'pc-slots', role: 'group', 'aria-label': 'Badge slots (empty)' },
+    el('div', { class: 'pc-slots', role: 'group', 'aria-label': 'Pinned badges' },
       [0, 1, 2].map(slot)),
 
     closeBtn,

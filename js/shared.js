@@ -225,12 +225,14 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
   profileButton.addEventListener('click', async () => {
     // Reading Streak (js/streak.js) and Camp Rank (js/rank.js): each is null when unavailable, so the card just hides that part
     const soon = (promise) => Promise.race([promise, new Promise((resolve) => setTimeout(() => resolve(null), 1500))]).catch(() => null);
-    const [streak, rank] = await Promise.all([
+    const [streak, rank, badges] = await Promise.all([
       import('./streak.js?v=2').then((module) => soon(module.getReadingStreak())).catch(() => null),
-      import('./rank.js?v=1').then((module) => soon(module.getCampRank())).catch(() => null)
+      import('./rank.js?v=1').then((module) => soon(module.getCampRank())).catch(() => null),
+      // Badges (js/badges.js): sync awards first, then read; null when sql/badges.sql has not been run
+      import('./badges.js?v=1').then((module) => soon(module.loadBadges())).catch(() => null)
     ]);
-    import('./profile-card.js?v=8')
-      .then((module) => module.openProfileCard({ profile, user, isAuthor, streak, rank, opener: profileButton, onSignOut: () => signOut() }))
+    import('./profile-card.js?v=9')
+      .then((module) => module.openProfileCard({ profile, user, isAuthor, streak, rank, badges, opener: profileButton, onSignOut: () => signOut() }))
       .catch((error) => {
         console.warn('Camp Profile card unavailable, using the menu:', error);
         const open = profileMenu.hidden;
