@@ -12,7 +12,7 @@ let cssReady = null;
 function ensureStyles() {
   if (cssReady) return cssReady;
   cssReady = new Promise((resolve) => {
-    const link = el('link', { rel: 'stylesheet', href: 'css/profile-card.css?v=1' });
+    const link = el('link', { rel: 'stylesheet', href: 'css/profile-card.css?v=3' });
     link.addEventListener('load', resolve); link.addEventListener('error', resolve);
     document.head.append(link);
   });
@@ -31,7 +31,11 @@ function silhouette() {
   return s;
 }
 
-export async function openProfileCard({ profile, user, isAuthor, opener, onSignOut }) {
+// Night Owl appears on the card only once the reader has a reading streak of at least this many days.
+export const NIGHT_OWL_MIN_STREAK = 3;
+
+// streak: current reading streak in days (number), or null while the streak system is not connected (row and owl stay hidden).
+export async function openProfileCard({ profile, user, isAuthor, streak = null, opener, onSignOut }) {
   if (document.querySelector('dialog.pc-dialog')) return;
   await ensureStyles();
 
@@ -40,6 +44,8 @@ export async function openProfileCard({ profile, user, isAuthor, opener, onSignO
   const joined = user?.created_at ? new Date(user.created_at).toLocaleDateString('en-GB') : '—';
   const campId = (user?.id || '').replace(/-/g, '').slice(0, 7).toUpperCase() || '—';
   const bio = (profile?.bio || '').trim();
+  const hasStreak = Number.isFinite(streak) && streak >= 0;
+  const nightOwl = hasStreak && streak >= NIGHT_OWL_MIN_STREAK;
 
   const closeBtn = el('button', { class: 'pc-i pc-close', type: 'button', 'aria-label': 'Close Camp Profile' });
   const tab = (cls, icon, label, attrs) => {
@@ -57,7 +63,17 @@ export async function openProfileCard({ profile, user, isAuthor, opener, onSignO
   const amber = el('b', { 'data-amber-balance': '', text: '…' });
   const editPencil = (href, label) => el('a', { class: 'pc-pencil', href, 'aria-label': label }, el('img', { src: A + 'edit.webp', alt: '', 'aria-hidden': 'true', draggable: 'false' }));
 
-  const stage = el('div', { class: 'pc-stage' },
+  const rows = [['Role', el('b', { text: isAuthor ? 'Author' : 'Reader' })], ['Amber Coin', amber]];
+  if (hasStreak) rows.push(['Reading Streak', el('b', { text: streak + (streak === 1 ? ' Day' : ' Days') })]);
+  rows.push(['Joined', el('b', { text: joined })]);
+
+  const slot = (i) => {
+    const add = el('button', { class: 'pc-slot-add', type: 'button', 'aria-label': 'Add badge (coming soon)', 'aria-disabled': 'true', title: 'Badges are coming soon',
+      onclick: (e) => { const b = e.currentTarget; b.classList.remove('is-nope'); void b.offsetWidth; b.classList.add('is-nope'); } });
+    return el('div', { class: 'pc-i pc-slot pc-slot-' + i }, el('img', { src: A + 'badge-slot.webp', alt: '', 'aria-hidden': 'true', draggable: 'false' }), add);
+  };
+
+  const stage = el('div', { class: 'pc-stage' + (hasStreak ? ' pc-has-streak' : '') },
     el('h2', { class: 'pc-sr', id: 'pcTitle', text: 'Camp Profile' }),
     img('title', 'pc-title'),
     img('book', 'pc-book'),
@@ -70,7 +86,7 @@ export async function openProfileCard({ profile, user, isAuthor, opener, onSignO
     // left page: the character card
     silhouette(),
     img('rank-hex', 'pc-hex'),
-    img('owl', 'pc-owl'),
+    nightOwl && img('owl', 'pc-owl'),
     el('div', { class: 'pc-i pc-nick' }, el('span', { text: nick }), editPencil(SETTINGS, 'Edit nickname')),
 
     // right page
@@ -79,14 +95,12 @@ export async function openProfileCard({ profile, user, isAuthor, opener, onSignO
     el('div', { class: 'pc-i pc-rank' }, el('b', { text: 'Camp Rank' }), el('small', { text: 'soon' })),
     el('div', { class: 'pc-i pc-bar', role: 'img', 'aria-label': 'Camp rank progress: not available yet' }, el('i')),
     el('div', { class: 'pc-i pc-campid', text: 'Camp ID: ' + campId }),
-    row(0, 'Role', el('b', { text: isAuthor ? 'Author' : 'Reader' })),
-    row(1, 'Amber Coin', amber),
-    row(2, 'Joined', el('b', { text: joined })),
+    rows.map(([label, value], i) => row(i, label, value)),
     el('section', { class: 'pc-i pc-manifesto', 'aria-labelledby': 'pcManifestoTitle' },
       el('header', {}, el('h3', { id: 'pcManifestoTitle', text: 'Personal Manifesto' }), editPencil(SETTINGS, 'Edit personal manifesto')),
       el('p', { class: bio ? '' : 'is-empty', text: bio || 'This camper wrote nothing.' })),
     el('div', { class: 'pc-slots', role: 'group', 'aria-label': 'Badge slots (empty)' },
-      [0, 1, 2].map((i) => img('badge-slot', 'pc-slot pc-slot-' + i))),
+      [0, 1, 2].map(slot)),
 
     closeBtn,
 

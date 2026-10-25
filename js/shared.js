@@ -223,8 +223,8 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
 
   // Account button opens the Camp Profile card (js/profile-card.js); the old dropdown stays hidden as a fallback.
   profileButton.addEventListener('click', () => {
-    import('./profile-card.js?v=1')
-      .then((module) => module.openProfileCard({ profile, user, isAuthor, opener: profileButton, onSignOut: () => signOut() }))
+    import('./profile-card.js?v=2')
+      .then((module) => module.openProfileCard({ profile, user, isAuthor, streak: null /* connect the reading-streak system here: days as a number */, opener: profileButton, onSignOut: () => signOut() }))
       .catch((error) => {
         console.warn('Camp Profile card unavailable, using the menu:', error);
         const open = profileMenu.hidden;
