@@ -222,9 +222,13 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
   }
 
   // Account button opens the Camp Profile card (js/profile-card.js); the old dropdown stays hidden as a fallback.
-  profileButton.addEventListener('click', () => {
+  profileButton.addEventListener('click', async () => {
+    // Reading Streak (js/streak.js): null when unavailable, so the card just hides the streak row and Night Owl
+    const streak = await import('./streak.js?v=1')
+      .then((module) => Promise.race([module.getReadingStreak(), new Promise((resolve) => setTimeout(() => resolve(null), 1500))]))
+      .catch(() => null);
     import('./profile-card.js?v=2')
-      .then((module) => module.openProfileCard({ profile, user, isAuthor, streak: null /* connect the reading-streak system here: days as a number */, opener: profileButton, onSignOut: () => signOut() }))
+      .then((module) => module.openProfileCard({ profile, user, isAuthor, streak, opener: profileButton, onSignOut: () => signOut() }))
       .catch((error) => {
         console.warn('Camp Profile card unavailable, using the menu:', error);
         const open = profileMenu.hidden;

@@ -4,6 +4,7 @@
 
 import { supabase } from '../config/supabase.js';
 import { el } from './dom.js?v=2';
+import { logReadingDay } from './streak.js?v=1';
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
@@ -84,6 +85,7 @@ export async function mountReadingTools({ chapter, userId, body, tools, resume, 
     last = now;
     const { error } = await saveProgress({ userId, chapter, progress: now });
     if (error) console.warn('Could not save reading progress:', error.message);
+    else logReadingDay();   // scrolling counts as reading today (Reading Streak)
   };
 
   // opening a chapter puts it in the history (keeps the saved position)
