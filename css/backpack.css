@@ -69,3 +69,12 @@
 @keyframes bp-glow { 50% { opacity: .35; } }
 @keyframes bp-nudge-l { 50% { translate: -6% 0; } } @keyframes bp-nudge-r { 50% { translate: 6% 0; } }
 @media (prefers-reduced-motion: reduce) { .bp *, .bp *::before, .bp *::after, .bp-box { animation: none !important; transition: none !important; } }
+
+/* Use button: nailed plank under the name plank */
+.bp-use { position: absolute; left: 22.1%; top: 81.3%; width: 11.4%; aspect-ratio: 420 / 203; display: grid; place-items: center; transition: transform .15s ease, filter .15s ease; animation: bp-in .4s ease both; }
+.bp-use[hidden] { display: none; }
+.bp-use span { position: relative; font-weight: 800; font-size: calc(var(--f) * 28); letter-spacing: .08em; color: #fff0c8; text-shadow: 0 2px 0 #3a1d10, 0 0 6px #3a1d10; margin-top: 4%; }
+.bp-use:hover:not(:disabled) { transform: scale(1.08) rotate(-1.5deg); filter: brightness(1.15) drop-shadow(0 0 8px rgba(255, 190, 80, .7)); animation: none; }
+.bp-use:active:not(:disabled) { transform: scale(.92); }
+.bp-use:disabled { filter: grayscale(.6) brightness(.85); cursor: default; }
+.bp-pv-err { color: #9b2a12; font-weight: 700; }
