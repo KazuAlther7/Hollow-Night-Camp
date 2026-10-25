@@ -12,7 +12,7 @@ let cssReady = null;
 function ensureStyles() {
   if (cssReady) return cssReady;
   cssReady = new Promise((resolve) => {
-    const link = el('link', { rel: 'stylesheet', href: 'css/profile-card.css?v=9' });
+    const link = el('link', { rel: 'stylesheet', href: 'css/profile-card.css?v=11' });
     link.addEventListener('load', resolve); link.addEventListener('error', resolve);
     document.head.append(link);
   });
@@ -66,6 +66,65 @@ export async function openProfileCard({ profile, user, isAuthor, streak = null, 
     return el('div', { class: 'pc-i pc-slot pc-slot-' + i }, el('img', { src: A + 'badge-slot.webp', alt: '', 'aria-hidden': 'true', draggable: 'false' }), add);
   };
 
+  // ---- inline editing: nickname pencil and Change (avatar) save right here, no trip to the settings page ----
+  const me = { nickname: profile?.nickname || '', bio: profile?.bio || '', avatar_url: profile?.avatar_url || null };
+  const MAX_AVATAR = 1.5 * 1024 * 1024;
+  const msg = el('div', { class: 'pc-i pc-msg', role: 'status', 'aria-live': 'polite' });
+  let msgTimer = null;
+  const say = (text, bad = true) => { msg.textContent = text; msg.classList.toggle('is-ok', !bad); clearTimeout(msgTimer); if (text) msgTimer = setTimeout(() => { msg.textContent = ''; }, 3500); };
+  async function saveProfile(patch) {
+    const { updateReaderProfile } = await import('./auth.js');
+    const updated = await updateReaderProfile(user.id, { ...me, ...patch });
+    me.nickname = updated.nickname; me.bio = updated.bio || ''; me.avatar_url = updated.avatar_url || null;
+    if (profile) { profile.nickname = me.nickname; profile.avatar_url = me.avatar_url; }
+    return updated;
+  }
+
+  const ring = el('div', { class: 'pc-i pc-ring' });
+  const paintRing = () => ring.replaceChildren(me.avatar_url ? el('img', { src: me.avatar_url, alt: '', draggable: 'false' }) : el('span', { text: (me.nickname.trim().charAt(0) || '?').toUpperCase() }));
+  paintRing();
+  const fileInput = el('input', { type: 'file', accept: 'image/png,image/jpeg,image/webp,image/gif', hidden: '', tabindex: '-1' });
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files?.[0]; fileInput.value = '';
+    if (!file) return;
+    if (file.size > MAX_AVATAR) { say('Picture too large. Max 1.5 MB.'); return; }
+    const reader = new FileReader();
+    reader.onerror = () => say('Could not read that image.');
+    reader.onload = async () => {
+      say('Saving picture…', false);
+      try { await saveProfile({ avatar_url: String(reader.result) }); paintRing(); say('Picture updated!', false); }
+      catch (error) { console.error(error); say(error.message || 'Could not save the picture.'); }
+    };
+    reader.readAsDataURL(file);
+  });
+
+  const nickSpan = el('span', { text: nick });
+  const nickPencil = el('button', { class: 'pc-pencil', type: 'button', 'aria-label': 'Edit nickname', title: 'Edit nickname' }, el('img', { src: A + 'edit.webp', alt: '', 'aria-hidden': 'true', draggable: 'false' }));
+  let nickInput = null;
+  const endNickEdit = () => { if (!nickInput) return; nickInput.replaceWith(nickSpan); nickInput = null; nickPencil.classList.remove('is-save'); nickPencil.setAttribute('aria-label', 'Edit nickname'); nickPencil.title = 'Edit nickname'; nickPencil.disabled = false; };
+  async function commitNick() {
+    const value = nickInput.value.trim();
+    if (value === me.nickname) { endNickEdit(); return; }
+    if (value.length < 3) { say('Nickname needs at least 3 characters.'); nickInput.focus(); return; }
+    nickInput.disabled = true; nickPencil.disabled = true; say('Saving…', false);
+    try { await saveProfile({ nickname: value }); nickSpan.textContent = me.nickname; endNickEdit(); if (!me.avatar_url) paintRing(); say('Nickname updated!', false); }
+    catch (error) { console.error(error); nickInput.disabled = false; nickPencil.disabled = false; nickInput.focus(); say(error.message || 'Could not save the nickname.'); }
+  }
+  nickPencil.addEventListener('click', () => {
+    if (nickInput) { commitNick(); return; }
+    nickInput = el('input', { class: 'pc-nick-input', type: 'text', maxlength: '30', value: me.nickname, 'aria-label': 'Camp nickname', autocomplete: 'off' });
+    nickInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); commitNick(); }
+      else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); endNickEdit(); say(''); }
+    });
+    nickSpan.replaceWith(nickInput);
+    nickPencil.classList.add('is-save'); nickPencil.setAttribute('aria-label', 'Save nickname'); nickPencil.title = 'Save nickname';
+    nickInput.focus(); nickInput.select();
+  });
+
+  // rank name shrinks with its length so "Camp Rank: [name]" always stays on one line
+  const rkSize = !rank ? 28 : rank.name.length <= 8 ? 28 : rank.name.length <= 12 ? 26 : rank.name.length <= 15 ? 23 : 20;
+
   const stage = el('div', { class: 'pc-stage' + (hasStreak ? ' pc-has-streak' : '') },
     el('h2', { class: 'pc-sr', id: 'pcTitle', text: 'Camp Profile' }),
     img('title', 'pc-title'),
@@ -83,14 +142,15 @@ export async function openProfileCard({ profile, user, isAuthor, streak = null, 
     nightOwl && img('owl', 'pc-owl'),
     nightOwl && el('div', { class: 'pc-i pc-owlstreak', title: 'Reading streak', text: 'DAY ' + streak }),
 
-    el('div', { class: 'pc-i pc-ring' },
-      profile?.avatar_url ? el('img', { src: profile.avatar_url, alt: '', draggable: 'false' }) : el('span', { text: initial })),
-    plank('pc-btn-chg', 'btn-orange', 'Change', { href: SETTINGS, title: 'Change profile picture and nickname' }),
-    el('div', { class: 'pc-i pc-nick' }, el('span', { text: nick }), editPencil(SETTINGS, 'Edit nickname')),
+    ring,
+    plank('pc-btn-chg', 'btn-orange', 'Change', { title: 'Change profile picture', onclick: () => fileInput.click() }),
+    fileInput,
+    msg,
+    el('div', { class: 'pc-i pc-nick' }, nickSpan, nickPencil),
     el('div', { class: 'pc-i pc-bar', role: 'img', 'aria-label': rank ? 'Camp rank progress: ' + rankText : 'Camp rank progress: not available yet' },
       el('i', { style: 'width:' + rankPct + '%' }), rank && el('span', { text: rankText })),
     el('div', { class: 'pc-i pc-campid', text: 'Camp ID: ' + campId }),
-    el('div', { class: 'pc-i pc-rankrow' }, el('span', { text: 'Camp Rank:' }), el('b', { class: 'pc-rankname', text: rank ? rank.name : 'Soon' })),
+    el('div', { class: 'pc-i pc-rankrow', style: '--rk:' + rkSize }, el('span', { text: 'Camp Rank:' }), el('b', { class: 'pc-rankname', title: rank ? rank.name : '', text: rank ? rank.name : 'Soon' })),
     rows.map(([label, value], i) => row(i, label, value)),
     el('section', { class: 'pc-i pc-manifesto', 'aria-labelledby': 'pcBioTitle' },
       el('header', {}, el('h3', { id: 'pcBioTitle', text: 'Reader Bio' }), editPencil(SETTINGS, 'Edit reader bio')),
@@ -105,7 +165,7 @@ export async function openProfileCard({ profile, user, isAuthor, streak = null, 
 
     // action planks (inside the left page on Profile, under the book on Statistik)
     plank('pc-btn-1', 'btn-orange', 'Full Profile', { href: FULL_PROFILE }),
-    plank('pc-btn-3', 'btn-teal', 'Collectibles', { disabled: '', title: 'Coming soon' }),
+    plank('pc-btn-3', 'btn-teal', 'Vault', { disabled: '', title: 'Coming soon' }),
     plank('pc-btn-4', 'btn-red', 'Sign Out', { id: 'pcSignOut' })
   );
 

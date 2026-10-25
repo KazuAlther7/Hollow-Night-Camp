@@ -229,7 +229,7 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
       import('./streak.js?v=2').then((module) => soon(module.getReadingStreak())).catch(() => null),
       import('./rank.js?v=1').then((module) => soon(module.getCampRank())).catch(() => null)
     ]);
-    import('./profile-card.js?v=6')
+    import('./profile-card.js?v=7')
       .then((module) => module.openProfileCard({ profile, user, isAuthor, streak, rank, opener: profileButton, onSignOut: () => signOut() }))
       .catch((error) => {
         console.warn('Camp Profile card unavailable, using the menu:', error);
