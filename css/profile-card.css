@@ -27,11 +27,12 @@ img.pc-i { pointer-events: none; }
 .pc-tab { display: flex; flex-direction: column; align-items: center; height: auto; padding: 0; border: 0; background: none; cursor: pointer; text-decoration: none; transition: transform .18s ease, filter .18s ease; }
 .pc-tab img { width: 100%; display: block; pointer-events: none; }
 .pc-tab span { font-size: calc(var(--u) * 36); line-height: 1; margin-top: calc(var(--u) * 4); }
-.pc-tab-1 { --x: 0;  --y: 480;  --w: 275; }
-.pc-tab-2 { --x: 15; --y: 780;  --w: 278; }
-.pc-tab-3 { --x: 15; --y: 1080; --w: 277; }
-.pc-tab:not([disabled]):not([aria-current]):hover { transform: translateX(calc(var(--u) * 10)); filter: brightness(1.1); }
-.pc-tab[aria-current] { filter: drop-shadow(0 0 calc(var(--u) * 10) rgba(255,206,114,.7)); }
+.pc-tab-1, .pc-tab-2, .pc-tab-3 { --x: 8; --w: 270; }
+.pc-tab-1 { --y: 480; } .pc-tab-2 { --y: 790; } .pc-tab-3 { --y: 1100; }
+/* `scale` (not transform) so it is not overridden by the entrance animation; the open tab grows, the rest stay normal */
+.pc-tab { scale: 1; transform-origin: 0 45%; transition: scale .35s cubic-bezier(.3,1.5,.5,1), filter .18s ease; }
+.pc-tab:not([disabled]):not([aria-current]):hover { scale: 1.05; filter: brightness(1.1); }
+.pc-tab[aria-current] { scale: 1.16; z-index: 2; filter: drop-shadow(0 0 calc(var(--u) * 10) rgba(255,206,114,.7)); }
 .pc-tab[disabled] { opacity: .55; cursor: not-allowed; }
 
 .pc-nick { --x: 625; --y: 1429; --w: 420; --h: 90; display: flex; align-items: center; transform: rotate(-2.9deg); } /* matches the tilt of the plank in the book art */
