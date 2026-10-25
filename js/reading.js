@@ -4,7 +4,7 @@
 
 import { supabase } from '../config/supabase.js';
 import { el } from './dom.js?v=2';
-import { logReadingDay } from './streak.js?v=2';
+import { logReadingDay } from './streak.js?v=3';
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 

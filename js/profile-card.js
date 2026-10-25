@@ -305,7 +305,7 @@ export async function openProfileCard({ profile, user, isAuthor, streak = null, 
   let statsLoaded = false;
   async function loadStats() {
     if (statsLoaded) return; statsLoaded = true;
-    const [{ getCampStats }, streakMod] = await Promise.all([import('./stats.js?v=1'), import('./streak.js?v=2')]);
+    const [{ getCampStats }, streakMod] = await Promise.all([import('./stats.js?v=1'), import('./streak.js?v=3')]);
     const longest = await streakMod.getLongestStreak().catch(() => null);
     const d = await getCampStats({ userId: user?.id, streak, longestStreak: longest });
 

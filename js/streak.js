@@ -16,7 +16,9 @@ export async function logReadingDay() {
   if (loggedFor === key) return;
   loggedFor = key;
   const { error } = await supabase.rpc('log_reading_day', { p_tz: tz });
-  if (error) { loggedFor = null; console.warn('Reading streak unavailable (run sql/reading_streak.sql):', error.message); }
+  if (error) { loggedFor = null; console.warn('Reading streak unavailable (run sql/reading_streak.sql):', error.message); return; }
+  // A new reading day can earn a badge (Night Owl): let the server award it now so the bell rings right away.
+  import('./badges.js?v=1').then((module) => module.syncBadges()).catch(() => {});
 }
 
 // Current streak in days, or null when it cannot be read.

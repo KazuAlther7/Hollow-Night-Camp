@@ -226,7 +226,7 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
     // Reading Streak (js/streak.js) and Camp Rank (js/rank.js): each is null when unavailable, so the card just hides that part
     const soon = (promise) => Promise.race([promise, new Promise((resolve) => setTimeout(() => resolve(null), 1500))]).catch(() => null);
     const [streak, rank, badges] = await Promise.all([
-      import('./streak.js?v=2').then((module) => soon(module.getReadingStreak())).catch(() => null),
+      import('./streak.js?v=3').then((module) => soon(module.getReadingStreak())).catch(() => null),
       import('./rank.js?v=1').then((module) => soon(module.getCampRank())).catch(() => null),
       // Badges (js/badges.js): sync awards first, then read; null when sql/badges.sql has not been run
       import('./badges.js?v=1').then((module) => soon(module.loadBadges())).catch(() => null)
