@@ -12,7 +12,7 @@ let cssReady = null;
 function ensureStyles() {
   if (cssReady) return cssReady;
   cssReady = new Promise((resolve) => {
-    const link = el('link', { rel: 'stylesheet', href: 'css/profile-card.css?v=7' });
+    const link = el('link', { rel: 'stylesheet', href: 'css/profile-card.css?v=9' });
     link.addEventListener('load', resolve); link.addEventListener('error', resolve);
     document.head.append(link);
   });
@@ -20,17 +20,6 @@ function ensureStyles() {
 }
 
 const img = (name, cls, extra = {}) => el('img', { class: 'pc-i ' + cls, src: A + name + '.webp', alt: '', 'aria-hidden': 'true', draggable: 'false', ...extra });
-const NS = 'http://www.w3.org/2000/svg';
-function silhouette() {
-  const s = document.createElementNS(NS, 'svg');
-  s.setAttribute('viewBox', '0 0 220 320'); s.setAttribute('class', 'pc-i pc-silhouette'); s.setAttribute('aria-hidden', 'true');
-  s.innerHTML = '<g fill="#2b0e14"><circle cx="112" cy="62" r="38"/><path d="M72 52c-6-30 18-46 44-44 26 0 44 16 38 42-8-12-20-18-40-18-18 0-32 6-42 20z"/>'
-    + '<rect x="34" y="118" width="86" height="104" rx="22"/><path d="M78 108h72c26 0 40 20 40 48v66h-38v82h-30v-82h-8v82h-30v-82h-18z"/>'
-    + '<rect x="176" y="120" width="8" height="190" rx="4"/><circle cx="180" cy="116" r="9"/></g>'
-    + '<rect x="46" y="140" width="22" height="28" rx="3" fill="#f5e3b4" opacity=".85"/>';
-  return s;
-}
-
 // Night Owl appears on the card only once the reader has a reading streak of at least this many days.
 export const NIGHT_OWL_MIN_STREAK = 3;
 
@@ -80,8 +69,7 @@ export async function openProfileCard({ profile, user, isAuthor, streak = null, 
   const stage = el('div', { class: 'pc-stage' + (hasStreak ? ' pc-has-streak' : '') },
     el('h2', { class: 'pc-sr', id: 'pcTitle', text: 'Camp Profile' }),
     img('title', 'pc-title'),
-    img('book', 'pc-book'),
-    img('stats-book', 'pc-st pc-st-book'),
+    img('stats-book', 'pc-book'),
     img('stats-title', 'pc-st pc-st-titleimg'),
 
     el('nav', { 'aria-label': 'Profile sections' },
@@ -89,33 +77,34 @@ export async function openProfileCard({ profile, user, isAuthor, streak = null, 
       tab('pc-tab-2', 'tab-stats', 'Statistik', { onclick: () => setView('stats') }),
       tab('pc-tab-3', 'tab-settings', 'Settings', { href: SETTINGS })),
 
-    // left page: the character card
-    silhouette(),
+    // left page: the camper's own info (the right page is still free)
     img('rank-hex', 'pc-hex'),
     rank && el('div', { class: 'pc-i pc-hexlv', text: 'LV ' + rank.tier }),
     nightOwl && img('owl', 'pc-owl'),
-    nightOwl && el('div', { class: 'pc-i pc-owlstreak', title: 'Reading streak', text: streak + (streak === 1 ? ' DAY' : ' DAYS') }),
-    el('div', { class: 'pc-i pc-nick' }, el('span', { text: nick }), editPencil(SETTINGS, 'Edit nickname')),
+    nightOwl && el('div', { class: 'pc-i pc-owlstreak', title: 'Reading streak', text: 'DAY ' + streak }),
 
-    // right page
     el('div', { class: 'pc-i pc-ring' },
       profile?.avatar_url ? el('img', { src: profile.avatar_url, alt: '', draggable: 'false' }) : el('span', { text: initial })),
-    el('div', { class: 'pc-i pc-rank' }, el('b', { text: rank ? rank.name : 'Camp Rank' }), el('small', { text: rank ? 'Lv ' + rank.tier : 'soon' })),
+    plank('pc-btn-chg', 'btn-orange', 'Change', { href: SETTINGS, title: 'Change profile picture and nickname' }),
+    el('div', { class: 'pc-i pc-nick' }, el('span', { text: nick }), editPencil(SETTINGS, 'Edit nickname')),
     el('div', { class: 'pc-i pc-bar', role: 'img', 'aria-label': rank ? 'Camp rank progress: ' + rankText : 'Camp rank progress: not available yet' },
       el('i', { style: 'width:' + rankPct + '%' }), rank && el('span', { text: rankText })),
     el('div', { class: 'pc-i pc-campid', text: 'Camp ID: ' + campId }),
+    el('div', { class: 'pc-i pc-rankrow' }, el('span', { text: 'Camp Rank:' }), el('b', { class: 'pc-rankname', text: rank ? rank.name : 'Soon' })),
     rows.map(([label, value], i) => row(i, label, value)),
-    el('section', { class: 'pc-i pc-manifesto', 'aria-labelledby': 'pcManifestoTitle' },
-      el('header', {}, el('h3', { id: 'pcManifestoTitle', text: 'Personal Manifesto' }), editPencil(SETTINGS, 'Edit personal manifesto')),
+    el('section', { class: 'pc-i pc-manifesto', 'aria-labelledby': 'pcBioTitle' },
+      el('header', {}, el('h3', { id: 'pcBioTitle', text: 'Reader Bio' }), editPencil(SETTINGS, 'Edit reader bio')),
       el('p', { class: bio ? '' : 'is-empty', text: bio || 'This camper wrote nothing.' })),
+
+    // right page: badges for now
+    el('div', { class: 'pc-i pc-badges-title', text: 'Badges' }),
     el('div', { class: 'pc-slots', role: 'group', 'aria-label': 'Badge slots (empty)' },
       [0, 1, 2].map(slot)),
 
     closeBtn,
 
-    // action planks
-    plank('pc-btn-1', 'btn-orange', 'View Full Profile', { href: FULL_PROFILE }),
-    plank('pc-btn-2', 'btn-brown', 'Edit Profile', { href: SETTINGS }),
+    // action planks (inside the left page on Profile, under the book on Statistik)
+    plank('pc-btn-1', 'btn-orange', 'Full Profile', { href: FULL_PROFILE }),
     plank('pc-btn-3', 'btn-teal', 'Collectibles', { disabled: '', title: 'Coming soon' }),
     plank('pc-btn-4', 'btn-red', 'Sign Out', { id: 'pcSignOut' })
   );
