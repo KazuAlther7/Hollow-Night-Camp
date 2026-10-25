@@ -35,7 +35,7 @@ img.pc-i { pointer-events: none; }
 .pc-tab[disabled] { opacity: .55; cursor: not-allowed; }
 
 .pc-nick { --x: 772; --y: 488; --w: 398; --h: 70; display: flex; align-items: center; }
-.pc-nick span { font-size: calc(var(--u) * 46); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: calc(var(--u) * 320); padding-top: calc(var(--u) * 4); }
+.pc-nick span { font-size: calc(var(--u) * 42); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: calc(var(--u) * 335); padding-top: calc(var(--u) * 4); }
 .pc-nick .pc-pencil { position: relative; flex: none; margin-left: calc(var(--u) * 10); width: calc(var(--u) * 58); height: calc(var(--u) * 58); }
 .pc-pencil { display: block; width: calc(var(--u) * 92); height: calc(var(--u) * 92); transition: transform .15s ease; }
 .pc-pencil img { width: 100%; height: 100%; display: block; }
@@ -71,7 +71,7 @@ img.pc-i { pointer-events: none; }
 .pc-stage.pc-has-streak .pc-manifesto { --y: 1150; --h: 275; }
 
 .pc-slots { display: contents; }
-.pc-slot { --y: 930; --w: 235; --h: 206; }
+.pc-slot { --y: 575; --w: 235; --h: 206; }
 .pc-slot > img { width: 100%; height: 100%; display: block; pointer-events: none; }
 .pc-slot-add { position: absolute; left: calc(var(--u) * 150); top: calc(var(--u) * -6); width: calc(var(--u) * 58); height: calc(var(--u) * 58); padding: 0; cursor: pointer;
   border: calc(var(--u) * 5) solid #3a1d10; border-radius: calc(var(--u) * 14);
@@ -81,7 +81,7 @@ img.pc-i { pointer-events: none; }
 .pc-slot-add:focus-visible { outline: calc(var(--u) * 7) solid #ffce72; outline-offset: calc(var(--u) * 5); }
 .pc-slot-add.is-nope { animation: pc-nope .35s ease; }
 @keyframes pc-nope { 20% { transform: translateX(calc(var(--u) * -8)); } 40% { transform: translateX(calc(var(--u) * 8)); } 60% { transform: translateX(calc(var(--u) * -5)); } 80% { transform: translateX(calc(var(--u) * 5)); } }
-.pc-slot-0 { --x: 1245; } .pc-slot-1 { --x: 1490; } .pc-slot-2 { --x: 1735; }
+.pc-slot-0 { --x: 1235; } .pc-slot-1 { --x: 1468; } .pc-slot-2 { --x: 1701; }
 
 .pc-close { --x: 1999; --y: 308; --w: 160; --h: 166; border: 0; border-radius: calc(var(--u) * 28); background: transparent; cursor: pointer; }
 .pc-close:hover { box-shadow: 0 0 calc(var(--u) * 26) calc(var(--u) * 6) rgba(255,120,90,.55); }
@@ -100,12 +100,22 @@ img.pc-i { pointer-events: none; }
 .pc-btn[disabled] { opacity: .55; cursor: not-allowed; filter: grayscale(.4); }
 
 /* Camp Rank row: label + bordered rank name (under Camp ID), Badges header on the right page */
-.pc-rankrow { --x: 772; --y: 676; --w: 398; display: flex; flex-wrap: wrap; align-items: center; gap: calc(var(--u) * 8) calc(var(--u) * 12); }
-.pc-rankrow > span { font-size: calc(var(--u) * 40); font-weight: 600; letter-spacing: .03em; }
-.pc-rankname { padding: calc(var(--u) * 2) calc(var(--u) * 18) calc(var(--u) * 4); border: calc(var(--u) * 5) solid #7a5233; border-radius: calc(var(--u) * 12);
-  background: rgba(255,244,214,.55); box-shadow: inset 0 calc(var(--u) * 3) 0 rgba(255,255,255,.35); font-size: calc(var(--u) * 36); font-weight: 700; color: #3a2416; white-space: nowrap; }
-.pc-badges-title { --x: 1245; --y: 830; --w: 725; --h: 72; display: flex; align-items: center; padding: 0 calc(var(--u) * 26); border-radius: calc(var(--u) * 10); background: rgba(168,128,84,.35);
+.pc-rankrow { --x: 772; --y: 676; --w: 398; --h: 50; display: flex; flex-wrap: nowrap; align-items: center; gap: calc(var(--u) * 10); }
+.pc-rankrow > span { flex: none; font-size: calc(var(--u) * 26); font-weight: 600; letter-spacing: .02em; white-space: nowrap; }
+.pc-rankname { padding: calc(var(--u) * 2) calc(var(--u) * 10) calc(var(--u) * 3); border: calc(var(--u) * 4) solid #7a5233; border-radius: calc(var(--u) * 12);
+  background: rgba(255,244,214,.55); box-shadow: inset 0 calc(var(--u) * 3) 0 rgba(255,255,255,.35); font-size: calc(var(--u) * var(--rk, 28)); font-weight: 700; color: #3a2416; white-space: nowrap; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.pc-badges-title { --x: 1245; --y: 480; --w: 640; --h: 72; display: flex; align-items: center; padding: 0 calc(var(--u) * 26); border-radius: calc(var(--u) * 10); background: rgba(168,128,84,.35);
   font-size: calc(var(--u) * 42); font-weight: 700; letter-spacing: .02em; text-transform: uppercase; color: #3a2416; }
+
+/* inline editing */
+.pc-nick-input { width: calc(var(--u) * 310); min-width: 0; box-sizing: border-box; padding: calc(var(--u) * 2) calc(var(--u) * 12) calc(var(--u) * 4); border: calc(var(--u) * 4) solid #7a5233; border-radius: calc(var(--u) * 10);
+  background: #fff4d6; color: #3a2416; font: 700 calc(var(--u) * 40) var(--heading); outline: none; }
+.pc-nick-input:focus { border-color: #f08a12; box-shadow: 0 0 0 calc(var(--u) * 5) rgba(255,178,58,.45); }
+.pc-pencil.is-save { filter: drop-shadow(0 0 calc(var(--u) * 8) rgba(255,206,114,.95)); transform: scale(1.1); }
+.pc-pencil:disabled { opacity: .6; cursor: progress; }
+.pc-msg { --x: 548; --y: 784; --w: 622; --h: 40; display: flex; align-items: center; font-size: calc(var(--u) * 28); font-weight: 600; color: #9a2f1c; pointer-events: none; }
+.pc-msg.is-ok { color: #3f6b2a; }
+.pc-nick .pc-pencil { cursor: pointer; border: 0; padding: 0; background: none; }
 
 /* ---- motion: the card drops from the bar and settles like a hanging board ---- */
 .pc-dialog[open] .pc-wrap { animation: pc-drop .66s cubic-bezier(.2,.8,.25,1) both; }
@@ -145,7 +155,7 @@ img.pc-i { pointer-events: none; }
 @keyframes pc-owl { 0%, 86%, 100% { transform: rotate(0); } 90% { transform: rotate(-5deg); } 94% { transform: rotate(3deg); } }
 
 /* ---- Statistik view: own book + title art, no avatar/rank, records on sticky notes ---- */
-.pc-stage.pc-view-stats :is(.pc-btn-chg, .pc-rankrow, .pc-badges-title, .pc-hexlv, .pc-owlstreak, .pc-title, .pc-silhouette, .pc-hex, .pc-owl, .pc-nick, .pc-ring, .pc-rank, .pc-bar, .pc-campid, .pc-row, .pc-manifesto, .pc-slots) { display: none; }
+.pc-stage.pc-view-stats :is(.pc-msg, .pc-btn-chg, .pc-rankrow, .pc-badges-title, .pc-hexlv, .pc-owlstreak, .pc-title, .pc-silhouette, .pc-hex, .pc-owl, .pc-nick, .pc-ring, .pc-rank, .pc-bar, .pc-campid, .pc-row, .pc-manifesto, .pc-slots) { display: none; }
 .pc-stage:not(.pc-view-stats) .pc-st { display: none; }
 .pc-stage.pc-view-stats .pc-st { animation: pc-row-in .5s cubic-bezier(.2,.8,.25,1) both; }
 .pc-st-book, .pc-st-titleimg { animation: none !important; }
@@ -218,7 +228,7 @@ img.pc-i { pointer-events: none; }
 @media (max-width: 640px) {
   .pc-dialog { inset: 64px 4px auto 4px; translate: none; width: auto; }
   .pc-row { font-size: calc(var(--u) * 52); padding: 0 calc(var(--u) * 20); }
-  .pc-rankrow > span { font-size: calc(var(--u) * 44); } .pc-rankname { font-size: calc(var(--u) * 40); }
+  .pc-rankrow > span { font-size: calc(var(--u) * 34); } .pc-rankname { font-size: calc(var(--u) * var(--rk, 28) * 1.12); }
   .pc-campid { font-size: calc(var(--u) * 44); white-space: nowrap; }
   .pc-tab span { font-size: calc(var(--u) * 48); }
   .pc-nick span { font-size: calc(var(--u) * 46); }
