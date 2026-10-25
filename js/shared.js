@@ -223,12 +223,14 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
 
   // Account button opens the Camp Profile card (js/profile-card.js); the old dropdown stays hidden as a fallback.
   profileButton.addEventListener('click', async () => {
-    // Reading Streak (js/streak.js): null when unavailable, so the card just hides the streak row and Night Owl
-    const streak = await import('./streak.js?v=2')
-      .then((module) => Promise.race([module.getReadingStreak(), new Promise((resolve) => setTimeout(() => resolve(null), 1500))]))
-      .catch(() => null);
-    import('./profile-card.js?v=4')
-      .then((module) => module.openProfileCard({ profile, user, isAuthor, streak, opener: profileButton, onSignOut: () => signOut() }))
+    // Reading Streak (js/streak.js) and Camp Rank (js/rank.js): each is null when unavailable, so the card just hides that part
+    const soon = (promise) => Promise.race([promise, new Promise((resolve) => setTimeout(() => resolve(null), 1500))]).catch(() => null);
+    const [streak, rank] = await Promise.all([
+      import('./streak.js?v=2').then((module) => soon(module.getReadingStreak())).catch(() => null),
+      import('./rank.js?v=1').then((module) => soon(module.getCampRank())).catch(() => null)
+    ]);
+    import('./profile-card.js?v=5')
+      .then((module) => module.openProfileCard({ profile, user, isAuthor, streak, rank, opener: profileButton, onSignOut: () => signOut() }))
       .catch((error) => {
         console.warn('Camp Profile card unavailable, using the menu:', error);
         const open = profileMenu.hidden;

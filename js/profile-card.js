@@ -12,7 +12,7 @@ let cssReady = null;
 function ensureStyles() {
   if (cssReady) return cssReady;
   cssReady = new Promise((resolve) => {
-    const link = el('link', { rel: 'stylesheet', href: 'css/profile-card.css?v=6' });
+    const link = el('link', { rel: 'stylesheet', href: 'css/profile-card.css?v=7' });
     link.addEventListener('load', resolve); link.addEventListener('error', resolve);
     document.head.append(link);
   });
@@ -35,7 +35,7 @@ function silhouette() {
 export const NIGHT_OWL_MIN_STREAK = 3;
 
 // streak: current reading streak in days (number), or null while the streak system is not connected (row and owl stay hidden).
-export async function openProfileCard({ profile, user, isAuthor, streak = null, opener, onSignOut }) {
+export async function openProfileCard({ profile, user, isAuthor, streak = null, rank = null, opener, onSignOut }) {
   if (document.querySelector('dialog.pc-dialog')) return;
   await ensureStyles();
 
@@ -46,6 +46,10 @@ export async function openProfileCard({ profile, user, isAuthor, streak = null, 
   const bio = (profile?.bio || '').trim();
   const hasStreak = Number.isFinite(streak) && streak >= 0;
   const nightOwl = hasStreak && streak >= NIGHT_OWL_MIN_STREAK;
+
+  // EXP bar fills from the current tier's threshold to the next one; the top tier shows full.
+  const rankPct = !rank ? 0 : rank.next_min == null ? 100 : Math.max(0, Math.min(100, (rank.exp - rank.tier_min) / (rank.next_min - rank.tier_min) * 100));
+  const rankText = !rank ? '' : rank.next_min == null ? rank.exp.toLocaleString('en-US') + ' EXP · MAX' : rank.exp.toLocaleString('en-US') + ' / ' + rank.next_min.toLocaleString('en-US') + ' EXP';
 
   const closeBtn = el('button', { class: 'pc-i pc-close', type: 'button', 'aria-label': 'Close Camp Profile' });
   const tab = (cls, icon, label, attrs) => {
@@ -88,14 +92,17 @@ export async function openProfileCard({ profile, user, isAuthor, streak = null, 
     // left page: the character card
     silhouette(),
     img('rank-hex', 'pc-hex'),
+    rank && el('div', { class: 'pc-i pc-hexlv', text: 'LV ' + rank.tier }),
     nightOwl && img('owl', 'pc-owl'),
+    nightOwl && el('div', { class: 'pc-i pc-owlstreak', title: 'Reading streak', text: streak + (streak === 1 ? ' DAY' : ' DAYS') }),
     el('div', { class: 'pc-i pc-nick' }, el('span', { text: nick }), editPencil(SETTINGS, 'Edit nickname')),
 
     // right page
     el('div', { class: 'pc-i pc-ring' },
       profile?.avatar_url ? el('img', { src: profile.avatar_url, alt: '', draggable: 'false' }) : el('span', { text: initial })),
-    el('div', { class: 'pc-i pc-rank' }, el('b', { text: 'Camp Rank' }), el('small', { text: 'soon' })),
-    el('div', { class: 'pc-i pc-bar', role: 'img', 'aria-label': 'Camp rank progress: not available yet' }, el('i')),
+    el('div', { class: 'pc-i pc-rank' }, el('b', { text: rank ? rank.name : 'Camp Rank' }), el('small', { text: rank ? 'Lv ' + rank.tier : 'soon' })),
+    el('div', { class: 'pc-i pc-bar', role: 'img', 'aria-label': rank ? 'Camp rank progress: ' + rankText : 'Camp rank progress: not available yet' },
+      el('i', { style: 'width:' + rankPct + '%' }), rank && el('span', { text: rankText })),
     el('div', { class: 'pc-i pc-campid', text: 'Camp ID: ' + campId }),
     rows.map(([label, value], i) => row(i, label, value)),
     el('section', { class: 'pc-i pc-manifesto', 'aria-labelledby': 'pcManifestoTitle' },
