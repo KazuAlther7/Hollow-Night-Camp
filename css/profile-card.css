@@ -34,10 +34,10 @@ img.pc-i { pointer-events: none; }
 .pc-tab[aria-current] { filter: drop-shadow(0 0 calc(var(--u) * 10) rgba(255,206,114,.7)); }
 .pc-tab[disabled] { opacity: .55; cursor: not-allowed; }
 
-.pc-nick { --x: 625; --y: 1425; --w: 420; --h: 90; display: flex; align-items: center; }
+.pc-nick { --x: 625; --y: 1429; --w: 420; --h: 90; display: flex; align-items: center; transform: rotate(-2.9deg); } /* matches the tilt of the plank in the book art */
 .pc-nick span { font-size: calc(var(--u) * 50); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; padding-top: calc(var(--u) * 6); }
-.pc-nick .pc-pencil { position: absolute; left: calc(var(--u) * 440); top: calc(var(--u) * -8); }
-.pc-pencil { display: block; width: calc(var(--u) * 100); height: calc(var(--u) * 100); transition: transform .15s ease; }
+.pc-nick .pc-pencil { position: absolute; left: calc(var(--u) * 428); top: calc(var(--u) * -4); }
+.pc-pencil { display: block; width: calc(var(--u) * 92); height: calc(var(--u) * 92); transition: transform .15s ease; }
 .pc-pencil img { width: 100%; height: 100%; display: block; }
 .pc-pencil:hover { transform: rotate(-8deg) scale(1.08); }
 
@@ -54,7 +54,7 @@ img.pc-i { pointer-events: none; }
 .pc-row { --x: 1263; --w: 716; --h: 74; display: flex; align-items: center; padding: 0 calc(var(--u) * 28); border-radius: calc(var(--u) * 10);
   background: rgba(168,128,84,.3); font-size: calc(var(--u) * 46); font-weight: 600; white-space: nowrap; gap: calc(var(--u) * 10); }
 .pc-row b { font-weight: 700; }
-.pc-row-0 { --y: 719; } .pc-row-1 { --y: 808; } .pc-row-2 { --y: 897; }
+.pc-row-0 { --y: 719; } .pc-row-1 { --y: 808; } .pc-row-2 { --y: 897; } .pc-row-3 { --y: 986; }
 
 .pc-manifesto { --x: 1263; --y: 1000; --w: 716; --h: 340; border: calc(var(--u) * 5) solid rgba(120,84,50,.55); border-radius: calc(var(--u) * 12); background: rgba(255,244,214,.35); display: flex; flex-direction: column; overflow: hidden; }
 .pc-manifesto header { display: flex; justify-content: space-between; align-items: center; padding: calc(var(--u) * 4) calc(var(--u) * 14) calc(var(--u) * 4) calc(var(--u) * 24); background: rgba(168,128,84,.35); }
@@ -63,8 +63,19 @@ img.pc-i { pointer-events: none; }
 .pc-manifesto p { margin: 0; padding: calc(var(--u) * 16) calc(var(--u) * 26); font: 400 calc(var(--u) * 40)/1.4 var(--typewriter); overflow-y: auto; word-break: break-word; scrollbar-width: thin; }
 .pc-manifesto p.is-empty { color: #7a6246; }
 
+.pc-stage.pc-has-streak .pc-manifesto { --y: 1085; --h: 285; }
+
 .pc-slots { display: contents; }
 .pc-slot { --y: 1384; --w: 235; --h: 206; }
+.pc-slot > img { width: 100%; height: 100%; display: block; pointer-events: none; }
+.pc-slot-add { position: absolute; left: calc(var(--u) * 150); top: calc(var(--u) * -6); width: calc(var(--u) * 58); height: calc(var(--u) * 58); padding: 0; cursor: pointer;
+  border: calc(var(--u) * 5) solid #3a1d10; border-radius: calc(var(--u) * 14);
+  background: linear-gradient(#fff0c8, #fff0c8) center / 56% 16% no-repeat, linear-gradient(#fff0c8, #fff0c8) center / 16% 56% no-repeat, linear-gradient(#ffb23a, #f08a12);
+  box-shadow: 0 calc(var(--u) * 4) 0 rgba(58,29,16,.55); transition: transform .15s ease, filter .15s ease; }
+.pc-slot-add:hover { transform: scale(1.12) rotate(6deg); filter: brightness(1.08); }
+.pc-slot-add:focus-visible { outline: calc(var(--u) * 7) solid #ffce72; outline-offset: calc(var(--u) * 5); }
+.pc-slot-add.is-nope { animation: pc-nope .35s ease; }
+@keyframes pc-nope { 20% { transform: translateX(calc(var(--u) * -8)); } 40% { transform: translateX(calc(var(--u) * 8)); } 60% { transform: translateX(calc(var(--u) * -5)); } 80% { transform: translateX(calc(var(--u) * 5)); } }
 .pc-slot-0 { --x: 1249; } .pc-slot-1 { --x: 1489; } .pc-slot-2 { --x: 1729; }
 
 .pc-close { --x: 1999; --y: 308; --w: 160; --h: 166; border: 0; border-radius: calc(var(--u) * 28); background: transparent; cursor: pointer; }
@@ -89,8 +100,8 @@ img.pc-i { pointer-events: none; }
 .pc-dialog[open] .pc-owl  { animation: pc-pop .55s .56s cubic-bezier(.3,1.6,.5,1) both, pc-owl 7s 1.4s ease-in-out infinite; }
 .pc-dialog[open] .pc-silhouette { animation: pc-rise .6s .4s ease both; }
 .pc-dialog[open] .pc-row { animation: pc-row-in .45s cubic-bezier(.2,.8,.25,1) both; }
-.pc-row-0 { animation-delay: .44s !important; } .pc-row-1 { animation-delay: .51s !important; } .pc-row-2 { animation-delay: .58s !important; }
-.pc-dialog[open] .pc-manifesto { animation: pc-row-in .45s .65s cubic-bezier(.2,.8,.25,1) both; }
+.pc-row-0 { animation-delay: .44s !important; } .pc-row-1 { animation-delay: .51s !important; } .pc-row-2 { animation-delay: .58s !important; } .pc-row-3 { animation-delay: .65s !important; }
+.pc-dialog[open] .pc-manifesto { animation: pc-row-in .45s .7s cubic-bezier(.2,.8,.25,1) both; }
 .pc-dialog[open] .pc-slot { animation: pc-pop .5s cubic-bezier(.3,1.6,.5,1) both; }
 .pc-slot-0 { animation-delay: .7s !important; } .pc-slot-1 { animation-delay: .78s !important; } .pc-slot-2 { animation-delay: .86s !important; }
 .pc-dialog[open] .pc-btn { animation: pc-btn-up .5s cubic-bezier(.2,.8,.25,1) both; }
@@ -120,8 +131,16 @@ img.pc-i { pointer-events: none; }
 @media (prefers-reduced-motion: reduce) {
   .pc-dialog *, .pc-dialog::backdrop { animation: none !important; transition: none !important; }
 }
-/* narrow phones: keep the card readable by letting it scroll sideways instead of shrinking the text */
+/* portrait phones: the whole card scales to the screen (no sideways scroll); text is enlarged so it stays readable */
 @media (max-width: 640px) {
-  .pc-dialog { inset: 70px 0 auto 0; translate: none; width: 100vw; overflow-x: auto; overflow-y: visible; }
-  .pc-wrap { width: 640px; }
+  .pc-dialog { inset: 64px 4px auto 4px; translate: none; width: auto; }
+  .pc-row { font-size: calc(var(--u) * 52); padding: 0 calc(var(--u) * 20); }
+  .pc-rank { font-size: calc(var(--u) * 54); white-space: nowrap; gap: calc(var(--u) * 10); } .pc-rank small { font-size: calc(var(--u) * 34); }
+  .pc-campid { font-size: calc(var(--u) * 48); white-space: nowrap; }
+  .pc-tab span { font-size: calc(var(--u) * 48); }
+  .pc-nick span { font-size: calc(var(--u) * 46); }
+  .pc-manifesto h3 { font-size: calc(var(--u) * 44); }
+  .pc-manifesto p { font-size: calc(var(--u) * 50); }
+  .pc-btn span { font-size: calc(var(--u) * 46); white-space: normal; text-align: center; line-height: .95; padding: 0 calc(var(--u) * 36) calc(var(--u) * 4); }
+  .pc-slot-add { width: calc(var(--u) * 74); height: calc(var(--u) * 74); left: calc(var(--u) * 140); top: calc(var(--u) * -14); }
 }
