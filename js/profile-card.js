@@ -12,7 +12,7 @@ let cssReady = null;
 function ensureStyles() {
   if (cssReady) return cssReady;
   cssReady = new Promise((resolve) => {
-    const link = el('link', { rel: 'stylesheet', href: 'css/profile-card.css?v=13' });
+    const link = el('link', { rel: 'stylesheet', href: 'css/profile-card.css?v=14' });
     link.addEventListener('load', resolve); link.addEventListener('error', resolve);
     document.head.append(link);
   });
@@ -77,54 +77,43 @@ export async function openProfileCard({ profile, user, isAuthor, streak = null, 
   };
   function paintSlot(i) {
     const { wrap, add } = slotEls[i];
-    wrap.querySelector('.pc-badge')?.remove();
+    wrap.querySelector('.pc-slot-badge')?.remove();
     const b = mine.slots[i];
-    if (b) add.before(badgeFace(b));
-    add.classList.toggle('is-edit', !!b);
-    const label = !badges ? 'Badges are not available right now' : b ? 'Change badge in slot ' + (i + 1) : 'Add badge to slot ' + (i + 1);
+    // Filled slot: the badge sits centred in the frame and is itself the button (opens the Backpack); the plus/edit corner button hides.
+    if (b) add.before(el('button', { class: 'pc-slot-badge', type: 'button', title: b.title + ' — tap to change', 'aria-label': b.title + ' — change badge in slot ' + (i + 1), onclick: (e) => openFromSlot(i, e.currentTarget) }, badgeFace(b)));
+    add.hidden = !!b;
+    const label = !badges ? 'Badges are not available right now' : 'Add badge to slot ' + (i + 1);
     add.setAttribute('aria-label', label); add.title = label;
     if (!badges) add.setAttribute('aria-disabled', 'true');
   }
   const slot = (i) => {
-    const add = el('button', { class: 'pc-slot-add', type: 'button', onclick: (e) => openPicker(i, e.currentTarget) });
+    const add = el('button', { class: 'pc-slot-add', type: 'button', onclick: (e) => openFromSlot(i, e.currentTarget) });
     const wrap = el('div', { class: 'pc-i pc-slot pc-slot-' + i }, el('img', { src: A + 'badge-slot.webp', alt: '', 'aria-hidden': 'true', draggable: 'false' }), add);
     slotEls[i] = { wrap, add };
     paintSlot(i);
     return wrap;
   };
-  function openPicker(i, from) {
+  // Slots and the Backpack button both open the Backpack; "Use" on a badge there pins it (target slot = the slot tapped, else the first empty one).
+  async function openFromSlot(i, from) {
     if (!badges) {
       from.classList.remove('is-nope'); void from.offsetWidth; from.classList.add('is-nope');
       say('Badges are not available right now.');
       return;
     }
-    const pick = el('dialog', { class: 'pc-pick', 'aria-label': 'Choose a badge for slot ' + (i + 1) });
-    const done = () => { pick.close(); pick.remove(); from.focus(); };
-    const choose = async (key) => {
-      pick.querySelectorAll('button').forEach((b) => { b.disabled = true; });
-      const { setBadgeSlot } = await import('./badges.js?v=1');
-      const err = await setBadgeSlot(i, key);
-      if (err) { say('Could not save the badge. Try again.'); done(); return; }
-      const picked = key ? mine.owned.find((b) => b.key === key) || null : null;
-      if (picked) mine.slots = mine.slots.map((b) => (b && b.key === key ? null : b));
-      mine.slots[i] = picked;
-      mine.slots.forEach((_, n) => paintSlot(n));
-      done();
-    };
-    const item = (b) => el('button', { class: 'pc-pick-item' + (mine.slots[i]?.key === b.key ? ' is-current' : ''), type: 'button', onclick: () => choose(b.key) },
-      badgeFace(b), el('span', { class: 'pc-pick-text' }, el('b', { text: b.title }), el('small', { text: b.description })));
-    pick.append(
-      el('h3', { text: 'Slot ' + (i + 1) + ' — choose a badge' }),
-      mine.owned.length ? el('div', { class: 'pc-pick-list' }, mine.owned.map(item))
-        : el('p', { class: 'pc-pick-empty', text: 'No badges yet. Keep reading around the campfire.' }),
-      el('div', { class: 'pc-pick-actions' },
-        mine.slots[i] && el('button', { type: 'button', onclick: () => choose(null), text: 'Empty this slot' }),
-        el('button', { type: 'button', onclick: done, text: 'Close' })));
-    pick.addEventListener('cancel', (e) => { e.preventDefault(); done(); });
-    pick.addEventListener('click', (e) => { if (e.target === pick) done(); });
-    document.body.append(pick);
-    pick.showModal();
-    pick.querySelector('button')?.focus();
+    const { openBackpack } = await import('./backpack.js?v=2');
+    openBackpack({ badges: mine.owned, slots: mine.slots, slot: i, onUse: useBadge, opener: from });
+  }
+  async function useBadge(item, target) {
+    const i = target ?? mine.slots.findIndex((b) => !b);
+    if (i < 0) return 'All 3 badge slots are full. Tap a pinned badge on your profile to replace it.';
+    const { setBadgeSlot } = await import('./badges.js?v=1');
+    if (await setBadgeSlot(i, item.key)) return 'Could not save the badge. Try again.';
+    const picked = mine.owned.find((b) => b.key === item.key) || item;
+    mine.slots = mine.slots.map((b) => (b && b.key === item.key ? null : b));
+    mine.slots[i] = picked;
+    mine.slots.forEach((_, n) => paintSlot(n));
+    slotEls[i].wrap.querySelector('.pc-slot-badge')?.classList.add('is-pop');
+    return null;
   }
 
   // ---- inline editing: nickname pencil and Change (avatar) save right here, no trip to the settings page ----
@@ -252,7 +241,7 @@ export async function openProfileCard({ profile, user, isAuthor, streak = null, 
 
     // action planks (inside the left page on Profile, under the book on Statistik)
     plank('pc-btn-1', 'btn-orange', 'Full Profile', { href: FULL_PROFILE }),
-    plank('pc-btn-3', 'btn-teal', 'Backpack', { title: 'Open your backpack', onclick: async (e) => { const opener = e.currentTarget; const { openBackpack } = await import('./backpack.js?v=1'); openBackpack({ badges: mine.owned, opener }); } }),
+    plank('pc-btn-3', 'btn-teal', 'Backpack', { title: 'Open your backpack', onclick: async (e) => { const opener = e.currentTarget; const { openBackpack } = await import('./backpack.js?v=2'); openBackpack({ badges: mine.owned, slots: mine.slots, onUse: useBadge, opener }); } }),
     plank('pc-btn-4', 'btn-red', 'Sign Out', { id: 'pcSignOut' })
   );
 
