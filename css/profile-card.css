@@ -242,3 +242,28 @@ img.pc-i { pointer-events: none; }
   .pc-btn span { font-size: calc(var(--u) * 46); white-space: normal; text-align: center; line-height: .95; padding: 0 calc(var(--u) * 36) calc(var(--u) * 4); }
   .pc-slot-add { width: calc(var(--u) * 74); height: calc(var(--u) * 74); left: calc(var(--u) * 140); top: calc(var(--u) * -14); }
 }
+
+/* ---- badges: pinned in the 3 slots, picker for choosing ---- */
+.pc-slot-add.is-edit { background: url("../assets/profile/edit.webp") center / 74% no-repeat, linear-gradient(#ffb23a, #f08a12); }
+.pc-slot-add[aria-disabled="true"] { filter: grayscale(.6) brightness(.9); cursor: not-allowed; }
+.pc-badge { position: absolute; inset: 16% 19% 12%; display: grid; place-items: center; pointer-events: none; }
+.pc-badge img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.pc-badge-pill { max-width: 100%; padding: calc(var(--u) * 6) calc(var(--u) * 12); border: calc(var(--u) * 5) solid #3a1d10; border-radius: 999px; background: linear-gradient(#8a5d38, #5b3a22);
+  color: #fff0c8; font-size: calc(var(--u) * 26); font-weight: 700; line-height: 1.1; text-align: center; overflow-wrap: anywhere; }
+
+.pc-pick { width: min(92vw, 420px); max-height: 80vh; padding: 18px; border: 4px solid #3a1d10; border-radius: 16px; background: #f1dcae; color: #3a2416; box-shadow: 0 12px 40px rgba(0,0,0,.5); }
+.pc-pick::backdrop { background: rgba(20, 10, 4, .6); }
+.pc-pick[open] { display: flex; flex-direction: column; gap: 12px; }
+.pc-pick h3 { margin: 0; font-size: 1.1rem; }
+.pc-pick-list { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; scrollbar-width: thin; }
+.pc-pick-item { display: flex; align-items: center; gap: 12px; padding: 8px 10px; border: 3px solid #7a5233; border-radius: 12px; background: rgba(255,244,214,.6); color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.pc-pick-item:hover, .pc-pick-item:focus-visible { background: #ffe3a1; outline: none; }
+.pc-pick-item.is-current { border-color: #f08a12; box-shadow: 0 0 0 2px #ffb23a; }
+.pc-pick-item .pc-badge { position: static; flex: none; width: 52px; height: 52px; }
+.pc-pick-item .pc-badge-pill { font-size: .6rem; padding: 3px 6px; border-width: 2px; }
+.pc-pick-text { display: flex; flex-direction: column; min-width: 0; }
+.pc-pick-text small { opacity: .75; }
+.pc-pick-empty { margin: 0; opacity: .8; }
+.pc-pick-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.pc-pick-actions button { padding: 8px 14px; border: 3px solid #3a1d10; border-radius: 10px; background: linear-gradient(#ffb23a, #f08a12); color: #3a1d10; font: inherit; font-weight: 700; cursor: pointer; }
+.pc-pick button:disabled { opacity: .6; cursor: wait; }
