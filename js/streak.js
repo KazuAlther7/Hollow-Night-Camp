@@ -25,3 +25,10 @@ export async function getReadingStreak() {
   if (error || !Number.isInteger(data)) return null;
   return data;
 }
+
+// Highest streak ever, in days, or null when it cannot be read (server side: sql/longest_reading_streak.sql).
+export async function getLongestStreak() {
+  const { data, error } = await supabase.rpc('longest_reading_streak', { p_tz: activeTimezone() });
+  if (error || !Number.isInteger(data)) return null;
+  return data;
+}

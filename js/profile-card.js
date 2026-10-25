@@ -12,7 +12,7 @@ let cssReady = null;
 function ensureStyles() {
   if (cssReady) return cssReady;
   cssReady = new Promise((resolve) => {
-    const link = el('link', { rel: 'stylesheet', href: 'css/profile-card.css?v=3' });
+    const link = el('link', { rel: 'stylesheet', href: 'css/profile-card.css?v=5' });
     link.addEventListener('load', resolve); link.addEventListener('error', resolve);
     document.head.append(link);
   });
@@ -77,10 +77,12 @@ export async function openProfileCard({ profile, user, isAuthor, streak = null, 
     el('h2', { class: 'pc-sr', id: 'pcTitle', text: 'Camp Profile' }),
     img('title', 'pc-title'),
     img('book', 'pc-book'),
+    img('stats-book', 'pc-st pc-st-book'),
+    img('stats-title', 'pc-st pc-st-titleimg'),
 
     el('nav', { 'aria-label': 'Profile sections' },
-      tab('pc-tab-1', 'tab-profile', 'Profile', { href: '#', 'aria-current': 'page', onclick: (e) => e.preventDefault() }),
-      tab('pc-tab-2', 'tab-stats', 'Statistik', { disabled: '', title: 'Coming soon' }),
+      tab('pc-tab-1', 'tab-profile', 'Profile', { href: '#', 'aria-current': 'page', onclick: (e) => { e.preventDefault(); setView('profile'); } }),
+      tab('pc-tab-2', 'tab-stats', 'Statistik', { onclick: () => setView('stats') }),
       tab('pc-tab-3', 'tab-settings', 'Settings', { href: SETTINGS })),
 
     // left page: the character card
@@ -110,6 +112,93 @@ export async function openProfileCard({ profile, user, isAuthor, streak = null, 
     plank('pc-btn-3', 'btn-teal', 'Collectibles', { disabled: '', title: 'Coming soon' }),
     plank('pc-btn-4', 'btn-red', 'Sign Out', { id: 'pcSignOut' })
   );
+
+  // ---- Statistik view: same book, the character card and nickname are gone (CSS hides them), these pieces take their place ----
+  const NSV = 'http://www.w3.org/2000/svg';
+  const ringSvg = () => {
+    const svg = document.createElementNS(NSV, 'svg');
+    svg.setAttribute('viewBox', '0 0 439 383'); svg.setAttribute('class', 'pc-st-ringsvg'); svg.setAttribute('aria-hidden', 'true');
+    svg.innerHTML = '<defs><linearGradient id="pcRingGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffc24a"/><stop offset="1" stop-color="#ee7d0f"/></linearGradient></defs>'
+      + '<circle cx="220" cy="180" r="128" fill="none" stroke="#2f2118" stroke-opacity=".75" stroke-width="24"/>'
+      + '<circle id="pcStRing" cx="220" cy="180" r="128" fill="none" stroke="url(#pcRingGrad)" stroke-width="18" stroke-linecap="round" transform="rotate(-90 220 180)" stroke-dasharray="804.25" stroke-dashoffset="804.25"/>';
+    return svg;
+  };
+  const note = (cls, ...kids) => el('section', { class: 'pc-i pc-st pc-st-note ' + cls }, el('i', { class: 'pc-st-tape', 'aria-hidden': 'true' }), ...kids);
+  const label = (icon, text) => el('div', { class: 'pc-st-head' }, icon && el('img', { src: icon, alt: '', 'aria-hidden': 'true', draggable: 'false' }), el('span', { text }));
+  const sub = (id, text = '') => el('small', { class: 'pc-st-sub', id, text });
+  const kv = (text, id) => el('div', { class: 'pc-st-kv' }, el('span', { text }), el('b', { id, text: '…' }));
+
+  stage.append(
+    el('section', { class: 'pc-i pc-st pc-st-ring', 'aria-label': 'Chapters read' },
+      el('img', { src: A + 'stats-frame.webp', alt: '', 'aria-hidden': 'true', draggable: 'false' }),
+      ringSvg(),
+      el('div', { class: 'pc-st-ringnum' }, el('b', { id: 'pcStChapters', text: '…' }), el('small', { id: 'pcStChaptersOf', text: 'chapters' }))),
+    note('pc-st-n-chapters n-yellow', label('assets/icons/chapters.png', 'Chapters Read'), sub('pcStChaptersSub', 'Finished chapters')),
+    note('pc-st-n-theories n-sage', label('assets/icons/theories.png', 'Theories Written'),
+      el('b', { class: 'pc-st-num', id: 'pcStTheories', text: '…' }), sub('pcStTheoriesSub', 'Posted to the camp')),
+    note('pc-st-n-streak n-peach', label('', 'Highest Streak'),
+      el('div', { class: 'pc-st-streakrow' },
+        el('img', { class: 'pc-st-owl', src: A + 'owl.webp', alt: '', 'aria-hidden': 'true', draggable: 'false' }),
+        el('div', {}, el('div', { class: 'pc-st-line' }, el('b', { class: 'pc-st-num', id: 'pcStBest', text: '…' }), el('span', { class: 'pc-st-unit', id: 'pcStBestUnit', text: 'days' })),
+          sub('pcStBestSub')))),
+    note('pc-st-n-arcade n-yellow', label('assets/arcade/amber-coin.png', 'Arcade Record'),
+      el('span', { class: 'pc-st-game', text: 'Amber Gacha Machine' }),
+      el('div', { class: 'pc-st-line' }, el('b', { class: 'pc-st-num', id: 'pcStWon', text: '…' }), el('span', { class: 'pc-st-unit', text: 'Amber won' })),
+      el('div', { class: 'pc-st-kvs' }, kv('Rank', 'pcStPos'), kv('Jackpots', 'pcStJack')))
+  );
+
+  const $ = (id) => stage.querySelector('#' + id);
+  const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fmt = (n) => Number(n).toLocaleString('en-US');
+  const countUp = (node, to) => {
+    if (to == null) { node.textContent = '—'; return; }
+    if (reduceMotion() || to === 0) { node.textContent = fmt(to); return; }
+    const t0 = performance.now(), dur = 800;
+    const tick = (now) => {
+      const k = Math.min(1, (now - t0) / dur);
+      node.textContent = fmt(Math.round(to * (1 - Math.pow(1 - k, 3))));
+      if (k < 1 && node.isConnected) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  };
+  const RING = 804.25;
+  const setRing = (pct) => { $('pcStRing').style.strokeDashoffset = String(RING * (1 - pct / 100)); stage.querySelector('.pc-st-ring').setAttribute('aria-label', Math.round(pct) + '% of published chapters read'); };
+
+  let statsLoaded = false;
+  async function loadStats() {
+    if (statsLoaded) return; statsLoaded = true;
+    const [{ getCampStats }, streakMod] = await Promise.all([import('./stats.js?v=1'), import('./streak.js?v=2')]);
+    const longest = await streakMod.getLongestStreak().catch(() => null);
+    const d = await getCampStats({ userId: user?.id, streak, longestStreak: longest });
+
+    countUp($('pcStChapters'), d.chapters.read);
+    if (d.chapters.read != null && d.chapters.total) {
+      const pct = Math.min(100, d.chapters.read / d.chapters.total * 100);
+      requestAnimationFrame(() => setRing(pct));
+      $('pcStChaptersOf').textContent = 'of ' + fmt(d.chapters.total);
+      $('pcStChaptersSub').textContent = Math.round(pct) + '% of the published library';
+    } else { $('pcStChaptersOf').textContent = 'chapters'; $('pcStChaptersSub').textContent = d.chapters.read == null ? 'Not available right now' : 'Finished chapters'; }
+    countUp($('pcStTheories'), d.theories);
+    if (d.theories == null) $('pcStTheoriesSub').textContent = 'Not available right now';
+
+    countUp($('pcStBest'), d.longestStreak);
+    $('pcStBestUnit').textContent = d.longestStreak === 1 ? 'day' : 'days';
+    $('pcStBestSub').textContent = d.longestStreak == null ? 'Not available right now'
+      : d.streak != null ? 'Now: ' + d.streak + (d.streak === 1 ? ' day' : ' days') : 'Your best run so far';
+
+    countUp($('pcStWon'), d.arcade ? d.arcade.totalWon : null);
+    $('pcStPos').textContent = d.arcade?.pos ? '#' + d.arcade.pos : '—';
+    $('pcStJack').textContent = d.arcade ? fmt(d.arcade.jackpots) : '—';
+  }
+
+  function setView(view) {
+    const stats = view === 'stats';
+    stage.classList.toggle('pc-view-stats', stats);
+    const [t1, t2] = [stage.querySelector('.pc-tab-1'), stage.querySelector('.pc-tab-2')];
+    (stats ? t2 : t1).setAttribute('aria-current', 'page');
+    (stats ? t1 : t2).removeAttribute('aria-current');
+    if (stats) loadStats();
+  }
 
   const dialog = el('dialog', { class: 'pc-dialog', 'aria-labelledby': 'pcTitle' }, el('div', { class: 'pc-wrap' }, stage));
   document.body.append(dialog);
