@@ -12,7 +12,7 @@ let cssReady = null;
 function ensureStyles() {
   if (cssReady) return cssReady;
   cssReady = new Promise((resolve) => {
-    const link = el('link', { rel: 'stylesheet', href: 'css/profile-card.css?v=11' });
+    const link = el('link', { rel: 'stylesheet', href: 'css/profile-card.css?v=12' });
     link.addEventListener('load', resolve); link.addEventListener('error', resolve);
     document.head.append(link);
   });
@@ -122,6 +122,32 @@ export async function openProfileCard({ profile, user, isAuthor, streak = null, 
     nickInput.focus(); nickInput.select();
   });
 
+  // reader bio: same inline pattern as the nickname (pencil toggles an editor in place; Ctrl+Enter or the pencil saves, Esc cancels)
+  const bioText = el('p', { class: me.bio ? '' : 'is-empty', text: me.bio || 'This camper wrote nothing.' });
+  const paintBio = () => { bioText.className = me.bio ? '' : 'is-empty'; bioText.textContent = me.bio || 'This camper wrote nothing.'; };
+  const bioPencil = el('button', { class: 'pc-pencil', type: 'button', 'aria-label': 'Edit reader bio', title: 'Edit reader bio' }, el('img', { src: A + 'edit.webp', alt: '', 'aria-hidden': 'true', draggable: 'false' }));
+  let bioArea = null;
+  const endBioEdit = () => { if (!bioArea) return; bioArea.replaceWith(bioText); bioArea = null; bioPencil.classList.remove('is-save'); bioPencil.setAttribute('aria-label', 'Edit reader bio'); bioPencil.title = 'Edit reader bio'; bioPencil.disabled = false; };
+  async function commitBio() {
+    const value = bioArea.value.trim();
+    if (value === me.bio) { endBioEdit(); return; }
+    bioArea.disabled = true; bioPencil.disabled = true; say('Saving…', false);
+    try { await saveProfile({ bio: value }); paintBio(); endBioEdit(); say('Bio updated!', false); }
+    catch (error) { console.error(error); bioArea.disabled = false; bioPencil.disabled = false; bioArea.focus(); say(error.message || 'Could not save the bio.'); }
+  }
+  bioPencil.addEventListener('click', () => {
+    if (bioArea) { commitBio(); return; }
+    bioArea = el('textarea', { class: 'pc-bio-input', maxlength: '300', 'aria-label': 'Reader bio', placeholder: 'Tell the camp a little about yourself…' });
+    bioArea.value = me.bio;
+    bioArea.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); commitBio(); }
+      else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); endBioEdit(); say(''); }
+    });
+    bioText.replaceWith(bioArea);
+    bioPencil.classList.add('is-save'); bioPencil.setAttribute('aria-label', 'Save reader bio'); bioPencil.title = 'Save reader bio';
+    bioArea.focus(); bioArea.setSelectionRange(bioArea.value.length, bioArea.value.length);
+  });
+
   // rank name shrinks with its length so "Camp Rank: [name]" always stays on one line
   const rkSize = !rank ? 28 : rank.name.length <= 8 ? 28 : rank.name.length <= 12 ? 26 : rank.name.length <= 15 ? 23 : 20;
 
@@ -133,7 +159,7 @@ export async function openProfileCard({ profile, user, isAuthor, streak = null, 
 
     el('nav', { 'aria-label': 'Profile sections' },
       tab('pc-tab-1', 'tab-profile', 'Profile', { href: '#', 'aria-current': 'page', onclick: (e) => { e.preventDefault(); setView('profile'); } }),
-      tab('pc-tab-2', 'tab-stats', 'Statistik', { onclick: () => setView('stats') }),
+      tab('pc-tab-2', 'tab-stats', 'Statistics', { onclick: () => setView('stats') }),
       tab('pc-tab-3', 'tab-settings', 'Settings', { href: SETTINGS })),
 
     // left page: the camper's own info (the right page is still free)
@@ -153,8 +179,8 @@ export async function openProfileCard({ profile, user, isAuthor, streak = null, 
     el('div', { class: 'pc-i pc-rankrow', style: '--rk:' + rkSize }, el('span', { text: 'Camp Rank:' }), el('b', { class: 'pc-rankname', title: rank ? rank.name : '', text: rank ? rank.name : 'Soon' })),
     rows.map(([label, value], i) => row(i, label, value)),
     el('section', { class: 'pc-i pc-manifesto', 'aria-labelledby': 'pcBioTitle' },
-      el('header', {}, el('h3', { id: 'pcBioTitle', text: 'Reader Bio' }), editPencil(SETTINGS, 'Edit reader bio')),
-      el('p', { class: bio ? '' : 'is-empty', text: bio || 'This camper wrote nothing.' })),
+      el('header', {}, el('h3', { id: 'pcBioTitle', text: 'Reader Bio' }), bioPencil),
+      bioText),
 
     // right page: badges for now
     el('div', { class: 'pc-i pc-badges-title', text: 'Badges' }),
