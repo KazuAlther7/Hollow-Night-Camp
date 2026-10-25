@@ -58,13 +58,18 @@ function noise(c, t, dur, vol, freq) {
   s.connect(f).connect(g).connect(c.destination); s.start(t);
 }
 const sfx = {
-  // canvas thump + rustle, zipper ticks running up, buckle clink
+  // bag opening: fabric rustle, a long zipper pulled open (ticks climbing in pitch over a rasp), slider stop
   open() {
     const c = ctx(); if (!c) return; const t = c.currentTime + .02;
-    tone(c, t, 120, .18, .5, 'sine', 55);
-    noise(c, t + .02, .32, .35, 1800);
-    for (let i = 0; i < 9; i++) tone(c, t + .14 + i * .028, 900 + i * 140, .02, .09, 'square');
-    tone(c, t + .42, 2100, .22, .12, 'triangle', 1900); tone(c, t + .47, 3150, .3, .08, 'triangle', 2900);
+    noise(c, t, .22, .3, 1100);
+    const len = .62, z = t + .1, n = Math.floor(c.sampleRate * len), buf = c.createBuffer(1, n, c.sampleRate), d = buf.getChannelData(0);
+    for (let k = 0; k < n; k++) d[k] = Math.random() * 2 - 1;
+    const src = c.createBufferSource(); src.buffer = buf;
+    const f = c.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 2.2; f.frequency.setValueAtTime(1800, z); f.frequency.exponentialRampToValueAtTime(4600, z + len);
+    const g = c.createGain(); g.gain.setValueAtTime(.0001, z); g.gain.exponentialRampToValueAtTime(.16, z + .05); g.gain.setValueAtTime(.16, z + len - .08); g.gain.exponentialRampToValueAtTime(.0001, z + len);
+    src.connect(f).connect(g).connect(c.destination); src.start(z);
+    for (let k = 0; k < 30; k++) { const tt = z + k * (len / 30) + Math.random() * .006; tone(c, tt, 1500 + k * 55, .016, .07, 'square'); }
+    tone(c, z + len, 1100, .05, .1, 'square', 800); noise(c, z + len, .06, .12, 2600);
   },
   tab() { const c = ctx(); if (!c) return; const t = c.currentTime; noise(c, t, .09, .18, 2400); tone(c, t, 520, .06, .08, 'triangle', 380); },
   pick() { const c = ctx(); if (!c) return; tone(c, c.currentTime, 760, .07, .07, 'triangle', 900); },
@@ -73,7 +78,8 @@ const sfx = {
 
 // badges: owned badge list; slots: the 3 pinned badges; slot: slot that opened it (or null);
 // onUse(item, slot) -> null on success or an error message. Collectibles are loaded here.
-export async function openBackpack({ badges = [], slots = [null, null, null], slot = null, onUse = null, opener = null } = {}) {
+export async function openBackpack({ badges = [], slots: slots0 = [null, null, null], slot = null, onUse = null, onUnequip = null, opener = null } = {}) {
+  let slots = [...slots0];
   sfx.open();
   await ensureStyles();
   let collectibles = [];
@@ -103,6 +109,12 @@ export async function openBackpack({ badges = [], slots = [null, null, null], sl
   const use = el('button', { class: 'bp-use', type: 'button', hidden: '', onclick: async () => {
     const it = state.selected; if (!it || !onUse) return;
     use.disabled = true;
+    const at = slot !== null ? (slots[slot]?.key === it.key ? slot : -1) : slots.findIndex((x) => x?.key === it.key);
+    if (at >= 0) { // equipped -> take it off, stay open so it can be put on again
+      const bad = onUnequip ? await onUnequip(it, at) : 'Cannot unequip right now.';
+      if (bad) { use.disabled = false; pvInfo.replaceChildren(el('p', { class: 'bp-pv-err', text: bad })); return; }
+      slots = slots.map((x, n) => (n === at ? null : x)); sfx.tab(); paintUse(); return;
+    }
     const err = await onUse(it, slot);
     if (err) { use.disabled = false; pvInfo.replaceChildren(el('p', { class: 'bp-pv-err', text: err })); return; }
     sfx.use(); dlg.close();
@@ -112,7 +124,7 @@ export async function openBackpack({ badges = [], slots = [null, null, null], sl
     use.hidden = !(it && it.useable && onUse);
     if (use.hidden) return;
     const equipped = slot !== null ? slots[slot]?.key === it.key : slots.some((b) => b?.key === it.key);
-    useLabel.textContent = equipped ? 'EQUIPPED' : 'USE'; use.disabled = equipped;
+    useLabel.textContent = equipped ? 'UNEQUIP' : 'USE'; use.disabled = false;
   }
   function paintPreview() {
     const it = state.selected;

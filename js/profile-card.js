@@ -100,8 +100,14 @@ export async function openProfileCard({ profile, user, isAuthor, streak = null, 
       say('Badges are not available right now.');
       return;
     }
-    const { openBackpack } = await import('./backpack.js?v=2');
-    openBackpack({ badges: mine.owned, slots: mine.slots, slot: i, onUse: useBadge, opener: from });
+    const { openBackpack } = await import('./backpack.js?v=3');
+    openBackpack({ badges: mine.owned, slots: mine.slots, slot: i, onUse: useBadge, onUnequip: unequipBadge, opener: from });
+  }
+  async function unequipBadge(item, at) {
+    const { setBadgeSlot } = await import('./badges.js?v=1');
+    if (await setBadgeSlot(at, null)) return 'Could not remove the badge. Try again.';
+    mine.slots[at] = null; paintSlot(at);
+    return null;
   }
   async function useBadge(item, target) {
     const i = target ?? mine.slots.findIndex((b) => !b);
@@ -241,7 +247,7 @@ export async function openProfileCard({ profile, user, isAuthor, streak = null, 
 
     // action planks (inside the left page on Profile, under the book on Statistik)
     plank('pc-btn-1', 'btn-orange', 'Full Profile', { href: FULL_PROFILE }),
-    plank('pc-btn-3', 'btn-teal', 'Backpack', { title: 'Open your backpack', onclick: async (e) => { const opener = e.currentTarget; const { openBackpack } = await import('./backpack.js?v=2'); openBackpack({ badges: mine.owned, slots: mine.slots, onUse: useBadge, opener }); } }),
+    plank('pc-btn-3', 'btn-teal', 'Backpack', { title: 'Open your backpack', onclick: async (e) => { const opener = e.currentTarget; const { openBackpack } = await import('./backpack.js?v=3'); openBackpack({ badges: mine.owned, slots: mine.slots, onUse: useBadge, onUnequip: unequipBadge, opener }); } }),
     plank('pc-btn-4', 'btn-red', 'Sign Out', { id: 'pcSignOut' })
   );
 
