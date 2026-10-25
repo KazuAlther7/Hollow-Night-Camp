@@ -252,7 +252,7 @@ export async function openProfileCard({ profile, user, isAuthor, streak = null, 
 
     // action planks (inside the left page on Profile, under the book on Statistik)
     plank('pc-btn-1', 'btn-orange', 'Full Profile', { href: FULL_PROFILE }),
-    plank('pc-btn-3', 'btn-teal', 'Vault', { disabled: '', title: 'Coming soon' }),
+    plank('pc-btn-3', 'btn-teal', 'Backpack', { title: 'Open your backpack', onclick: async (e) => { const opener = e.currentTarget; const { openBackpack } = await import('./backpack.js?v=1'); openBackpack({ badges: mine.owned, opener }); } }),
     plank('pc-btn-4', 'btn-red', 'Sign Out', { id: 'pcSignOut' })
   );
 

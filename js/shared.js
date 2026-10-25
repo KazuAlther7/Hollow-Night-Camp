@@ -231,7 +231,7 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
       // Badges (js/badges.js): sync awards first, then read; null when sql/badges.sql has not been run
       import('./badges.js?v=1').then((module) => soon(module.loadBadges())).catch(() => null)
     ]);
-    import('./profile-card.js?v=9')
+    import('./profile-card.js?v=10')
       .then((module) => module.openProfileCard({ profile, user, isAuthor, streak, rank, badges, opener: profileButton, onSignOut: () => signOut() }))
       .catch((error) => {
         console.warn('Camp Profile card unavailable, using the menu:', error);
