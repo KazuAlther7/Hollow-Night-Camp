@@ -24,9 +24,7 @@
   <main class="camp-app">
     <section class="camp-page shop-page">
       <div class="shop-board">
-        <p class="shop-hint">Scroll the shelves, tap an item.</p>
         <h1 class="shop-sign">SHOP</h1>
-        <div class="shop-wallet" title="Amber balance"><img src="assets/arcade/amber-coin.png" alt=""><span data-amber-balance>—</span></div>
 
         <div class="shop-panel shop-items" id="shopItems" tabindex="0" aria-label="Items for sale">
           <div class="shop-grid" id="shopGrid"></div>
@@ -107,7 +105,7 @@
 
     $('shopTabs').addEventListener('click', (e) => { const t = e.target.closest('[data-cat]'); if (!t) return; cat = t.dataset.cat; msg(''); renderTabs(); renderGrid(); $('shopItems').scrollTo({ top: 0, behavior: 'smooth' }); });
     $('shopGrid').addEventListener('click', (e) => { const c = e.target.closest('[data-key]'); if (!c) return; sel = ITEMS.find((i) => i.key === c.dataset.key); msg(''); renderGrid(); renderInfo(); });
-    const ERR = { insufficient_amber: 'Not enough Amber.', already_owned: 'You already own this.', item_unavailable: 'Item is no longer sold.', not_signed_in: 'Sign in first.' };
+    const ERR = { insufficient_balance: 'Not enough Amber.', already_owned: 'You already own this.', item_unavailable: 'Item is no longer sold.', not_signed_in: 'Sign in first.' };
     let confirming = null;
     const resetConfirm = () => { confirming = null; };
     $('buyBtn').addEventListener('click', async () => {
@@ -121,7 +119,7 @@
       busy = false;
       if (error) {
         const known = Object.keys(ERR).find((k) => error.message?.includes(k));
-        console.warn(error); msg(known ? ERR[known] : 'Shop counter not open yet (run sql/shop.sql).'); if (known === 'already_owned') owned.add(sel.key); renderAll(); return;
+        console.warn(error); msg(known ? ERR[known] : 'Shop error: ' + (error.message || error.code || 'unknown')); if (known === 'already_owned') owned.add(sel.key); renderAll(); return;
       }
       if (data && typeof data.balance === 'number') { balance = data.balance; setBalance(balance); } else { const w = await refreshWallet(); balance = w?.balance ?? balance; }
       owned.add(sel.key); msg('Added to your Backpack!', true); renderAll();
