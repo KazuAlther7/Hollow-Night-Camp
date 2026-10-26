@@ -92,3 +92,11 @@ body[data-page="shop"] .camp-app { position: relative; z-index: 1; width: min(10
   .shop-hint { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { .shop-card, .shop-info-art img, .shop-board { animation: none; } }
+
+/* rarity: card border + info tag */
+.shop-card[data-r="uncommon"] { border-color: #6ea14a; } .shop-card[data-r="rare"] { border-color: #4a7fc4; }
+.shop-card[data-r="epic"] { border-color: #8a56c9; } .shop-card[data-r="legendary"] { border-color: #e0a21c; box-shadow: 0 0 10px rgba(255,190,60,.5); }
+.shop-card.is-sel { border-color: #ffb23a !important; }
+.shop-info-cat[data-r="uncommon"] { background: #4f7f32; } .shop-info-cat[data-r="rare"] { background: #2f62a8; }
+.shop-info-cat[data-r="epic"] { background: #6d3aa8; } .shop-info-cat[data-r="legendary"] { background: #c98a0c; }
+.shop-card[data-r="legendary"] .shop-art, .shop-card[data-r="epic"] .shop-art { background: radial-gradient(circle, rgba(255,230,160,.55), transparent 70%); }

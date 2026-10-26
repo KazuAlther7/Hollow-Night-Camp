@@ -44,6 +44,10 @@ img.pc-i { pointer-events: none; }
 .pc-ring { --x: 548; --y: 496; --w: 190; --h: 190; border-radius: 50%; overflow: hidden; display: grid; place-items: center;
   background: #5b3a22; box-shadow: 0 0 0 calc(var(--u) * 12) #7a5233, 0 0 0 calc(var(--u) * 20) #3a1d10, 0 calc(var(--u) * 10) calc(var(--u) * 18) rgba(0,0,0,.35); }
 .pc-ring img { width: 100%; height: 100%; object-fit: cover; }
+.pc-ring.has-frame { --x: 559; --y: 507; --w: 168; --h: 168; box-shadow: none; }            /* same centre, a little smaller so the frame fits the page */
+.pc-frame { --x: 501; --y: 449; --w: 284; --h: 284; }                                      /* hole = 94% of the avatar; art is 432px with a 240px hole */
+.pc-frame { pointer-events: none; }
+.pc-frame[hidden] { display: none; }
 .pc-ring span { font-size: calc(var(--u) * 96); font-weight: 700; color: #fff0c8; }
 .pc-bar i { transition: width .9s .4s cubic-bezier(.2,.8,.25,1); }
 .pc-bar span { position: absolute; inset: 0; display: grid; place-items: center; font-size: calc(var(--u) * 30); font-weight: 700; letter-spacing: .03em; color: #fff0c8; -webkit-text-stroke: calc(var(--u) * 6) #3a1d10; paint-order: stroke fill; }
@@ -159,7 +163,7 @@ img.pc-i { pointer-events: none; }
 @keyframes pc-owl { 0%, 86%, 100% { transform: rotate(0); } 90% { transform: rotate(-5deg); } 94% { transform: rotate(3deg); } }
 
 /* ---- Statistik view: own book + title art, no avatar/rank, records on sticky notes ---- */
-.pc-stage.pc-view-stats :is(.pc-msg, .pc-btn-chg, .pc-rankrow, .pc-badges-title, .pc-hexlv, .pc-owlstreak, .pc-title, .pc-silhouette, .pc-hex, .pc-owl, .pc-nick, .pc-ring, .pc-rank, .pc-bar, .pc-campid, .pc-row, .pc-manifesto, .pc-slots) { display: none; }
+.pc-stage.pc-view-stats :is(.pc-frame, .pc-msg, .pc-btn-chg, .pc-rankrow, .pc-badges-title, .pc-hexlv, .pc-owlstreak, .pc-title, .pc-silhouette, .pc-hex, .pc-owl, .pc-nick, .pc-ring, .pc-rank, .pc-bar, .pc-campid, .pc-row, .pc-manifesto, .pc-slots) { display: none; }
 .pc-stage:not(.pc-view-stats) .pc-st { display: none; }
 .pc-stage.pc-view-stats .pc-st { animation: pc-row-in .5s cubic-bezier(.2,.8,.25,1) both; }
 .pc-st-book, .pc-st-titleimg { animation: none !important; }

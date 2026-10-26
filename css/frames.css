@@ -1,0 +1,29 @@
+/* HOLLOW NIGHT CAMP — frame skin effects (used by the Camp Profile card and the Main Bar avatar) */
+.frame-fx { position: relative; display: block; pointer-events: none; }
+.frame-fx img { display: block; width: 100%; height: 100%; user-select: none; }
+
+/* epic: soft violet glow */
+.frame-fx[data-r="epic"] img { filter: drop-shadow(0 0 4px rgba(150,110,255,.5)); }
+
+/* legendary: golden glow that breathes + a light sweep clipped to the frame's own shape */
+.frame-fx[data-r="legendary"] img { animation: frameGlow 2.8s ease-in-out infinite; }
+.frame-fx[data-r="legendary"]::after {
+  content: ""; position: absolute; inset: 0; mix-blend-mode: screen;
+  -webkit-mask: var(--frame) center / 100% 100% no-repeat; mask: var(--frame) center / 100% 100% no-repeat;
+  background: linear-gradient(115deg, transparent 38%, rgba(255,246,200,0) 42%, rgba(255,246,200,.95) 50%, rgba(255,246,200,0) 58%, transparent 62%) 0 0 / 300% 100% no-repeat;
+  background-position: 100% 0; animation: frameSweep 3.6s ease-in-out infinite;
+}
+@keyframes frameGlow {
+  0%, 100% { filter: drop-shadow(0 0 2px rgba(255,190,70,.35)) brightness(1); }
+  50%      { filter: drop-shadow(0 0 8px rgba(255,205,90,.9)) brightness(1.12); }
+}
+@keyframes frameSweep { 0%, 40% { background-position: 100% 0; } 85%, 100% { background-position: 0 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .frame-fx[data-r="legendary"] img { animation: none; filter: drop-shadow(0 0 5px rgba(255,205,90,.7)); }
+  .frame-fx[data-r="legendary"]::after { animation: none; opacity: 0; }
+}
+
+/* Main Bar avatar: the frame sits over the avatar button; the avatar shrinks a touch so the hole fits */
+.profile-menu-button { position: relative; }
+.profile-menu-button.has-frame :is(.bar-avatar, .bar-avatar-fallback) { width: 28px; height: 28px; }
+.bar-frame { position: absolute; left: 50%; top: 50%; width: 47px; height: 47px; translate: -50% -50%; z-index: 2; }
