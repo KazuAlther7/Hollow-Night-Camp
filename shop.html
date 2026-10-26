@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#17251d">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/image/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/image/favicon-192.png">
+  <link rel="shortcut icon" href="assets/image/favicon.ico">
+  <link rel="apple-touch-icon" href="assets/image/apple-touch-icon.png">
+  <title>Shop — Hollow Night Camp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Special+Elite&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/loader.css?v=2">
+  <script src="js/loader.js?v=2"></script>
+  <link rel="stylesheet" href="css/base.css?v=4">
+  <link rel="stylesheet" href="css/mainbar.css?v=12">
+</head>
+
+<body class="camp-body" data-page="shop">
+
+  <main class="camp-app">
+    <section class="camp-page shop-page">
+      <header class="shop-head">
+        <h1>Camp Shop</h1>
+        <p>Outfits, toys and keepsakes for your Backpack. The stall opens soon.</p>
+      </header>
+    </section>
+  </main>
+
+  <style>
+    .shop-page { max-width: 960px; margin: 0 auto; padding: 120px 20px 60px; text-align: center; }
+    .shop-head h1 { margin: 0 0 8px; font-family: var(--heading); font-size: clamp(32px, 5vw, 50px); color: var(--paper, #f3e7c9); }
+    .shop-head p { margin: 0; color: rgba(243, 231, 201, .75); }
+  </style>
+  <script type="module">
+    import { initPage } from './js/shared.js?v=28';
+    await initPage({ active: 'shop' });
+  </script>
+
+</body>
+</html>
