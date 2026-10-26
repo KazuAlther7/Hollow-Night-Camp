@@ -32,8 +32,25 @@ function noise(d, v = 0.1) {
   for (let i = 0; i < n; i++) x[i] = (Math.random() * 2 - 1) * (1 - i / n);
   const s = c.createBufferSource(), g = c.createGain(); s.buffer = b; g.gain.value = v; s.connect(g).connect(c.destination); s.start();
 }
+/* Lever pull sound (assets/arcade/lever-pull.mp3, trimmed so the clunk lands when the lever hits the bottom) */
+let pullSnd = null;
+function leverSound() {
+  if (muted) return;
+  try { pullSnd ??= new Audio('assets/arcade/lever-pull.mp3'); pullSnd.currentTime = 0; pullSnd.play().catch(() => {}); } catch { /* sound is optional */ }
+}
+/* Lever animation, measured from the reference video (30 fps): [ball dy, ball dx, stick scaleY, stick skew°] in 640px-wide machine units.
+   The lever folds toward the viewer (stick shortens, ball drops to the base), holds, then springs back. */
+const LEVER = [[1.2, 0.4, 0.995, 0.1], [2.9, 1.4, 0.988, 0.4], [5.8, 1.9, 0.975, 0.6], [9.9, 3.4, 0.957, 1.0], [16.6, 5.1, 0.929, 1.6], [25.1, 7.0, 0.893, 2.2], [36.2, 9.8, 0.845, 3.4], [53.1, 12.9, 0.772, 4.8], [78.6, 15.7, 0.663, 6.8], [122.2, 12.6, 0.477, 7.6], [165.7, 9.5, 0.29, 9.4], [209.3, 6.4, 0.103, 17.4], [224.7, 2.4, 0.037, 0], [229.6, 0.8, 0.02, 0], [229.5, 0.8, 0.02, 0], [224.8, 2.3, 0.037, 0], [189.0, 7.5, 0.19, 11.2], [153.2, 12.7, 0.344, 10.5], [117.4, 17.9, 0.497, 10.3], [77.4, 15.8, 0.668, 6.8], [53.9, 13.0, 0.769, 4.8], [36.7, 10.0, 0.843, 3.4], [25.0, 7.0, 0.893, 2.3], [16.2, 5.1, 0.931, 1.6], [10.2, 3.5, 0.956, 1.1], [5.7, 1.9, 0.976, 0.6], [3.4, 1.2, 0.985, 0.4], [1.2, 0.6, 0.995, 0.2], [0.1, 0.4, 1.0, 0.1]];
+function leverPull() {
+  if (fast) return;
+  const k = $('machine').clientWidth / 640, last = LEVER.length - 1, ms = (last * 1000) / 30;
+  const frames = (f) => LEVER.map((p, i) => ({ offset: i / last, ...f(p) }));
+  $('leverBall').animate(frames(([dy, dx]) => ({ transform: `translate(${(dx * k).toFixed(1)}px, ${(dy * k).toFixed(1)}px)` })), { duration: ms, easing: 'linear' });
+  $('leverStick').animate(frames(([, , s, sk]) => ({ transform: `scaleY(${s}) skewX(${-sk}deg)` })), { duration: ms, easing: 'linear' });
+}
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const sfx = {
-  pull() { noise(0.08, 0.15); tone(120, 0.18, 'square', 0.1, 0, 60); tone(900, 0.04, 'square', 0.05, 0.12); },
+  pull() { /* replaced by leverSound() */ },
   tick() { tone(700 + Math.random() * 200, 0.025, 'square', 0.03); },
   stop() { tone(160, 0.1, 'triangle', 0.18, 0, 70); noise(0.04, 0.08); },
   win(p) {
@@ -99,8 +116,9 @@ async function pull(n = 1) {
   let won = 0, jackpots = 0, done = 0, last = null, failed = null;
   for (let k = 0; k < n; k++) {
     if (n > 1) msg(`Pull ${k + 1} of ${n}…`);
-    sfx.pull();
-    const { data, error } = await supabase.rpc('slot_spin');
+    leverPull(); leverSound();   // same animation + sound for the lever and for both buttons
+    // reels start once the lever reaches the bottom (~0.45s), like the reference
+    const [{ data, error }] = await Promise.all([supabase.rpc('slot_spin'), wait(fast ? 0 : 450)]);
     if (error) { failed = error; break; }
     const tick = setInterval(sfx.tick, 85);
     await Promise.all(reels.map((r, i) => spinTo(r, i, data.reels[i], quick ? 620 + i * 220 : 1100 + i * 450).then(sfx.stop)));
@@ -127,6 +145,7 @@ $('pull').onclick = () => pull(1); $('lever').onclick = () => pull(1); $('pull5'
 
 let ready = false;
 export async function openSlot() {
+  pullSnd ??= new Audio('assets/arcade/lever-pull.mp3'); pullSnd.preload = 'auto';
   if (!ready) { ready = true; new ResizeObserver(() => { if (!busy && reels[0].clientHeight) measure(); }).observe(reels[0]); }
   measure(); await loadState();
 }
