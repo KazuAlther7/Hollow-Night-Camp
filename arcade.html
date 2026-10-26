@@ -16,7 +16,7 @@
   <script src="js/loader.js?v=2"></script>
   <link rel="stylesheet" href="css/base.css?v=4">
   <link rel="stylesheet" href="css/mainbar.css?v=7">
-  <link rel="stylesheet" href="css/arcade.css?v=7">
+  <link rel="stylesheet" href="css/arcade.css?v=8">
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","cannon-es":"https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js"}}</script>
 </head>
 
@@ -47,7 +47,9 @@
             <p class="note-avg" id="oddsAvg"></p>
           </aside>
           <div class="slot-machine" id="machine">
-            <img class="slot-img" src="assets/arcade/slot-machine.webp?v=2" alt="" draggable="false">
+            <img class="slot-img" src="assets/arcade/slot-machine.webp?v=3" alt="" draggable="false">
+            <img class="slot-lever-stick" id="leverStick" src="assets/arcade/lever-stick.webp" alt="" draggable="false">
+            <img class="slot-lever-ball" id="leverBall" src="assets/arcade/lever-ball.webp" alt="" draggable="false">
             <div class="slot-window">
               <div class="slot-reel"><div class="slot-strip"></div></div>
               <div class="slot-reel"><div class="slot-strip"></div></div>
@@ -112,8 +114,8 @@
       window.scrollTo(0, 0);
       try {
         if (v === 'dice') await load('dice', './js/arcade-dice.js?v=1');
-        if (v === 'slot') (await load('slot', './js/arcade-slot.js?v=10')).openSlot();
-        if (v === 'board') (await load('slot', './js/arcade-slot.js?v=10')).openBoard();
+        if (v === 'slot') (await load('slot', './js/arcade-slot.js?v=11')).openSlot();
+        if (v === 'board') (await load('slot', './js/arcade-slot.js?v=11')).openBoard();
       } catch (e) { console.error(e); HNLoader.fail('This game could not load.', () => location.reload()); }
     }
     addEventListener('hashchange', route);
