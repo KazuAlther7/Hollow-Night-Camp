@@ -3,7 +3,7 @@
 > **Document type:** Product Requirements Document (PRD)  
 > **Product:** Hollow Night Camp  
 > **Document status:** Working specification  
-> **Audit basis:** `Hollow-Night-Camp-main (12).zip` supplied on 2026-10-21, cross-checked against the current project conversation  
+> **Audit basis:** Live default-branch repository snapshot audited on 2026-10-26, including the current file tree and implementation source. This audit distinguishes source-code presence from verified production behavior.  
 > **Primary maintainer:** Kazu Alther  
 > **Repository:** https://github.com/KazuAlther7/Hollow-Night-Camp  
 > **Deployment reference:** Cloudflare Worker URL `https://hollow-night-camp.kazualtr.workers.dev/` (configured in Supabase Auth Redirect URLs per project progress). The repository README still references GitHub Pages; canonical production domain and final deployment routing should be verified.
@@ -34,6 +34,39 @@ The intended visual direction is **mystery-adventure with hand-crafted, animated
 
 ---
 
+## 2.0 Live Repository Snapshot — 2026-10-26
+
+This section supersedes older ZIP-based assumptions where the current repository differs. The latest default-branch tree contains substantially more UI and client logic than the earlier audit snapshot.
+
+### Newly verified source areas
+
+| Area | Evidence in current repository | Status |
+| --- | --- | --- |
+| Corners Arcade / 3D dice | `arcade.html`, `css/arcade.css`, `js/arcade-dice.js`; Three.js and cannon-es import map | **Implemented in source; live behavior to verify** |
+| Amber Gacha Machine | `js/arcade-slot.js`, `assets/arcade/` art and sound assets | **Implemented in source; server-side prize/cost enforcement to verify** |
+| Shop | `shop.html`, `css/shop.css` and shared navigation includes Shop | **UI/source present; purchase persistence and inventory rules to verify** |
+| Backpack / inventory | `js/backpack.js`, `css/backpack.css`, `assets/backpack/` | **Implemented in source; data depends on Supabase collectibles/badges** |
+| Profile frame skins | `js/frames.js`, `css/frames.css`, `assets/frames/` (nine frame artwork files) | **Implemented in source; ownership/equip RPCs to verify** |
+| Badge collection | `js/badges.js`, `assets/badges/` | **Implemented in source; server award rules to verify** |
+| Camp Rank | `js/rank.js` calls `camp_rank` | **Client integration present; database function to verify** |
+| Daily login / Amber Coin | `js/daily-login.js`, `js/wallet.js`, `css/daily-login.css`, `assets/daily-login/` | **Client integration present; RPCs and wallet ledger to verify** |
+| Reading streak / statistics | `js/streak.js`, `js/stats.js`, `js/reading.js`, `js/history.js` | **Client integration present; database schema and persistence to verify** |
+| Settings pages | `settings-profile.html`, `settings-display.html`, `settings-clock.html`, `settings-history.html`, `settings-community.html`, `settings-information.html`, `settings-preferences.html`, `settings-support.html` | **Multiple dedicated pages exist; each workflow still requires functional testing** |
+| World-building pages | `characters.html`, `maps.html`, `locations.html`, `world-building.html` and corresponding JS/CSS modules | **Source present; CRUD and map marker persistence to verify** |
+| Loading / notification / profile-card systems | `js/loader.js`, `js/notifications.js`, `js/profile-card.js` and related styles | **Source present; cross-route and live backend behavior to verify** |
+
+### Important repository packaging finding
+
+The current repository tree audited on 2026-10-26 contains **no `sql/` directory and no committed `.sql` migration files**. Several client modules explicitly depend on database RPCs/tables (including `camp_rank`, `wallet_state`, `daily_checkin`, `slot_state`, `sync_badges`, `set_badge_slot`, `set_profile_frame`, and reading-streak RPCs). Therefore, their existence in JavaScript does not prove the corresponding backend schema is present in Supabase, and the migration scripts referenced in comments are not currently delivered by this repository snapshot. Add and version the required SQL migrations, or document their authoritative external location before considering these workflows deployable.
+
+### Audit rules for this snapshot
+
+- Treat frontend implementation, database readiness, and production verification as separate states.
+- A page, art asset, RPC call, or button is evidence of implementation intent—not proof of a successful end-to-end workflow.
+- Keep user-facing balance, item ownership, purchase costs, reward odds, EXP, rank, and badge awards server-authoritative. Never trust client-only calculations for valuable state.
+- The README still points to GitHub Pages. Confirm the actual production host and Supabase redirect allow-list separately; repository contents alone cannot establish the current live deployment.
+
+---
 ## 2. Current Repository Audit
 
 The statuses below describe what is evidenced by the supplied ZIP's source code. A visible page or button does **not** count as a complete feature if its underlying workflow is still a placeholder. Hosting configuration and live deployment status cannot be confirmed from the ZIP alone.
@@ -86,10 +119,10 @@ The statuses below describe what is evidenced by the supplied ZIP's source code.
 | Theories page | **IMPLEMENTED IN SOURCE / VERIFY** | `theories.html` and `js/theories.js` implement theory list/detail, categories, posting and replies. |
 | Theory posts, replies and cloud persistence | **IMPLEMENTED IN SOURCE / VERIFY** | Verify rate limits, persistence, and policies. |
 | Theory categories and moderation | **PARTIAL / VERIFY** | Categories Confirmed / Likely / Speculation / Wild Theory. |
-| Corners Arcade | **NOT STARTED** | `arcade.html` remains a "Coming soon" placeholder. |
-| D&D-style dice roll and games | **NOT STARTED** | No playable dice simulation or arcade game present. |
-| Camp Rank, EXP and levels | **NOT STARTED** | 12-tier progression system (§5.22). |
-| Reading streak and Night Owl badge | **NOT STARTED** | Three consecutive reading days → Night Owl badge (§5.22). |
+| Corners Arcade | **PARTIAL — playable modules present / VERIFY** | `arcade.html`, `js/arcade-dice.js`, and `js/arcade-slot.js` implement a 3D physics dice experience and Amber Gacha Machine UI. Verify SQL RPCs, wallet integration, odds/prize enforcement, and production behavior. |
+| D&D-style dice roll and games | **IMPLEMENTED IN SOURCE / VERIFY** | Three.js + cannon-es dice tower/roll implementation is present in `js/arcade-dice.js`; test rendering, physics, mobile performance, and accessibility on live devices. Other arcade games remain future work unless separately implemented. |
+| Camp Rank, EXP and levels | **IMPLEMENTED IN SOURCE / VERIFY** | `js/rank.js` calls the server-side `camp_rank` RPC and badge assets are present. Verify the database function/schema and all 12 rank thresholds in the live Supabase project. |
+| Reading streak and Night Owl badge | **IMPLEMENTED IN SOURCE / VERIFY** | `js/streak.js` tracks reading days through RPCs; `js/badges.js` requests server-side badge synchronization; `assets/badges/night-owl.png` exists. Verify database functions, timezone boundaries, and award rules in Supabase. |
 | Daily Campfire check-in and Amber wallet | **IMPLEMENTED IN SOURCE / VERIFY** | `sql/amber_wallet.sql` (append-only `amber_ledger`, `daily_checkins`, RPCs `wallet_state` / `daily_checkin`, RLS read-own, Asia/Jakarta day, 20 Amber/check-in), `js/wallet.js`, `css/wallet.css`; balance row in account menu, check-in card on `home.html`. Run SQL in Supabase and verify. Amber Gacha Machine now spends/wins via the ledger (`sql/arcade_slot.sql`, run after `sql/amber_wallet.sql`; legacy `arcade_wallets.balance` migrated once). Amber is the primary in-platform currency (§5.22). |
 | Camp Challenge author menu | **NOT STARTED** | Dedicated Main Bar menu + Author CRUD + Amber rewards (§5.23). |
 | Category leaderboards and monthly reset | **NOT STARTED** | Top Theorist / Top Reader / Top Arcade Player (§5.24). |
@@ -100,7 +133,7 @@ The statuses below describe what is evidenced by the supplied ZIP's source code.
 | Character Relationship Graph | **NOT STARTED** | Character pages exist, but no relationship graph/schema with spoiler-aware reveal filtering found; §5.30. |
 | Digital Letters | **NOT STARTED** | No letter authoring, delivery, inbox, or archive workflow found; §5.31. |
 | Amber currency icon | **PARTIAL** | Small flame glyph is inline SVG (no file). Final asset file and path (`assets/icon/` vs `assets/icons/`) still undecided. |
-| Badge assets | **NOT STARTED** | 12 Camp Rank + Night Owl badges under `assets/badges/` (§5.22). |
+| Badge assets | **DONE (asset set) / VERIFY (awarding workflow)** | Badge artwork exists under `assets/badges/`; `js/badges.js` implements badge loading, slot selection, and server-side synchronization calls. Verify definitions, ownership tables, and RPCs in Supabase. |
 | Settings: profile details | **DONE (core profile) / VERIFY** | Profile form and save feedback exist. |
 | Settings: theme and language | **IMPLEMENTED IN SOURCE** | System / Light / Dark + EN / ID on its own page `settings-display.html` (logic in `js/preferences.js`, stored in localStorage). Only strings in the dictionary are translated; live verification required. |
 | Notification bell / notification center | **IMPLEMENTED IN SOURCE** | Bell opens a panel on any page after a shake animation; red dot only while unread; realtime; mark read / delete / clear all (`js/notifications.js`). Notifications are created by DB triggers (new chapter, reply on your theory, theory pinned) per `supabase/notifications.sql`. Promotions / Events has a switch but no emitter yet. Live verification required. |
