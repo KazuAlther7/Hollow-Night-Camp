@@ -16,7 +16,7 @@
   <script src="js/loader.js?v=2"></script>
   <link rel="stylesheet" href="css/base.css?v=4">
   <link rel="stylesheet" href="css/mainbar.css?v=13">
-  <link rel="stylesheet" href="css/shop.css?v=1">
+  <link rel="stylesheet" href="css/shop.css?v=2">
 </head>
 
 <body class="camp-body" data-page="shop">
@@ -48,7 +48,7 @@
   </main>
 
   <script type="module">
-    import { initPage } from './js/shared.js?v=29';
+    import { initPage } from './js/shared.js?v=30';
     import { supabase } from './config/supabase.js';
     import { getCollectibles } from './js/collectibles.js';
     import { refreshWallet, setBalance, startLive, formatAmber } from './js/wallet.js';
@@ -57,10 +57,6 @@
     const A = 'assets/arcade/', B = 'assets/badges/';
     // Placeholder catalog — swap for a shop_items table later. price = Amber Coin.
     const FALLBACK = [
-      { key: 'badge-camper',      cat: 'Badges',     name: 'Camper Badge',      price: 120, art: B + 'camper.png',        desc: 'Sewn on your sleeve: you sat by the fire and stayed.' },
-      { key: 'badge-night-owl',   cat: 'Badges',     name: 'Night Owl Badge',   price: 250, art: B + 'night-owl.png',     desc: 'For readers who never sleep before the next chapter.' },
-      { key: 'badge-fire-watch',  cat: 'Badges',     name: 'Fire Watcher',      price: 300, art: B + 'fire-watcher.png',  desc: 'Someone has to keep the campfire lit.' },
-      { key: 'badge-clue-hunter', cat: 'Badges',     name: 'Clue Hunter',       price: 350, art: B + 'clue-hunter.png',   desc: 'Every footprint means something. Probably.' },
       { key: 'toy-d20',           cat: 'Toys',       name: 'Lucky D20',         price: 180, art: A + 'd20.png',           desc: 'A twenty-sided die. Rolls suspiciously well at night.' },
       { key: 'toy-sword',         cat: 'Toys',       name: 'Wooden Sword',      price: 200, art: A + 'sword.png',         desc: 'Whittled by a camper. Fights beasts, mostly imaginary ones.' },
       { key: 'toy-radio',         cat: 'Toys',       name: 'Walkie Talkie',     price: 280, art: A + 'radio.png',         desc: 'Static, whispers, and sometimes a voice that answers back.' },
@@ -68,10 +64,18 @@
       { key: 'keep-rune',         cat: 'Keepsakes',  name: 'Rune Stone',        price: 220, art: A + 'stone.png',         desc: 'Carved marks nobody at camp can read.' },
       { key: 'keep-binoculars',   cat: 'Keepsakes',  name: 'Binoculars',        price: 260, art: A + 'binocular.png',     desc: 'See what moves between the trees.' },
       { key: 'keep-eye',          cat: 'Keepsakes',  name: 'Watching Eye',      price: 400, art: A + 'eye.png',           desc: 'It blinks when you look away.' },
-      { key: 'outfit-tee',        cat: 'Outfit',     name: 'Camp Hollow Tee',   price: 500, art: 'assets/backpack/tab-outfit.webp', desc: 'Soft green tee. Do not feed the beasts.' },
+      { key: 'frame-autumnwood-wreath', cat: 'Outfit', rarity: 'uncommon', name: 'Autumnwood Wreath', price: 150, art: 'assets/frames/autumnwood-wreath.webp', desc: 'Twisted branches, fallen leaves and one warm lantern.' },
+      { key: 'frame-emberbound-explorer', cat: 'Outfit', rarity: 'rare', name: 'Emberbound Explorer', price: 300, art: 'assets/frames/emberbound-explorer.webp', desc: 'A rope ring around a crackling campfire. Marshmallow included.' },
+      { key: 'frame-clockwork-vanguard', cat: 'Outfit', rarity: 'epic', name: 'Clockwork Vanguard', price: 750, art: 'assets/frames/clockwork-vanguard.webp', desc: 'Riveted steel, a brass porthole and ticking gears.' },
+      { key: 'frame-runestone-relic', cat: 'Outfit', rarity: 'rare', name: 'Runestone Relic', price: 350, art: 'assets/frames/runestone-relic.webp', desc: 'Moss-covered stones carved with runes nobody can read.' },
+      { key: 'frame-golden-seal-of-kings', cat: 'Outfit', rarity: 'legendary', name: 'Golden Seal of Kings', price: 1000, art: 'assets/frames/golden-seal-of-kings.webp', desc: 'Amber gems set in gold, sealed with a lock fit for a king.' },
+      { key: 'frame-astral-nightwatch', cat: 'Outfit', rarity: 'epic', name: 'Astral Nightwatch', price: 800, art: 'assets/frames/astral-nightwatch.webp', desc: 'Starlit feathers and glowing mushrooms keep watch over the night.' },
+      { key: 'frame-mossbound-ruins', cat: 'Outfit', rarity: 'uncommon', name: 'Mossbound Ruins', price: 200, art: 'assets/frames/mossbound-ruins.webp', desc: 'Ancient ruins, slowly taken back by the vines.' },
+      { key: 'frame-royal-embercrest', cat: 'Outfit', rarity: 'legendary', name: 'Royal Embercrest', price: 1200, art: 'assets/frames/royal-embercrest.webp', desc: 'A crest of polished amber for the camp\'s finest.' },
+      { key: 'frame-mystic-hollowgrove', cat: 'Outfit', rarity: 'epic', name: 'Mystic Hollowgrove', price: 850, art: 'assets/frames/mystic-hollowgrove.webp', desc: 'A hollow tree ring lit by glowing mushrooms.' },
     ];
     let ITEMS = FALLBACK;
-    const CATS = ['All', 'Outfit', 'Toys', 'Badges', 'Keepsakes'];
+    const CATS = ['All', 'Outfit', 'Toys', 'Keepsakes'];
     const $ = (id) => document.getElementById(id);
     let cat = 'All', sel = null, balance = null, owned = new Set(), busy = false;
 
@@ -84,7 +88,7 @@
     function renderGrid() {
       const list = ITEMS.filter((i) => cat === 'All' || i.cat === cat);
       $('shopGrid').innerHTML = list.length ? list.map((i, n) => `
-        <button class="shop-card${i.key === sel?.key ? ' is-sel' : ''}${owned.has(i.key) ? ' is-owned' : ''}" style="--n:${n}" data-key="${i.key}" type="button" aria-label="${i.name}">
+        <button class="shop-card${i.key === sel?.key ? ' is-sel' : ''}${owned.has(i.key) ? ' is-owned' : ''}" style="--n:${n}" data-r="${i.rarity || ''}" data-key="${i.key}" type="button" aria-label="${i.name}">
           <span class="shop-art"><img src="${i.art}" alt="" loading="lazy" draggable="false"></span>
           <span class="shop-price">${owned.has(i.key) ? '✓ Owned' : price(i.price)}</span>
         </button>`).join('') : '<p class="shop-empty">Shelf is empty.</p>';
@@ -93,7 +97,7 @@
       const i = sel;
       $('infoArt').src = i ? i.art : ''; $('infoArt').style.visibility = i ? 'visible' : 'hidden';
       $('infoName').textContent = i ? i.name : 'Pick an item';
-      $('infoCat').textContent = i ? i.cat : '—';
+      $('infoCat').textContent = i ? (i.cat === 'Outfit' ? 'Frame Skin' : i.cat) + (i.rarity ? ' · ' + i.rarity : '') : '—'; $('infoCat').dataset.r = i?.rarity || '';
       $('infoDesc').textContent = i ? i.desc : 'Tap something on the shelf to see what it does.';
       const b = $('buyBtn');
       if (!i) { b.disabled = true; b.textContent = 'BUY'; return; }
@@ -130,8 +134,8 @@
     await initPage({ active: 'shop' });
     renderAll();
     try {
-      const { data } = await supabase.from('shop_items').select('key,title,description,category,asset_path,price,sort').order('sort');
-      if (data?.length) { ITEMS = data.map((r) => ({ key: r.key, cat: r.category, name: r.title, price: r.price, art: r.asset_path, desc: r.description })); sel = null; renderAll(); }
+      const { data } = await supabase.from('shop_items').select('key,title,description,category,asset_path,price,sort,rarity').order('sort');
+      if (data?.length) { ITEMS = data.map((r) => ({ key: r.key, cat: r.category, name: r.title, price: r.price, art: r.asset_path, desc: r.description, rarity: r.category === 'Outfit' ? r.rarity : '' })); sel = null; renderAll(); }
     } catch (_) {}
     try { const w = await refreshWallet(); if (w) { balance = w.balance; startLive(); } } catch (_) {}
     document.addEventListener('amber:balance', (e) => { balance = e.detail.balance; renderInfo(); });
