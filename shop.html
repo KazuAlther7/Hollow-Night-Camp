@@ -16,27 +16,130 @@
   <script src="js/loader.js?v=2"></script>
   <link rel="stylesheet" href="css/base.css?v=4">
   <link rel="stylesheet" href="css/mainbar.css?v=13">
+  <link rel="stylesheet" href="css/shop.css?v=1">
 </head>
 
 <body class="camp-body" data-page="shop">
 
   <main class="camp-app">
     <section class="camp-page shop-page">
-      <header class="shop-head">
-        <h1>Camp Shop</h1>
-        <p>Outfits, toys and keepsakes for your Backpack. The stall opens soon.</p>
-      </header>
+      <div class="shop-board">
+        <p class="shop-hint">Scroll the shelves, tap an item.</p>
+        <h1 class="shop-sign">SHOP</h1>
+        <div class="shop-wallet" title="Amber balance"><img src="assets/arcade/amber-coin.png" alt=""><span data-amber-balance>—</span></div>
+
+        <div class="shop-panel shop-items" id="shopItems" tabindex="0" aria-label="Items for sale">
+          <div class="shop-grid" id="shopGrid"></div>
+        </div>
+
+        <aside class="shop-side">
+          <div class="shop-tabs" id="shopTabs" role="tablist" aria-label="Categories"></div>
+          <div class="shop-panel shop-info" id="shopInfo" aria-live="polite">
+            <div class="shop-info-art"><img id="infoArt" alt=""></div>
+            <h2 class="shop-info-name" id="infoName">Pick an item</h2>
+            <div class="shop-info-body">
+              <span class="shop-info-cat" id="infoCat">—</span>
+              <p class="shop-info-desc" id="infoDesc"></p>
+              <button class="shop-buy" id="buyBtn" type="button" disabled>BUY</button>
+              <p class="shop-msg" id="shopMsg"></p>
+            </div>
+          </div>
+        </aside>
+      </div>
     </section>
   </main>
 
-  <style>
-    .shop-page { max-width: 960px; margin: 0 auto; padding: 120px 20px 60px; text-align: center; }
-    .shop-head h1 { margin: 0 0 8px; font-family: var(--heading); font-size: clamp(32px, 5vw, 50px); color: var(--paper, #f3e7c9); }
-    .shop-head p { margin: 0; color: rgba(243, 231, 201, .75); }
-  </style>
   <script type="module">
     import { initPage } from './js/shared.js?v=29';
+    import { supabase } from './config/supabase.js';
+    import { getCollectibles } from './js/collectibles.js';
+    import { refreshWallet, setBalance, startLive, formatAmber } from './js/wallet.js';
+
+    const COIN = 'assets/arcade/amber-coin.png';
+    const A = 'assets/arcade/', B = 'assets/badges/';
+    // Placeholder catalog — swap for a shop_items table later. price = Amber Coin.
+    const FALLBACK = [
+      { key: 'badge-camper',      cat: 'Badges',     name: 'Camper Badge',      price: 120, art: B + 'camper.png',        desc: 'Sewn on your sleeve: you sat by the fire and stayed.' },
+      { key: 'badge-night-owl',   cat: 'Badges',     name: 'Night Owl Badge',   price: 250, art: B + 'night-owl.png',     desc: 'For readers who never sleep before the next chapter.' },
+      { key: 'badge-fire-watch',  cat: 'Badges',     name: 'Fire Watcher',      price: 300, art: B + 'fire-watcher.png',  desc: 'Someone has to keep the campfire lit.' },
+      { key: 'badge-clue-hunter', cat: 'Badges',     name: 'Clue Hunter',       price: 350, art: B + 'clue-hunter.png',   desc: 'Every footprint means something. Probably.' },
+      { key: 'toy-d20',           cat: 'Toys',       name: 'Lucky D20',         price: 180, art: A + 'd20.png',           desc: 'A twenty-sided die. Rolls suspiciously well at night.' },
+      { key: 'toy-sword',         cat: 'Toys',       name: 'Wooden Sword',      price: 200, art: A + 'sword.png',         desc: 'Whittled by a camper. Fights beasts, mostly imaginary ones.' },
+      { key: 'toy-radio',         cat: 'Toys',       name: 'Walkie Talkie',     price: 280, art: A + 'radio.png',         desc: 'Static, whispers, and sometimes a voice that answers back.' },
+      { key: 'keep-pinecone',     cat: 'Keepsakes',  name: 'Pinecone',          price: 90,  art: A + 'pine.png',          desc: 'Found near the old trail. It smells like rain.' },
+      { key: 'keep-rune',         cat: 'Keepsakes',  name: 'Rune Stone',        price: 220, art: A + 'stone.png',         desc: 'Carved marks nobody at camp can read.' },
+      { key: 'keep-binoculars',   cat: 'Keepsakes',  name: 'Binoculars',        price: 260, art: A + 'binocular.png',     desc: 'See what moves between the trees.' },
+      { key: 'keep-eye',          cat: 'Keepsakes',  name: 'Watching Eye',      price: 400, art: A + 'eye.png',           desc: 'It blinks when you look away.' },
+      { key: 'outfit-tee',        cat: 'Outfit',     name: 'Camp Hollow Tee',   price: 500, art: 'assets/backpack/tab-outfit.webp', desc: 'Soft green tee. Do not feed the beasts.' },
+    ];
+    let ITEMS = FALLBACK;
+    const CATS = ['All', 'Outfit', 'Toys', 'Badges', 'Keepsakes'];
+    const $ = (id) => document.getElementById(id);
+    let cat = 'All', sel = null, balance = null, owned = new Set(), busy = false;
+
+    const price = (n) => `<img src="${COIN}" alt="">${formatAmber(n)}`;
+    const msg = (t, ok) => { $('shopMsg').textContent = t || ''; $('shopMsg').classList.toggle('is-ok', !!ok); };
+
+    function renderTabs() {
+      $('shopTabs').innerHTML = CATS.map((c) => `<button class="shop-tab${c === cat ? ' is-on' : ''}" role="tab" aria-selected="${c === cat}" data-cat="${c}" type="button">${c}</button>`).join('');
+    }
+    function renderGrid() {
+      const list = ITEMS.filter((i) => cat === 'All' || i.cat === cat);
+      $('shopGrid').innerHTML = list.length ? list.map((i, n) => `
+        <button class="shop-card${i.key === sel?.key ? ' is-sel' : ''}${owned.has(i.key) ? ' is-owned' : ''}" style="--n:${n}" data-key="${i.key}" type="button" aria-label="${i.name}">
+          <span class="shop-art"><img src="${i.art}" alt="" loading="lazy" draggable="false"></span>
+          <span class="shop-price">${owned.has(i.key) ? '✓ Owned' : price(i.price)}</span>
+        </button>`).join('') : '<p class="shop-empty">Shelf is empty.</p>';
+    }
+    function renderInfo() {
+      const i = sel;
+      $('infoArt').src = i ? i.art : ''; $('infoArt').style.visibility = i ? 'visible' : 'hidden';
+      $('infoName').textContent = i ? i.name : 'Pick an item';
+      $('infoCat').textContent = i ? i.cat : '—';
+      $('infoDesc').textContent = i ? i.desc : 'Tap something on the shelf to see what it does.';
+      const b = $('buyBtn');
+      if (!i) { b.disabled = true; b.textContent = 'BUY'; return; }
+      if (owned.has(i.key)) { b.disabled = true; b.textContent = '✓ OWNED'; return; }
+      b.disabled = busy || (balance !== null && balance < i.price);
+      b.innerHTML = `BUY <img src="${COIN}" alt="">${formatAmber(i.price)}`;
+    }
+    const renderAll = () => { renderTabs(); renderGrid(); renderInfo(); };
+
+    $('shopTabs').addEventListener('click', (e) => { const t = e.target.closest('[data-cat]'); if (!t) return; cat = t.dataset.cat; msg(''); renderTabs(); renderGrid(); $('shopItems').scrollTo({ top: 0, behavior: 'smooth' }); });
+    $('shopGrid').addEventListener('click', (e) => { const c = e.target.closest('[data-key]'); if (!c) return; sel = ITEMS.find((i) => i.key === c.dataset.key); msg(''); renderGrid(); renderInfo(); });
+    const ERR = { insufficient_amber: 'Not enough Amber.', already_owned: 'You already own this.', item_unavailable: 'Item is no longer sold.', not_signed_in: 'Sign in first.' };
+    let confirming = null;
+    const resetConfirm = () => { confirming = null; };
+    $('buyBtn').addEventListener('click', async () => {
+      if (!sel || busy || owned.has(sel.key)) return;
+      if (confirming !== sel.key) {            // 1st click: ask to confirm
+        confirming = sel.key; $('buyBtn').innerHTML = `CONFIRM? <img src="${COIN}" alt="">${formatAmber(sel.price)}`;
+        msg('Tap again to buy.'); setTimeout(() => { if (confirming === sel?.key && !busy) { resetConfirm(); msg(''); renderInfo(); } }, 4000); return;
+      }
+      resetConfirm(); busy = true; renderInfo(); msg('');
+      const { data, error } = await supabase.rpc('shop_buy', { p_item: sel.key });   // server checks price, balance, ownership
+      busy = false;
+      if (error) {
+        const known = Object.keys(ERR).find((k) => error.message?.includes(k));
+        console.warn(error); msg(known ? ERR[known] : 'Shop counter not open yet (run sql/shop.sql).'); if (known === 'already_owned') owned.add(sel.key); renderAll(); return;
+      }
+      if (data && typeof data.balance === 'number') { balance = data.balance; setBalance(balance); } else { const w = await refreshWallet(); balance = w?.balance ?? balance; }
+      owned.add(sel.key); msg('Added to your Backpack!', true); renderAll();
+    });
+    $('shopGrid').addEventListener('click', resetConfirm);
+    $('shopTabs').addEventListener('click', resetConfirm);
+
     await initPage({ active: 'shop' });
+    renderAll();
+    try {
+      const { data } = await supabase.from('shop_items').select('key,title,description,category,asset_path,price,sort').order('sort');
+      if (data?.length) { ITEMS = data.map((r) => ({ key: r.key, cat: r.category, name: r.title, price: r.price, art: r.asset_path, desc: r.description })); sel = null; renderAll(); }
+    } catch (_) {}
+    try { const w = await refreshWallet(); if (w) { balance = w.balance; startLive(); } } catch (_) {}
+    document.addEventListener('amber:balance', (e) => { balance = e.detail.balance; renderInfo(); });
+    try { (await getCollectibles()).forEach((c) => owned.add(c.key));
+      const { data: pu } = await supabase.from('shop_purchases').select('item_key'); (pu || []).forEach((r) => owned.add(r.item_key)); } catch (_) {}
+    renderAll();
   </script>
 
 </body>
