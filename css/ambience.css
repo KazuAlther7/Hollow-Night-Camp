@@ -1,0 +1,29 @@
+/* HOLLOW NIGHT CAMP — Ambience Mixer (settings-sound.html) */
+.settings-kicker { color:var(--orange); font-size:11px; letter-spacing:2px; font-weight:700; }
+.settings-h2 { margin:0 0 14px; font-family:var(--heading); font-size:clamp(26px,4vw,36px); }
+#sound { padding-top:10px; }
+.mixer { max-width:760px; margin-top:26px; display:grid; gap:22px; }
+.mixer-label { margin:0 0 10px; color:var(--paper-dark); font-size:11px; font-weight:700; letter-spacing:1.5px; }
+.mixer-bar { display:flex; flex-wrap:wrap; align-items:center; gap:12px; padding:14px; border:1px solid rgba(243,231,201,.22); border-radius:16px; background:rgba(10,15,25,.45); }
+.mixer-btn { display:inline-flex; align-items:center; gap:8px; padding:11px 16px; border:1px solid rgba(243,231,201,.3); border-radius:11px; background:rgba(242,163,75,.14); color:var(--paper); font:700 13px var(--body); cursor:pointer; }
+.mixer-btn:hover { background:rgba(242,163,75,.24); }
+.mixer-btn:focus-visible, .mixer-chip:focus-visible { outline:2px solid var(--orange); outline-offset:2px; }
+.mixer-btn.primary { background:linear-gradient(135deg,#e6a04c,#b96a3e); color:#192018; border-color:transparent; }
+.mixer-btn[aria-pressed="true"] { background:rgba(217,110,69,.28); border-color:#ffb69b; color:#ffb69b; }
+.mixer-btn .icon { width:18px; height:18px; vertical-align:0; }
+.mixer-master { flex:1 1 220px; display:flex; align-items:center; gap:10px; color:var(--muted); font-size:12px; }
+.mixer-master input { flex:1; }
+.mixer-presets { display:flex; flex-wrap:wrap; gap:8px; }
+.mixer-chip { padding:9px 14px; border:1px solid rgba(243,231,201,.28); border-radius:999px; background:transparent; color:var(--paper); font:600 13px var(--body); cursor:pointer; }
+.mixer-chip:hover { background:rgba(255,255,255,.08); }
+.mixer-chip[aria-pressed="true"] { background:var(--orange); border-color:var(--orange); color:#192018; }
+.mixer-channels { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:12px; }
+.mixer-channel { padding:14px 16px; border:1px solid rgba(243,231,201,.2); border-radius:14px; background:rgba(10,15,25,.4); display:grid; gap:8px; transition:opacity .2s; }
+.mixer-channel.off { opacity:.62; }
+.mixer-channel header { display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+.mixer-channel strong { font-size:15px; }
+.mixer-channel output { color:var(--fire); font-weight:700; font-size:13px; font-variant-numeric:tabular-nums; }
+.mixer-channel small { color:var(--muted); font-size:12px; }
+.mixer input[type=range] { width:100%; accent-color:var(--orange); }
+.mixer-note { color:var(--muted); font-size:12px; line-height:1.6; min-height:20px; }
+.mixer.muted .mixer-channels { opacity:.55; }

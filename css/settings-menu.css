@@ -20,6 +20,9 @@
 
 /* Display entry icon */
 .icon-display { --mask: url("../assets/icons/display.png"); }
+.icon-volume { --mask: url("../assets/icons/volume.png"); }
+.icon-information { --mask: url("../assets/icons/information.png"); }
+.icon-help { --mask: url("../assets/icons/help.png"); }
 
 @media (prefers-reduced-motion: reduce) {
   .settings-trigger .icon, .settings-menu { transition: none; }
