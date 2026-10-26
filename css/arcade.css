@@ -55,7 +55,7 @@ body[data-page="arcade"] .camp-app { position: relative; z-index: 1; }
 /* ---------- slot machine ---------- */
 .slot-layout { display: flex; flex-wrap: wrap; gap: 28px; align-items: center; justify-content: center; }
 .slot-machine { position: relative; width: min(82vw, 340px); aspect-ratio: 640 / 1120; flex: none; transition: transform .2s ease; }
-.slot-machine.is-pulling { animation: slot-shake .12s linear infinite; }
+/* the lever animation replaces the old whole-machine shake */
 .slot-machine.is-win { filter: drop-shadow(0 0 22px rgba(255,206,114,.9)); }
 .slot-img { position: absolute; inset: 0; width: 100%; height: 100%; user-select: none; pointer-events: none; }
 .slot-window {
@@ -169,3 +169,8 @@ body[data-page="arcade"] .camp-app { position: relative; z-index: 1; }
 .arc-card:hover .arc-card-logo-d20 { animation: logo-bob 1.6s ease-in-out infinite; }
 .dice-logo img { width: min(70vw, 300px); height: auto; }
 @media (prefers-reduced-motion: reduce) { .arc-card:hover .arc-card-logo-d20 { animation: none; } }
+
+/* lever: stick + ball are separate pieces, animated from js/arcade-slot.js (positions in % of the 640x1120 machine art) */
+.slot-lever-stick, .slot-lever-ball { position: absolute; display: block; pointer-events: none; user-select: none; will-change: transform; }
+.slot-lever-stick { left: 77%; top: 43.47%; width: 5.31%; height: 17.77%; transform-origin: 50% 100%; }
+.slot-lever-ball { left: 75.64%; top: 37.63%; width: 10.94%; height: 6.34%; }
