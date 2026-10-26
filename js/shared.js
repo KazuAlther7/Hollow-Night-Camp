@@ -161,8 +161,12 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
     // bring the active page into view
     const activeItem = linksScroll.querySelector('.active');
     requestAnimationFrame(() => {
+      // only scroll when the active page sits outside the visible part (Campfire etc. stay put at the start)
       if (activeItem && linksScroll.scrollWidth > linksScroll.clientWidth) {
-        linksScroll.scrollLeft = activeItem.offsetLeft - (linksScroll.clientWidth - activeItem.offsetWidth) / 2;
+        const end = activeItem.offsetLeft + activeItem.offsetWidth;
+        linksScroll.style.scrollBehavior = 'auto';
+        linksScroll.scrollLeft = end > linksScroll.clientWidth ? end - linksScroll.clientWidth + 14 : 0;
+        linksScroll.style.scrollBehavior = '';
       }
       fade();
     });
