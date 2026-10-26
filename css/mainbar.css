@@ -470,7 +470,7 @@ body:not(.bar-sidebar) .bar-links-scroll {
   display: block;
   flex: 0 1 auto;
   min-width: 0;
-  max-width: min(430px, 100%);
+  max-width: 430px;   /* px, not %: a % max-width is ignored when the bar sizes itself, leaving empty space after the avatar */
   padding: 2px 4px;
   overflow-x: auto;
   overflow-y: hidden;
