@@ -69,7 +69,7 @@ The current repository tree audited on 2026-10-26 contains **no `sql/` directory
 ---
 ## 2. Current Repository Audit
 
-The statuses below describe what is evidenced by the supplied ZIP's source code. A visible page or button does **not** count as a complete feature if its underlying workflow is still a placeholder. Hosting configuration and live deployment status cannot be confirmed from the ZIP alone.
+The statuses below describe what is evidenced by the live default-branch repository snapshot audited on 2026-10-26. A page, button, asset, or client RPC call does **not** by itself prove an end-to-end workflow works. Supabase schema/RLS, deployed-host parity, and production behavior require separate verification.
 
 ### Status legend
 
@@ -85,7 +85,7 @@ The statuses below describe what is evidenced by the supplied ZIP's source code.
 | Login and registration UI | **DONE** | `index.html` and `js/login.js` provide Login / Join Camp flows. |
 | Supabase email/password authentication | **DONE / VERIFY** | `js/auth.js` implements sign-up, sign-in, sign-out, session retrieval and auth-state observation. |
 | Reader profile: nickname and bio | **DONE** | `js/auth.js` reads and updates `profiles`; Settings page reports successful saves. |
-| Reader profile picture UI | **PARTIAL** | Avatar preview / remove exists; durable object storage and upload policies need verification. |
+| Reader profile picture UI | **PARTIAL / VERIFY** | Profile/avatar UI exists; durable upload/storage bucket and access policies require verification. |
 | Reader / Author role distinction | **PARTIAL** | Author role is loaded from `profiles`; Author Mode toggle and UI gating exist. Trusted role assignment still needs testing. |
 | Author-only editor route guard | **DONE (client-side) / VERIFY (server-side)** | `initPage({ requireAuthor: true })` protects editor route. RLS remains the real security boundary. |
 | Campfire homepage / welcome screen | **DONE** | `home.html`, `css/home.css`, `js/home.js` implement the welcome experience. |
@@ -110,20 +110,24 @@ The statuses below describe what is evidenced by the supplied ZIP's source code.
 | Novel Ratings (aggregate of chapter votes) | **IMPLEMENTED IN SOURCE / VERIFY** | `js/rating.js` and `js/novels.js` include novel rating mounting. |
 | Chapter import from TXT / DOCX / text-based PDF | **DONE in source / VERIFY** | `js/import.js` parses supported formats (5 MB limit). |
 | Latest Chapter section | **PARTIAL / VERIFY** | Homepage author controls present; confirm reader-facing latest-published-chapter section. |
-| Global branded loading animation | **PARTIAL / VERIFY** | `assets/loader/` contains multiple WebP frames and `css/loader.css`, `js/loader.js` exist. Verify integration, transitions, error cleanup, and reduced-motion behavior on every route. |
+| Global branded loading animation | **IMPLEMENTED IN SOURCE / VERIFY** | Loader assets and `css/loader.css`, `js/loader.js` exist. Verify route coverage, transition cleanup on errors, and reduced-motion behavior. |
 | Background music and sound effects controls | **NOT STARTED** | Separate Music and SFX controls; assets under `assets/sound/`. |
 | Realtime online readers count | **IMPLEMENTED IN SOURCE / VERIFY** | `js/status-widget.js` uses Supabase Realtime Presence channel `camp-online`; verify production Realtime config, duplicate-tab behavior, stale-session cleanup, and privacy. |
 | Realtime flip-style digital clock | **IMPLEMENTED IN SOURCE / VERIFY** | `js/status-widget.js` and `settings-clock.html` implement a timezone-aware 24-hour retro flip clock; verify saved timezone behavior and reduced motion. |
 | Global Settings gear dropdown | **IMPLEMENTED IN SOURCE / VERIFY** | Shared Settings dropdown exists in `js/shared.js`; verify keyboard, focus, mobile placement, and route coverage. |
-| Volumes / arcs and chapter list | **PARTIAL / VERIFY** | Verify full grouping/reordering experience. |
+| Volumes / arcs and chapter list | **IMPLEMENTED IN SOURCE / VERIFY** | `js/volumes.js` loads/creates volumes and sorts chapters by volume/position; verify editor controls, schema, and live reordering. |
 | Theories page | **IMPLEMENTED IN SOURCE / VERIFY** | `theories.html` and `js/theories.js` implement theory list/detail, categories, posting and replies. |
 | Theory posts, replies and cloud persistence | **IMPLEMENTED IN SOURCE / VERIFY** | Verify rate limits, persistence, and policies. |
 | Theory categories and moderation | **PARTIAL / VERIFY** | Categories Confirmed / Likely / Speculation / Wild Theory. |
 | Corners Arcade | **PARTIAL — playable modules present / VERIFY** | `arcade.html`, `js/arcade-dice.js`, and `js/arcade-slot.js` implement a 3D physics dice experience and Amber Gacha Machine UI. Verify SQL RPCs, wallet integration, odds/prize enforcement, and production behavior. |
 | D&D-style dice roll and games | **IMPLEMENTED IN SOURCE / VERIFY** | Three.js + cannon-es dice tower/roll implementation is present in `js/arcade-dice.js`; test rendering, physics, mobile performance, and accessibility on live devices. Other arcade games remain future work unless separately implemented. |
-| Camp Rank, EXP and levels | **IMPLEMENTED IN SOURCE / VERIFY** | `js/rank.js` calls the server-side `camp_rank` RPC and badge assets are present. Verify the database function/schema and all 12 rank thresholds in the live Supabase project. |
-| Reading streak and Night Owl badge | **IMPLEMENTED IN SOURCE / VERIFY** | `js/streak.js` tracks reading days through RPCs; `js/badges.js` requests server-side badge synchronization; `assets/badges/night-owl.png` exists. Verify database functions, timezone boundaries, and award rules in Supabase. |
-| Daily Campfire check-in and Amber wallet | **IMPLEMENTED IN SOURCE / VERIFY** | `sql/amber_wallet.sql` (append-only `amber_ledger`, `daily_checkins`, RPCs `wallet_state` / `daily_checkin`, RLS read-own, Asia/Jakarta day, 20 Amber/check-in), `js/wallet.js`, `css/wallet.css`; balance row in account menu, check-in card on `home.html`. Run SQL in Supabase and verify. Amber Gacha Machine now spends/wins via the ledger (`sql/arcade_slot.sql`, run after `sql/amber_wallet.sql`; legacy `arcade_wallets.balance` migrated once). Amber is the primary in-platform currency (§5.22). |
+| World Building spoiler warning | **IMPLEMENTED IN SOURCE / BACKEND VERIFY** | `js/spoiler-note.js` gates World Building pages, stores acknowledgement in session storage, and provides a reopen control. Server-side spoiler filtering remains required. |
+| Sheet Page Number / d20 sheet marker | **PARTIAL — differs from original requirement** | `js/sheets.js` creates deterministic text-based sheets and d20 separators; `js/reading.js` resumes to the sheet associated with saved progress. Original requirement called for author-defined page breaks. |
+| Shop and frame skin purchases | **IMPLEMENTED IN SOURCE / BACKEND VERIFY** | `shop.html` includes catalog UI, categories, owned state, confirmation, `shop_buy` RPC, and purchase/collectible reads. Verify server catalog, atomic transaction, ledger, ownership, and RLS. |
+| Camp Profile quick card and Backpack | **IMPLEMENTED IN SOURCE / BACKEND VERIFY** | `js/profile-card.js` opens the in-place card and links to Full Profile/Backpack; `js/backpack.js` displays frames, badges, and toys. Verify route, accessibility, and data permissions. |
+| Camp Rank, EXP and levels | **IMPLEMENTED IN CLIENT SOURCE / BACKEND UNVERIFIED** | `js/rank.js` calls `camp_rank`; `js/profile-card.js` renders rank when available. Verify all 12 tiers, EXP idempotency, database function, and authorization in Supabase. |
+| Reading streak and Night Owl badge | **IMPLEMENTED IN CLIENT SOURCE / BACKEND UNVERIFIED** | `js/streak.js` calls streak RPCs and `js/badges.js` requests server-side badge synchronization; `assets/badges/night-owl.png` exists. Verify database functions, timezone boundaries, and award rules. |
+| Daily Campfire check-in and Amber wallet | **IMPLEMENTED IN CLIENT SOURCE / BACKEND UNVERIFIED** | `js/daily-login.js` and `js/wallet.js` call `wallet_state`, `daily_checkin`, and timezone RPCs. Source comments reference SQL migrations, but no SQL migration files are committed in this snapshot. Verify the authoritative schema/RPCs, ledger rules, RLS, and production behavior. Amber is the primary in-platform currency (§5.22). |
 | Camp Challenge author menu | **NOT STARTED** | Dedicated Main Bar menu + Author CRUD + Amber rewards (§5.23). |
 | Category leaderboards and monthly reset | **NOT STARTED** | Top Theorist / Top Reader / Top Arcade Player (§5.24). |
 | Author Analytics Dashboard | **NOT STARTED** | All instrumented insights (§5.25). |
@@ -146,52 +150,24 @@ The statuses below describe what is evidenced by the supplied ZIP's source code.
 | Supabase database CRUD for novels / chapters | **IMPLEMENTED IN SOURCE / VERIFY** | Production schema, RLS, and data persistence require live tests. |
 | Security: role-based database policies | **VERIFY** | RLS and table grants must be checked against actual tables and buckets. |
 
-### 2.2 Existing source files
+### 2.2 Current repository structure (representative)
 
-```text
-Hollow-Night-Camp/
-├── index.html
-├── home.html
-├── novels.html
-├── novel.html
-├── editor.html
-├── theories.html
-├── arcade.html
-├── settings.html
-├── config/
-│   └── supabase.js
-├── assets/
-│   ├── image/
-│   │   ├── hollow-night-logo.png
-│   │   ├── welcome-bg.jpg
-│   │   └── welcome-depth.png
-│   └── icons/
-│       ├── campfire.png
-│       ├── novels.png
-│       ├── theories.png
-│       ├── arcade.png
-│       ├── settings.png
-│       ├── author-studio.png
-│       ├── notification.png
-│       ├── add-novel.png
-│       ├── chapters.png
-│       └── world-building.png
-├── css/
-│   ├── base.css
-│   ├── mainbar.css
-│   ├── novels.css
-│   ├── editor.css
-│   ├── auth.css
-│   └── home.css
-└── js/
-    ├── auth.js
-    ├── login.js
-    ├── shared.js
-    ├── home.js
-    ├── novels.js
-    ├── editor.js
-    └── parallax.js
-```
+The repository now contains more files than the initial prototype tree. This is a functional overview, not a complete file listing.
+
+| Area | Representative files |
+| --- | --- |
+| Main pages | `index.html`, `home.html`, `novels.html`, `novel.html`, `read.html`, `editor.html`, `theories.html`, `arcade.html`, `shop.html` |
+| World building | `characters.html`, `maps.html`, `locations.html`, `world-building.html`, `js/world.js`, `js/spoiler-note.js` |
+| Settings | `settings-profile.html`, `settings-display.html`, `settings-clock.html`, `settings-history.html`, `settings-community.html`, `settings-information.html`, `settings-preferences.html`, `settings-support.html` |
+| Authentication/navigation | `config/supabase.js`, `js/auth.js`, `js/login.js`, `js/shared.js` |
+| Reading and authoring | `js/novels.js`, `js/editor.js`, `js/read.js`, `js/import.js`, `js/volumes.js`, `js/sheets.js`, `js/reading.js`, `js/history.js`, `js/rating.js` |
+| Community | `js/theories.js`, `js/notifications.js`, `js/preferences.js` |
+| Arcade/economy | `js/arcade-dice.js`, `js/arcade-slot.js`, `js/wallet.js`, `js/daily-login.js`, `js/rank.js`, `js/streak.js`, `js/stats.js` |
+| Profile/collectibles | `js/profile-card.js`, `js/backpack.js`, `js/collectibles.js`, `js/badges.js`, `js/frames.js` |
+| Styles/assets | `css/`, `assets/image/`, `assets/icons/`, `assets/badges/`, `assets/frames/`, `assets/backpack/`, `assets/arcade/`, `assets/daily-login/` |
+| Backend migration packaging | No committed `.sql` files or `sql/` / `supabase/` migration directory were present in the audited tree. Several client modules reference database scripts that are not included in this snapshot. |
+
+Keep working components intact where possible. Extend the existing shared navigation, authentication utilities, visual tokens, and reusable modules rather than replacing them unnecessarily.
 
 Keep working components intact where possible. Extend the existing shared navigation, authentication utilities, visual tokens, and parallax implementation instead of replacing them unnecessarily.
 
@@ -1317,122 +1293,156 @@ Each table uses stable IDs, timestamps, explicit relationships, indexes.
 
 ## 9. Delivery Plan and Current Progress
 
-### Phase 0 — Audit and stabilization
-- [x] Repository and initial static website structure.
+**Progress rule:** A checked box means the implementation or documentation artifact exists in source. It does **not** certify backend schema, RLS, deployment, accessibility, or end-to-end behavior. Items labeled **VERIFY** remain release blockers.
+
+### Phase 0 — Foundation, authentication, and deployment
+- [x] Repository and static multi-page website structure.
 - [x] Supabase email/password sign-up and sign-in client flow.
 - [x] Profile read/update for nickname and bio.
-- [x] Shared navigation and Author-only editor route guard.
+- [x] Shared navigation and client-side Author-only editor route guard.
 - [x] Campfire welcome screen and parallax depth effect.
 - [x] Glass Main Bar with top-bar / sidebar / compact navigation modes.
 - [x] Supabase project URL and publishable client key configured.
-- [x] `profiles` table created; profile save behavior confirmed.
-- [x] Cloudflare Worker URL added to Supabase Auth Redirect URLs.
-- [x] Loader assets and loader implementation files exist; [ ] verify complete global integration, error/reduced-motion states.
-- [ ] Production sign-up, email verification, login, logout, session persistence verified end-to-end.
-- [ ] RLS and Storage policies tested with Reader, Author, signed-out sessions.
-- [ ] Canonical production domain and repeatable deployment workflow confirmed.
+- [x] `profiles` table creation and profile-save behavior were reported during project progress.
+- [x] Cloudflare Worker URL was added to Supabase Auth Redirect URLs during project progress.
+- [x] Branded loader assets and implementation files exist.
+- [ ] **VERIFY:** Production sign-up, email verification, login, logout, and session persistence end-to-end.
+- [ ] **VERIFY:** RLS and Storage policies using Reader, Author, and signed-out sessions.
+- [ ] **VERIFY:** Trusted Author assignment; client role state must never grant authorization.
+- [ ] **VERIFY:** Canonical production domain, Cloudflare Pages/Worker routing, direct-page navigation, and repeatable deployment.
+- [ ] **VERIFY:** Loader integration on every route, error cleanup, and reduced-motion behavior.
 
-**Current exit status: PARTIALLY COMPLETE.**
+**Current exit status: PARTIALLY COMPLETE — source exists; security and production verification remain.**
 
-### Phase 1 — Core story library and authoring
-- [x] Novel library data loading in `js/novels.js`.
-- [x] Novel detail and chapter-management workflow.
-- [x] Novel create/edit/delete in source.
-- [x] Chapter editor with metadata and word count.
-- [x] Save-draft and publish actions in source.
-- [x] Reader-facing chapter page and navigation.
-- [x] Chapter Ratings d20 UI and rating helpers present in source; [ ] verify schema, one-vote enforcement, fractional fill, realtime aggregates.
-- [x] Novel rating helpers present in source; [ ] verify weighted aggregation, realtime updates, uniqueness, and RLS.
-- [x] Chapter import for TXT, DOCX, text-based PDF with review before draft creation.
-- [ ] Database schema, RLS, published-only visibility, Storage bucket policies, cross-session persistence verified.
-- [ ] Latest-published-chapter section on Campfire homepage verified.
-- [ ] Chapter ordering, volume / arc grouping, deletion confirmation in live workflow verified.
-- [ ] Unsaved-change protection and save failure recovery tested.
+### Phase 1 — Core story library, authoring, and reading
+- [x] Novel listing, detail page, and novel create/edit/delete operations in source.
+- [x] Chapter editor with metadata, body editing, word count, draft saving, and publishing controls.
+- [x] Reader-facing chapter page and chapter navigation.
+- [x] TXT, DOCX, and text-based PDF chapter import with review before draft creation.
+- [x] Chapter d20 ratings and novel rating helpers in source.
+- [x] Volume/arc data helpers and chapter sorting in `js/volumes.js`.
+- [x] Latest-chapter homepage elements and continue-reading helpers are present in source.
+- [ ] **VERIFY:** Database schema, RLS, published-only visibility, Storage bucket policies, and cross-session persistence.
+- [ ] **VERIFY:** Rating uniqueness, averages/counts, weighted novel aggregation, Realtime updates, and abuse prevention.
+- [ ] **VERIFY:** Volume create/edit/order controls and chapter reordering end-to-end.
+- [ ] **VERIFY:** Latest-published chapter and continue-reading behavior with real published data.
+- [ ] **VERIFY:** Unsaved-change protection, save failure recovery, and deletion confirmation.
+- [ ] **DECIDE / IMPLEMENT:** `js/sheets.js` automatically divides text into sheets. The original specification requested author-defined page breaks; settle the intended model before calling it complete.
 
-**Current exit status: IMPLEMENTED IN SOURCE, LIVE VERIFICATION REQUIRED.**
+**Current exit status: IMPLEMENTED IN SOURCE, LIVE BACKEND AND WORKFLOW VERIFICATION REQUIRED.**
 
 ### Phase 2 — Author tools and world building
-- [ ] Volume / arc organization and chapter reordering completed.
-- [x] Characters management and reader pages (`characters.html`, `js/world.js`).
-- [x] Maps, map image upload, responsive named markers (`maps.html`).
-- [x] Locations management and linked lore (`locations.html`).
-- [x] Novels sub-navigation under each page headline.
-- [ ] `supabase/world-building.sql` run; RLS and `worldbuilding` Storage bucket verified.
-- [ ] Novel cover / image upload through Supabase Storage verified and improved.
+- [x] Character management and reader pages (`characters.html`, `js/world.js`).
+- [x] Maps page, map image display/upload flow, and named markers in source.
+- [x] Locations management and linked lore in source.
+- [x] Novels / World Building sub-navigation.
+- [x] World Building spoiler acknowledgement gate, session-based acknowledgement, and reopen control (`js/spoiler-note.js`).
+- [ ] **VERIFY:** World Building data schema, RLS, and Storage upload policies. No SQL migration files are committed in the current repository snapshot.
+- [ ] **VERIFY:** Spoiler filtering is enforced before protected lore is sent to readers; a popup alone is not a security boundary.
+- [ ] **VERIFY:** Novel cover and map uploads persist through the correct Supabase Storage buckets.
+- [ ] **VERIFY:** Volume/arc controls and chapter ordering are accessible and persist after reload.
 
-**Current exit status: NOT COMPLETE.**
+**Current exit status: PARTIAL — major UI flows exist; backend/security verification remains.**
 
 ### Phase 3 — Community investigation
 - [x] Theory creation and listing.
 - [x] Confirmed / Likely / Speculation / Wild Theory filters.
 - [x] Theory detail pages and replies.
-- [ ] Ownership rules, reporting, moderation, anti-spam.
-- [ ] Persistence and RLS verified.
-- [ ] Theory like events emitted for Top Theorist leaderboard.
+- [ ] **VERIFY:** Ownership rules, RLS, persistence, report/moderation tools, and anti-spam protections.
+- [ ] **VERIFY:** Category-change permissions and the process for marking a theory Confirmed.
+- [ ] **IMPLEMENT:** Like/activity events required for the planned Top Theorist leaderboard.
+- [ ] **VERIFY:** Keyboard, mobile, empty, loading, and error states.
 
-**Current exit status: IMPLEMENTED IN SOURCE, LIVE VERIFICATION REQUIRED.**
+**Current exit status: IMPLEMENTED IN SOURCE, MODERATION AND BACKEND VERIFICATION REQUIRED.**
 
-### Phase 4 — Settings and notifications
+### Phase 4 — Settings, history, notifications, and reader experience
 - [x] Profile nickname / bio editing and save feedback.
-- [ ] Avatar persistence through object-storage bucket.
-- [x] System / Light / Dark themes (`settings-display.html`, `js/preferences.js`).
-- [x] English / Indonesian interface localization (`settings-display.html`; dictionary in `js/preferences.js`, extend it as pages get new text).
-- [x] Notification preferences (`settings-preferences.html`) and notification center (bell panel).
-- [x] Reading history and bookmarks (`js/reading.js`, `js/history.js`; tables `bookmarks`, `reading_progress`).
-- [ ] Help / FAQ, support feedback, Community social links.
-- [x] Global Settings gear dropdown available in place on every applicable page.
-- [ ] Music and SFX enable/disable and independent volume controls backed by `assets/sound/` (no `assets/sound/` directory in supplied ZIP).
+- [x] System / Light / Dark display preferences.
+- [x] English / Indonesian localization dictionary and language selection.
+- [x] Notification preference UI and notification center source.
+- [x] Reading history, bookmarks, saved progress, and resume helpers.
+- [x] Global Settings gear dropdown.
 - [x] Persisted timezone selection and retro neon split-flap clock UI.
+- [x] Realtime online-reader Presence client implementation.
+- [x] d20 sheet separators and automatic sheet number indicator in `js/sheets.js`.
+- [ ] **VERIFY:** Avatar persistence through a correctly secured object-storage bucket.
+- [ ] **VERIFY:** Notification schema/triggers, per-user RLS, preferences, and Realtime behavior.
+- [ ] **VERIFY:** Reading history/bookmarks RLS and cross-device persistence.
+- [ ] **VERIFY:** Complete localization coverage for new UI strings.
+- [ ] **IMPLEMENT / VERIFY:** Help/FAQ content, support feedback workflow, and community social links.
+- [ ] **NOT IMPLEMENTED:** Independent music and SFX controls; no `assets/sound/` directory is present in the current repository tree.
+- [ ] **VERIFY:** Online-reader count cleanup, timezone edge cases, and clock behavior.
+- [ ] **DECIDE / IMPLEMENT:** Author-defined page breaks vs current automatic sheet splitting.
+
+**Current exit status: PARTIAL — reader-facing features exist; support, audio, and backend verification remain.**
+
+### Phase 4B — Camp Rank, achievements, daily rewards, and economy
+- [x] Camp Rank client module calls the `camp_rank` RPC.
+- [x] Profile card has rank/EXP display slots and progress rendering.
+- [x] Reading streak client module calls current/longest streak RPCs.
+- [x] Badge client module supports owned badges, three display slots, and server synchronization calls.
+- [x] Badge artwork set exists under `assets/badges/`.
+- [x] Daily login/check-in UI and Amber wallet client modules exist.
+- [x] Shop UI, frame catalog fallback, purchase confirmation, and `shop_buy` RPC call exist.
+- [x] Backpack/collectibles UI and frame equip client calls exist.
+- [ ] **BLOCKER / VERIFY:** Commit and document authoritative SQL migrations/schema for wallet, check-in, rank/EXP, badges, collectibles, frames, and shop. No `.sql` files are included in the current repository snapshot.
+- [ ] **VERIFY:** Server-authoritative EXP awards, rank thresholds, streak time boundaries, and Night Owl eligibility.
+- [ ] **VERIFY:** Daily check-in grants at most once per eligible day; reward streak/reset rules are clear.
+- [ ] **VERIFY:** Amber ledger is append-only/auditable; purchases are atomic, idempotent, and cannot create a negative balance.
+- [ ] **VERIFY:** Collectible ownership, badge slot selection, frame equip, and shop catalog authorization use backend checks and RLS.
+- [ ] **NOT STARTED:** Dedicated Camp Challenge menu, author CRUD, reader completion flow, and validated Amber rewards.
+- [ ] **NOT STARTED:** Dedicated community Leaderboards with Top Theorist, Top Reader, and Top Arcade Player.
+- [ ] **NOT STARTED:** Monthly archive, authorized settlement controls, and idempotent monthly rewards.
+- [ ] **NOT STARTED:** Author Analytics Dashboard covering all instrumented insights.
+- [ ] **VERIFY:** Abuse prevention, concurrency, privacy, and reward duplication tests.
+
+**Current exit status: PARTIAL — client integration exists, but missing committed migrations are a deployment blocker; challenges, leaderboards, and analytics remain unimplemented.**
+
+### Phase 5 — Corners Arcade
+- [x] Corners Arcade page and styling.
+- [x] 3D dice tower/rolling experience source using Three.js and cannon-es.
+- [x] Amber Gacha Machine UI, reels, odds display, and wallet/RPC integration in source.
+- [ ] **VERIFY:** Dice rendering/physics, roll results, mobile performance, keyboard access, and reduced-motion behavior.
+- [ ] **VERIFY:** Server-controlled gacha cost, prize odds, prize award, limits, and ledger integrity.
+- [ ] **NOT STARTED / VERIFY:** Additional browser games beyond dice and gacha.
+- [ ] **VERIFY:** Arcade stats, score persistence, leaderboard submission, and Author Analytics integration.
+- [ ] **VERIFY:** SQL functions/tables and RLS; required migrations are not included in the current repository snapshot.
+
+**Current exit status: PARTIAL — two playable-module implementations are present in source; backend and deployed behavior remain unverified.**
+
+### Phase 6 — Camp exploration, responsive polish, and release
+- [x] Campfire scene and parallax interaction.
+- [x] Realtime online-reader count client implementation.
+- [ ] **NOT STARTED / VERIFY:** Wide-angle/distant-camera mode and FireWatcher inspection/easter eggs.
+- [ ] **VERIFY:** Scene asset and animation performance on low-end mobile devices.
+- [ ] **VERIFY:** Accessibility, responsive layouts, keyboard operation, reduced motion, and regression testing across all routes.
+- [ ] **VERIFY:** Cloudflare Worker / Pages deployment, canonical domain, direct-page navigation, and Supabase Auth redirects.
+- [ ] **UPDATE:** README deployment instructions to match the actual canonical hosting setup.
 
 **Current exit status: PARTIAL.**
 
-### Phase 4B — Camp Rank, rewards, challenges, leaderboards, and analytics
-- [ ] EXP events, rank calculation, streak day boundary, Night Owl award rules defined.
-- [ ] Camp Rank profile display and server-validated activity tracking.
-- [ ] Daily Campfire check-in and append-only Amber ledger.
-- [ ] `assets/badges/` created with 12-rank list and Night Owl naming convention.
-- [ ] Dedicated **Camp Challenge** menu, Author CRUD, Reader flow, server-side completion validation, Amber rewards.
-- [ ] Dedicated **Leaderboards** menu with Top Theorist, Top Reader, Top Arcade Player.
-- [ ] Monthly archive, Author-controlled leaderboard management (reachable from Leaderboards page), idempotent badge/Amber rewards.
-- [ ] Author Analytics Dashboard covering ALL instrumented insights with explicit "not yet instrumented" labels.
-- [ ] RLS, abuse prevention, idempotency, privacy review, concurrency tests for every reward/ranking flow.
+### Phase 7 — Shop, profile identity, and collectibles
+- [x] Shop page, item/category display, selected-item detail, owned-state display, and purchase confirmation UI.
+- [x] Frame skin assets and frame equip client integration.
+- [x] Camp Profile quick card, full-profile navigation, rank/streak/badge/frame slots, and Backpack access.
+- [x] Backpack tabs for Outfit, Badges, Toys, and All.
+- [ ] **VERIFY:** Server-backed shop catalog, atomic purchases, purchase history, balance deduction, and ownership grants.
+- [ ] **VERIFY:** Full-profile destination and all profile/backpack actions on mobile and keyboard.
+- [ ] **VERIFY:** Cosmetic equip/unequip, badge slot ownership, and item rendering after reload.
+- [ ] **DECIDE:** Whether public profiles of other readers can be opened, or profile cards are initially self-only.
 
-**Current exit status: NOT STARTED.**
+**Current exit status: IMPLEMENTED IN SOURCE, BACKEND AND END-TO-END VERIFICATION REQUIRED.**
 
-### Phase 5 — Arcade
-- [ ] Supabase-backed arcade score submissions and leaderboards with RLS and validated writes.
-- [ ] Compact versioned Supabase save-game records and player stats.
-- [ ] Animated dice rolling and session roll history.
-- [ ] Simple playable browser games.
-- [ ] Mobile input and reduced-motion behavior tested.
-- [ ] Validated scores submitted to Top Arcade Player leaderboard and Author Analytics.
-
-**Current exit status: NOT STARTED.**
-
-### Phase 6 — Camp exploration, deployment and polish
-- [ ] Wide-angle / distant-camera mode.
-- [ ] FireWatcher inspection interaction and optional easter eggs.
-- [ ] Scene assets and animation performance optimized.
-- [x] Aggregate realtime online-reader count with stale-session cleanup.
-- [ ] Accessibility, responsive, regression testing.
-- [ ] Cloudflare Worker / Pages deployment, canonical domain, direct-page navigation, Supabase Auth redirects verified.
-- [ ] README deployment instructions updated to match actual hosting setup.
-
-**Current exit status: PARTIAL.**
-
----
-
-
-### Phase 5 — Immersion and personalized reader spaces
-- [ ] AI Camp Staff Worker integration, lore retrieval, bounded local conversation history, free-tier quota handling, and optional sound/vibration.
+### Phase 8 — Future immersive and personalized systems
+- [ ] AI Camp Staff Worker integration, lore retrieval, bounded conversation history, quota handling, and optional sound/vibration.
 - [ ] Personal Cabin with slot-based customization, item catalog, Amber unlocks, and public/private view modes.
 - [ ] Ambience Mixer with campfire/rain/forest channels, presets, global mute, and persisted preferences.
 - [ ] Character Relationship Graph with Author management and server-side spoiler filtering.
 - [ ] Digital Letters with Author composer, trigger delivery, unfold modal, and Letter Archive.
-- [ ] Amber currency icon and final asset path convention decided.
-- [ ] RLS, validation, idempotency, accessibility, and mobile behavior tested for all new systems.
+- [ ] Seasonal greeting cards, event configuration, and collectible themes.
+- [ ] Complete RLS, validation, idempotency, accessibility, and mobile tests for these systems.
 
-**Current exit status: NOT STARTED (requirements documented; implementation not present in supplied ZIP).**
+**Current exit status: NOT STARTED / FUTURE ROADMAP.**
 
 ## 10. Definition of Done
 
@@ -1449,6 +1459,7 @@ A feature is complete only when all relevant conditions are met:
 - [ ] No regressions in existing features.
 - [ ] Feature tested in deployed environment, not only locally.
 - [ ] PRD status table updated to reflect actual implementation.
+- [ ] Every required Supabase schema change/RPC is versioned in repository migrations (or linked to a clearly maintained authoritative migration source) and can be applied reproducibly.
 
 ---
 
@@ -1506,7 +1517,7 @@ Cloudflare Worker URL `https://hollow-night-camp.kazualtr.workers.dev/` added to
 
 **Security note:** A client-side Author Mode switch or route guard is not sufficient authorization. Verify RLS and Storage policies reject unauthorized writes. Do not place service-role keys or private credentials in frontend files.
 
-**Audit limitation:** Source-code and project-progress review, not a live penetration test. External dashboard state, production routing, deployed code parity, RLS behavior, and persistence must be verified separately.
+**Audit limitation:** This is a source-code and project-progress audit, not a live penetration test or direct Supabase database inspection. The current GitHub tree has no committed SQL migration files even though several modules reference RPCs/tables and migration filenames in comments. Confirm authoritative schema source, production routing, deployed code parity, RLS behavior, Storage permissions, and persistence separately.
 
 <div align="center">
 
@@ -1517,15 +1528,15 @@ Cloudflare Worker URL `https://hollow-night-camp.kazualtr.workers.dev/` added to
 
 ### Feature requirements recorded on 2026-10-21
 
-Planned only, not implemented in supplied ZIP: (1) custom logo-led loading animation, (2) separate Music and SFX controls with independent volumes under `assets/sound/`, (3) aggregate realtime online-reader count, (4) timezone-configurable retro neon split-flap clock, (5) global in-place Settings gear dropdown with synchronized gear/dropdown animation. Detailed acceptance criteria in §5.16–§5.21.
+Historical planning note from 2026-10-21, superseded by the current audit: loader, realtime online-reader count, timezone-aware flip clock, and global Settings dropdown now have source implementations. Independent Music/SFX controls remain unimplemented. See §2 and §9 for current status.
 
 ### Camp Rank / gamification requirements recorded on 2026-10-21
 
-Planned only, not implemented in supplied ZIP: **12-tier Camp Rank** (Wanderer → Camper → Story Seeker → Clue Hunter → Night Reader → Theorist → Hollow Investigator → Fire Watcher → Hollow Watcher → Hollow Flame → The UnderReader → Hollow Legend), EXP and levels, three-day Night Owl streak badge, daily Campfire check-in and **Amber as the primary in-platform currency**, **dedicated Camp Challenge menu** with Author-managed challenges and Amber rewards, **dedicated Leaderboards menu** with Top Theorist / Top Reader / Top Arcade Player categories, monthly period settlement, Author-controlled leaderboard management, and **Author Analytics Dashboard** surfacing all instrumented insights. Custom badge art planned for `assets/badges/` with kebab-case naming. Requirements, controls, acceptance criteria, and data entities in §5.22–§5.26. Do not mark complete until implementation and backend policies verified.
+Historical planning note from 2026-10-21, superseded where current source has advanced: Camp Rank, streak, badge, daily check-in, and Amber wallet client integrations plus badge artwork now exist. Their database/RPC implementation remains unverified because migration files are not committed. Camp Challenge, dedicated Leaderboards, monthly settlement, and Author Analytics remain roadmap items. Requirements and acceptance criteria remain in §5.22–§5.26.
 
 ### Additional requirements recorded on 2026-10-22
 
-Planned only, not implemented in the supplied ZIP:
+Historical planning note from 2026-10-22 (current status is updated in §2, §9, and §13):
 - **AI Camp Staff** using a lore-aware server-side `systemPrompt` in a Cloudflare Worker, bounded 5–10-turn browser-local history, optional crackling-fire/whisper response sounds, and optional supported-device vibration. Target a free-first deployment, but respect provider quotas and do not promise unlimited free access or allow paid fallback without approval.
 - **Currency correction:** the official currency name is **Amber**, inspired by ancient tree resin. Replace all previous "Ember" currency references with "Amber". Keep "Ember" only when describing fire embers as an environmental visual/audio motif, not as the currency. The currency icon is planned for `assets/icon/`; note the current repo convention is `assets/icons/` (plural), so decide whether to preserve the requested singular path or align it with existing assets before implementation.
 - **Personal Cabin**, an SVG-based customizable, shareable room with wallpaper, lighting, bookshelf, floor, and decorative slots; catalog and ownership records; unlocks via Amber, challenges, badges, or Author grants.
@@ -1535,7 +1546,7 @@ Planned only, not implemented in the supplied ZIP:
 
 ### Updated repository audit summary — 2026-10-22
 
-The supplied ZIP contains 96 archive entries and includes `assets/loader/` frames, `css/loader.css`, `js/loader.js`, `js/status-widget.js`, `settings-clock.html`, `settings-history.html`, `js/reading.js`, `js/history.js`, world-building pages (`characters.html`, `maps.html`, `locations.html`), and the existing theories/rating/novel/chapter workflows. The clock and online-reader Presence widget are present in source and should be treated as **implemented in source, external verification pending**, not as missing. The repository does **not** contain an `assets/sound/` directory or a Cloudflare Worker source file, and it does not contain implementation files for AI Camp Staff, Personal Cabin, Ambience Mixer, Character Relationship Graph, or Digital Letters. These are roadmap features, not existing functionality.
+The current repository snapshot contains loader assets, `js/status-widget.js`, dedicated settings pages, reading history, world-building pages, and the novel/chapter/theory/rating workflows. The current tree also includes arcade dice/gacha, daily login, wallet, Camp Rank, streaks, badges, collectibles, frame skins, Shop, Backpack, profile card, spoiler gate, and sheet pagination source. No `assets/sound/` directory, committed SQL migration files, or Cloudflare Worker source file were found in the repository tree. AI Camp Staff, Personal Cabin, Ambience Mixer, Character Relationship Graph, Digital Letters, and seasonal greeting cards remain future roadmap items. Treat backend-dependent features as unverified until the authoritative database schema and production behavior are checked.
 
 **Currency terminology rule:** use **Amber** for the currency in all new UI, schema, documentation, and rewards. Proposed ledger name: `amber_ledger`. Keep fire embers as ordinary atmospheric imagery only.
 
@@ -1544,10 +1555,11 @@ The supplied ZIP contains 96 archive entries and includes `assets/loader/` frame
 
 ## 13. Additional Product Requirements — World Building, Reading UX, Seasonal Collectibles, Shop & Profile
 **Recorded:** 2026-10-23  
-**Status:** Planned — requirements only; do not mark implemented until source code and backend behavior are verified.
+**Status:** Mixed: source implementation now exists for the spoiler gate, sheet pagination, shop, and profile card; see each subsection for remaining gaps. Database/security behavior remains unverified.
 
 ### 13.1 World Building spoiler warning
-**Priority: P1**
+**Priority: P1**  
+**Implementation status (2026-10-26): IMPLEMENTED IN SOURCE / SERVER-SIDE SPOILER FILTERING VERIFY.** The repo contains `js/spoiler-note.js`; `js/world.js` calls the gate before rendering World Building pages, and the UI includes a reopen control. The referenced SQL migration is not committed in the current snapshot.
 
 When a reader opens the World Building area (including Characters, Maps, Locations, and any future lore/reference pages), show an animated warning popup before exposing spoiler-sensitive content.
 
@@ -1572,7 +1584,8 @@ When a reader opens the World Building area (including Characters, Maps, Locatio
 - Any future chapter-gated lore is filtered server-side or through a trusted data query before rendering.
 
 ### 13.2 d20 Sheet Page Number and reading separators
-**Priority: P1**
+**Priority: P1**  
+**Implementation status (2026-10-26): PARTIAL.** `js/sheets.js` creates d20 sheet markers and automatic text-based sheets; `js/reading.js` resumes to the sheet associated with saved reading progress. This differs from the original author-defined page-break requirement. Decide whether automatic deterministic splitting is intended, or implement explicit author-controlled break markers.
 
 Add a **Sheet Page Number** feature to the reader so readers can resume reading quickly and refer to the same reading position.
 
@@ -1594,7 +1607,8 @@ Add a **Sheet Page Number** feature to the reader so readers can resume reading 
 - Page-break markers are represented safely in stored chapter content and survive save/load/import workflows.
 
 ### 13.3 Seasonal / major-holiday greeting cards and collectible themes
-**Priority: P2**
+**Priority: P2**  
+**Implementation status (2026-10-26): NOT STARTED.** Existing notifications and collectibles provide reusable foundations, but no event calendar, greeting-card delivery, or event-claim workflow was identified in the current source tree.
 
 Extend the existing notification center with event-based greeting cards for configured major celebration days.
 
@@ -1617,7 +1631,8 @@ Extend the existing notification center with event-based greeting cards for conf
 - Event notifications respect user preferences and timezone rules.
 
 ### 13.4 Amber Shop
-**Priority: P2**
+**Priority: P2**  
+**Implementation status (2026-10-26): PARTIAL / BACKEND VERIFY.** `shop.html` contains category/item browsing, selected-item details, owned-state display, confirmation, a `shop_buy` RPC call, and reads for `shop_items` / `shop_purchases`. It also contains a client-side fallback catalog. No SQL migrations are committed in the current snapshot, so atomic purchase, ledger, catalog authorization, and ownership guarantees are not proven.
 
 Add a Shop where readers can spend **Amber**, the site's in-platform currency, on eligible digital items such as profile-card decorations, themes, collectible cosmetics, and future Personal Cabin items.
 
@@ -1638,7 +1653,8 @@ Add a Shop where readers can spend **Amber**, the site's in-platform currency, o
 - Author-only catalog management is protected by backend authorization.
 
 ### 13.5 Profile quick card and full profile
-**Priority: P2**
+**Priority: P2**  
+**Implementation status (2026-10-26): IMPLEMENTED IN SOURCE / VERIFY.** `js/profile-card.js` provides an in-place Camp Profile card with profile data, rank/streak/badge/frame areas, Full Profile navigation, and Backpack access. Verify the target full-profile route, privacy boundaries, backend data permissions, and responsive/keyboard interactions.
 
 Support two profile entry modes from the Account/Profile control:
 
@@ -1673,16 +1689,18 @@ Treat the following as proposed schema entities, not proof that tables already e
 - Use database constraints, RLS, and trusted transactions/functions for currency, ownership, event claims, and spoiler gating.
 
 ### 13.7 Delivery plan additions and current step
-These are roadmap additions; no implementation is implied by this PRD update.
 
-- [ ] **Step A — World Building spoiler warning:** textured sticky-note popup, acknowledgement flow, accessibility, and future-safe spoiler metadata.
-- [ ] **Step B — Sheet Page Number:** author-defined page breaks, d20 page marker, and stable reading resume.
-- [ ] **Step C — Greeting cards & Collectible Themes:** configurable event calendar, notification delivery, one-time claims, collection view.
-- [ ] **Step D — Amber Shop:** catalog, Amber balance display, atomic purchases, ledger and ownership records.
-- [ ] **Step E — Profile quick card & full profile:** in-place identity card, dedicated full-profile route, extensible cosmetic slots.
-- [ ] **Step F — Integration & QA:** database migrations/RLS, duplicate-action tests, accessibility, mobile layout, regression and deployed verification.
+The following status reflects the **current repository source**, not merely the original planning date. A checked item means the relevant client/UI implementation is present; it does not certify backend readiness.
 
-**Current step after this PRD update: Planning / specification (before Step A).** This task updates requirements documentation only; it does not implement these features in application code.
+- [x] **Step A — World Building spoiler warning:** session-based acknowledgement popup, reopen action, and pre-render gate are present in `js/spoiler-note.js` / `js/world.js`. **Remaining:** trusted server-side filtering and database migration.
+- [ ] **Step B — Sheet Page Number:** a d20 sheet marker and automatic text-based pagination exist in `js/sheets.js`, and reading resume is integrated. **Partial:** the original requirement asked for author-defined page breaks; confirm the intended model and update the editor/content format if required.
+- [ ] **Step C — Greeting cards & Collectible Themes:** no event calendar, seasonal greeting-card workflow, or one-time event claim flow found.
+- [x] **Step D — Amber Shop UI / RPC integration:** catalog UI, categories, owned-state, purchase confirmation, and `shop_buy` call are present. **Remaining:** commit authoritative SQL migrations and verify atomic transactions, ledger entries, catalog management, and RLS.
+- [x] **Step E — Profile quick card & Backpack:** `js/profile-card.js` and `js/backpack.js` implement the in-place card and collectible inventory flow in source. **Remaining:** verify full-profile destination, permissions, and end-to-end behavior.
+- [ ] **Step F — Integration & QA:** ongoing. Database migrations/RLS, duplicate-action tests, accessibility, mobile layout, regression testing, and deployed verification remain open.
+- [ ] **Step G — Gamification, challenges, leaderboards, analytics:** rank/streak/badge/wallet client integrations exist, but backend readiness is unverified. Camp Challenge, dedicated Leaderboards, monthly settlement, and Author Analytics are not implemented in the current source tree.
+
+**Current status: Mixed implementation. Steps A, D, and E have meaningful source implementations; B is partial; C and the remaining integration/QA work are open.**
 
 ### 13.8 Open decisions for these additions
 25. Which celebration days and event timezone(s) should be enabled first?
