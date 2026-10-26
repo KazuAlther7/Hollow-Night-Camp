@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#17251d">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/image/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/image/favicon-192.png">
+  <link rel="shortcut icon" href="assets/image/favicon.ico">
+  <link rel="apple-touch-icon" href="assets/image/apple-touch-icon.png">
+  <title>Sound & Music — Hollow Night Camp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Special+Elite&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/loader.css?v=2">
+  <script src="js/loader.js?v=2"></script>
+  <link rel="stylesheet" href="css/base.css?v=4">
+  <link rel="stylesheet" href="css/mainbar.css?v=13">
+  <link rel="stylesheet" href="css/ui.css?v=4">
+  <link rel="stylesheet" href="css/history.css?v=1">
+  <link rel="stylesheet" href="css/ambience.css?v=1">
+</head>
+
+<body class="camp-body" data-page="settings">
+
+  <main class="camp-app">
+    <section class="camp-page camp-placeholder-page" id="sound">
+      <span class="settings-kicker">SOUND &amp; MUSIC</span>
+      <h2 class="settings-h2">Ambience Mixer</h2>
+      <p>Blend the sounds of camp. Your mix is saved on this device.</p>
+
+      <div class="mixer" id="mixer">
+        <div class="mixer-bar">
+          <button class="mixer-btn primary" id="mixPlay" type="button">Start ambience</button>
+          <button class="mixer-btn" id="mixMute" type="button" aria-pressed="false">Mute all</button>
+          <label class="mixer-master"><span>Master</span><input type="range" id="mixMaster" min="0" max="100" step="1" aria-label="Master volume"><output id="mixMasterOut">70</output></label>
+        </div>
+
+        <div>
+          <p class="mixer-label">PRESETS</p>
+          <div class="mixer-presets" id="mixPresets" role="group" aria-label="Presets"></div>
+        </div>
+
+        <div>
+          <p class="mixer-label">CHANNELS</p>
+          <div class="mixer-channels" id="mixChannels"></div>
+        </div>
+        <p class="mixer-note" id="mixNote" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { initPage } from './js/shared.js?v=31';
+    import { CHANNELS, PRESETS, loadPrefs, savePrefs, setPrefs, start, stop, isPlaying } from './js/ambience.js?v=1';
+
+    await initPage({ active: 'settings' });
+
+    const prefs = loadPrefs();
+    const $ = (id) => document.getElementById(id);
+    const note = $('mixNote');
+
+    // build UI
+    $('mixPresets').innerHTML = PRESETS.map((p) => `<button class="mixer-chip" type="button" data-preset="${p.id}" aria-pressed="false">${p.label}</button>`).join('');
+    $('mixChannels').innerHTML = CHANNELS.map((c) => `
+      <div class="mixer-channel" data-ch="${c.id}">
+        <header><strong>${c.label}</strong><output>0</output></header>
+        <small>${c.hint}</small>
+        <input type="range" min="0" max="100" step="1" aria-label="${c.label} volume">
+      </div>`).join('');
+
+    const commit = () => { savePrefs(prefs); setPrefs(prefs); };
+
+    function paint() {
+      $('mixMaster').value = prefs.master; $('mixMasterOut').textContent = prefs.master;
+      $('mixMute').setAttribute('aria-pressed', String(prefs.muted));
+      $('mixMute').textContent = prefs.muted ? 'Unmute all' : 'Mute all';
+      $('mixer').classList.toggle('muted', prefs.muted);
+      document.querySelectorAll('[data-preset]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.preset === prefs.preset)));
+      document.querySelectorAll('.mixer-channel').forEach((el) => {
+        const v = prefs.channels[el.dataset.ch];
+        el.querySelector('input').value = v; el.querySelector('output').textContent = v;
+        el.classList.toggle('off', v === 0);
+      });
+      $('mixPlay').textContent = isPlaying() ? 'Stop ambience' : 'Start ambience';
+    }
+
+    $('mixMaster').addEventListener('input', (e) => { prefs.master = +e.target.value; commit(); paint(); });
+    $('mixMute').addEventListener('click', () => { prefs.muted = !prefs.muted; commit(); paint(); });
+    $('mixPresets').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-preset]'); if (!b) return;
+      const p = PRESETS.find((x) => x.id === b.dataset.preset);
+      prefs.preset = p.id; prefs.channels = { ...p.mix }; commit(); paint();
+    });
+    $('mixChannels').addEventListener('input', (e) => {
+      const el = e.target.closest('.mixer-channel'); if (!el) return;
+      prefs.channels[el.dataset.ch] = +e.target.value; prefs.preset = 'custom'; commit(); paint();
+    });
+    $('mixPlay').addEventListener('click', async () => {
+      if (isPlaying()) { stop(); note.textContent = ''; }
+      else {
+        const ok = await start(prefs);
+        note.textContent = ok ? 'Ambience plays on this page only. Leaving the page stops it.' : 'This browser cannot play Web Audio.';
+        if (ok && prefs.muted) note.textContent = 'Ambience is muted. Press Unmute all to hear it.';
+      }
+      paint();
+    });
+    paint();
+  </script>
+</body>
+</html>
