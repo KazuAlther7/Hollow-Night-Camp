@@ -139,6 +139,16 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
   const shrinkButton = document.getElementById('barShrinkButton');
   const dotsButton = document.getElementById('barDotsButton');
   const profileButton = document.getElementById('profileMenuButton');
+  // Frame skin on the Main Bar avatar (js/frames.js); null / missing SQL just leaves the plain avatar.
+  const paintBarFrame = async (frame) => {
+    profileButton.querySelector('.bar-frame')?.remove();
+    profileButton.classList.toggle('has-frame', !!frame);
+    if (!frame) return;
+    const { frameEl } = await import('./frames.js?v=2');
+    profileButton.append(frameEl(frame, 'bar-frame'));
+  };
+  import('./frames.js?v=2').then((module) => module.getEquippedFrame()).then(paintBarFrame).catch(() => {});
+  document.addEventListener('camp:frame', (event) => paintBarFrame(event.detail));
   const profileMenu = document.getElementById('barProfileMenu');
 
   // Left group (Campfire, Novels, ... Shop) scrolls on its own inside the bar; the right group (Author Studio, settings, bell, avatar) stays put.
@@ -246,14 +256,15 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
   profileButton.addEventListener('click', async () => {
     // Reading Streak (js/streak.js) and Camp Rank (js/rank.js): each is null when unavailable, so the card just hides that part
     const soon = (promise) => Promise.race([promise, new Promise((resolve) => setTimeout(() => resolve(null), 1500))]).catch(() => null);
-    const [streak, rank, badges] = await Promise.all([
+    const [streak, rank, badges, frame] = await Promise.all([
       import('./streak.js?v=3').then((module) => soon(module.getReadingStreak())).catch(() => null),
       import('./rank.js?v=1').then((module) => soon(module.getCampRank())).catch(() => null),
       // Badges (js/badges.js): sync awards first, then read; null when sql/badges.sql has not been run
-      import('./badges.js?v=1').then((module) => soon(module.loadBadges())).catch(() => null)
+      import('./badges.js?v=1').then((module) => soon(module.loadBadges())).catch(() => null),
+      import('./frames.js?v=2').then((module) => soon(module.getEquippedFrame())).catch(() => null)
     ]);
-    import('./profile-card.js?v=12')
-      .then((module) => module.openProfileCard({ profile, user, isAuthor, streak, rank, badges, opener: profileButton, onSignOut: () => signOut() }))
+    import('./profile-card.js?v=14')
+      .then((module) => module.openProfileCard({ profile, user, isAuthor, streak, rank, badges, frame, opener: profileButton, onSignOut: () => signOut() }))
       .catch((error) => {
         console.warn('Camp Profile card unavailable, using the menu:', error);
         const open = profileMenu.hidden;

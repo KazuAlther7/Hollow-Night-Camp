@@ -12,7 +12,7 @@ let cssReady = null;
 function ensureStyles() {
   if (cssReady) return cssReady;
   cssReady = new Promise((resolve) => {
-    const link = el('link', { rel: 'stylesheet', href: 'css/profile-card.css?v=14' });
+    const link = el('link', { rel: 'stylesheet', href: 'css/profile-card.css?v=15' });
     link.addEventListener('load', resolve); link.addEventListener('error', resolve);
     document.head.append(link);
   });
@@ -25,7 +25,7 @@ export const NIGHT_OWL_MIN_STREAK = 3;
 
 // streak: current reading streak in days (number), or null while the streak system is not connected (row and owl stay hidden).
 // badges: { owned, slots } from js/badges.js, or null while the badge system is not connected (slots stay disabled).
-export async function openProfileCard({ profile, user, isAuthor, streak = null, rank = null, badges = null, opener, onSignOut }) {
+export async function openProfileCard({ profile, user, isAuthor, streak = null, rank = null, badges = null, frame = null, opener, onSignOut }) {
   if (document.querySelector('dialog.pc-dialog')) return;
   await ensureStyles();
 
@@ -100,8 +100,8 @@ export async function openProfileCard({ profile, user, isAuthor, streak = null, 
       say('Badges are not available right now.');
       return;
     }
-    const { openBackpack } = await import('./backpack.js?v=3');
-    openBackpack({ badges: mine.owned, slots: mine.slots, slot: i, onUse: useBadge, onUnequip: unequipBadge, opener: from });
+    const { openBackpack } = await import('./backpack.js?v=4');
+    openBackpack({ frameKey: me.frame?.key || null, onFrame: useFrame, badges: mine.owned, slots: mine.slots, slot: i, onUse: useBadge, onUnequip: unequipBadge, opener: from });
   }
   async function unequipBadge(item, at) {
     const { setBadgeSlot } = await import('./badges.js?v=1');
@@ -123,7 +123,7 @@ export async function openProfileCard({ profile, user, isAuthor, streak = null, 
   }
 
   // ---- inline editing: nickname pencil and Change (avatar) save right here, no trip to the settings page ----
-  const me = { nickname: profile?.nickname || '', bio: profile?.bio || '', avatar_url: profile?.avatar_url || null };
+  const me = { nickname: profile?.nickname || '', bio: profile?.bio || '', avatar_url: profile?.avatar_url || null, frame };
   const MAX_AVATAR = 1.5 * 1024 * 1024;
   const msg = el('div', { class: 'pc-i pc-msg', role: 'status', 'aria-live': 'polite' });
   let msgTimer = null;
@@ -139,6 +139,21 @@ export async function openProfileCard({ profile, user, isAuthor, streak = null, 
   const ring = el('div', { class: 'pc-i pc-ring' });
   const paintRing = () => ring.replaceChildren(me.avatar_url ? el('img', { src: me.avatar_url, alt: '', draggable: 'false' }) : el('span', { text: (me.nickname.trim().charAt(0) || '?').toUpperCase() }));
   paintRing();
+  // frame skin: drawn over the avatar ring (art is normalised so the hole is the same size in every frame; see css .pc-frame)
+  const frameHost = el('div', { class: 'pc-i pc-frame', hidden: '' });
+  const paintFrame = async () => {
+    const f = me.frame; frameHost.hidden = !f; frameHost.replaceChildren(); ring.classList.toggle('has-frame', !!f);
+    if (f) { const { frameEl } = await import('./frames.js?v=2'); frameHost.append(frameEl(f)); }
+  };
+  paintFrame();
+  async function useFrame(item) { // item = collectible, or null to take the frame off; returns an error message or null
+    const { setProfileFrame, frameRarity } = await import('./frames.js?v=2');
+    const bad = await setProfileFrame(item ? item.key : null);
+    if (bad) return bad;
+    me.frame = item ? { key: item.key, title: item.title, asset_path: item.asset_path, rarity: frameRarity(item.description) } : null; paintFrame();
+    document.dispatchEvent(new CustomEvent('camp:frame', { detail: me.frame }));   // the Main Bar avatar listens
+    return null;
+  }
   const fileInput = el('input', { type: 'file', accept: 'image/png,image/jpeg,image/webp,image/gif', hidden: '', tabindex: '-1' });
   fileInput.addEventListener('change', () => {
     const file = fileInput.files?.[0]; fileInput.value = '';
@@ -225,6 +240,7 @@ export async function openProfileCard({ profile, user, isAuthor, streak = null, 
     nightOwl && hasStreak && el('div', { class: 'pc-i pc-owlstreak', title: 'Reading streak', text: 'DAY ' + streak }),
 
     ring,
+    frameHost,
     plank('pc-btn-chg', 'btn-orange', 'Change', { title: 'Change profile picture', onclick: () => fileInput.click() }),
     fileInput,
     msg,
@@ -247,7 +263,7 @@ export async function openProfileCard({ profile, user, isAuthor, streak = null, 
 
     // action planks (inside the left page on Profile, under the book on Statistik)
     plank('pc-btn-1', 'btn-orange', 'Full Profile', { href: FULL_PROFILE }),
-    plank('pc-btn-3', 'btn-teal', 'Backpack', { title: 'Open your backpack', onclick: async (e) => { const opener = e.currentTarget; const { openBackpack } = await import('./backpack.js?v=3'); openBackpack({ badges: mine.owned, slots: mine.slots, onUse: useBadge, onUnequip: unequipBadge, opener }); } }),
+    plank('pc-btn-3', 'btn-teal', 'Backpack', { title: 'Open your backpack', onclick: async (e) => { const opener = e.currentTarget; const { openBackpack } = await import('./backpack.js?v=4'); openBackpack({ frameKey: me.frame?.key || null, onFrame: useFrame, badges: mine.owned, slots: mine.slots, onUse: useBadge, onUnequip: unequipBadge, opener }); } }),
     plank('pc-btn-4', 'btn-red', 'Sign Out', { id: 'pcSignOut' })
   );
 

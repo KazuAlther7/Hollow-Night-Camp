@@ -6,12 +6,12 @@ import { el } from './dom.js?v=2';
 const A = 'assets/backpack/';
 const PER_PAGE = 16;
 const TABS = [
-  { id: 'outfit', label: 'Outfit', sprite: 'tab-outfit', empty: 'No outfits yet.' },
+  { id: 'outfit', label: 'Outfit', sprite: 'tab-outfit', empty: 'No frame skins yet. Visit the Shop.' },
   { id: 'badges', label: 'Badges', sprite: 'tab-badges', empty: 'No badges yet. Keep reading around the campfire.' },
   { id: 'toys', label: 'Toys', sprite: 'tab-toys', empty: 'No toys yet.' },
   { id: 'all', label: 'All', sprite: 'tab-all', empty: 'Your backpack is empty.' }
 ];
-const CATEGORY_LABEL = { outfit: 'Outfit', badges: 'Badge', toys: 'Toy' };
+const CATEGORY_LABEL = { outfit: 'Frame Skin', badges: 'Badge', toys: 'Toy' };
 
 let cssReady = null;
 function ensureStyles() {
@@ -78,7 +78,7 @@ const sfx = {
 
 // badges: owned badge list; slots: the 3 pinned badges; slot: slot that opened it (or null);
 // onUse(item, slot) -> null on success or an error message. Collectibles are loaded here.
-export async function openBackpack({ badges = [], slots: slots0 = [null, null, null], slot = null, onUse = null, onUnequip = null, opener = null } = {}) {
+export async function openBackpack({ badges = [], slots: slots0 = [null, null, null], slot = null, onUse = null, onUnequip = null, frameKey = null, onFrame = null, opener = null } = {}) {
   let slots = [...slots0];
   sfx.open();
   await ensureStyles();
@@ -107,7 +107,15 @@ export async function openBackpack({ badges = [], slots: slots0 = [null, null, n
   // Use button under the name plank, only for useable items (badges). Pins the badge to the slot that opened the Backpack.
   const useLabel = el('span', { text: 'USE' });
   const use = el('button', { class: 'bp-use', type: 'button', hidden: '', onclick: async () => {
-    const it = state.selected; if (!it || !onUse) return;
+    const it = state.selected; if (!it) return;
+    if (it.cat === 'outfit' && onFrame) { // frame skin: wear / take off (stays open so it can be swapped)
+      use.disabled = true;
+      const wearing = frameKey === it.key;
+      const bad = await onFrame(wearing ? null : it);
+      if (bad) { use.disabled = false; pvInfo.replaceChildren(el('p', { class: 'bp-pv-err', text: bad })); return; }
+      frameKey = wearing ? null : it.key; wearing ? sfx.tab() : sfx.use(); paintUse(); return;
+    }
+    if (!onUse) return;
     use.disabled = true;
     const at = slot !== null ? (slots[slot]?.key === it.key ? slot : -1) : slots.findIndex((x) => x?.key === it.key);
     if (at >= 0) { // equipped -> take it off, stay open so it can be put on again
@@ -121,9 +129,10 @@ export async function openBackpack({ badges = [], slots: slots0 = [null, null, n
   } }, sprite('plank-nailed', 'bp-bg'), useLabel);
   function paintUse() {
     const it = state.selected;
-    use.hidden = !(it && it.useable && onUse);
+    const isFrame = !!(it && it.cat === 'outfit' && onFrame);
+    use.hidden = !(isFrame || (it && it.useable && onUse));
     if (use.hidden) return;
-    const equipped = slot !== null ? slots[slot]?.key === it.key : slots.some((b) => b?.key === it.key);
+    const equipped = isFrame ? frameKey === it.key : slot !== null ? slots[slot]?.key === it.key : slots.some((b) => b?.key === it.key);
     useLabel.textContent = equipped ? 'UNEQUIP' : 'USE'; use.disabled = false;
   }
   function paintPreview() {
