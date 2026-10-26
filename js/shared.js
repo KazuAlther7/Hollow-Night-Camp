@@ -24,6 +24,7 @@ const NAV = [
   { id: 'novels',   href: 'novels.html',   icon: 'novels', label: t('Novels') },
   { id: 'theories', href: 'theories.html', icon: 'theories', label: t('Theories') },
   { id: 'arcade',   href: 'arcade.html',   icon: 'arcade', label: t('Arcade') },
+  { id: 'shop',     href: 'shop.html',     icon: 'shop', label: t('Shop') },
   { id: 'settings', href: 'settings-profile.html', icon: 'settings', label: t('Settings') }
 ];
 
@@ -106,7 +107,7 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
         <img class="bar-logo" src="assets/image/hollow-night-logo.png" alt="Hollow Night">
       </a>
       <div class="bar-scroll" id="barScroll">
-      <div class="bar-primary-links" id="barPrimaryLinks">${navLinks(active, NAV.filter((page) => page.id !== 'settings'))}</div>
+      <div class="bar-links-scroll" id="barLinksScroll"><div class="bar-primary-links" id="barPrimaryLinks">${navLinks(active, NAV.filter((page) => page.id !== 'settings'))}</div></div>
       <div class="bar-utility-links">
         ${authorEntry(isAuthor)}
         <button class="bar-icon-button bar-util-link settings-trigger${active === 'settings' ? ' active' : ''}" id="settingsMenuButton" type="button" aria-label="Settings" title="Settings" aria-haspopup="true" aria-expanded="false" aria-controls="settingsMenu">
@@ -140,14 +141,30 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
   const profileButton = document.getElementById('profileMenuButton');
   const profileMenu = document.getElementById('barProfileMenu');
 
-  // mobile: menu items scroll inside .bar-scroll, bar itself stays fixed; bring the active item into view
-  const activeItem = bar.querySelector('.bar-scroll .active');
-  if (activeItem) {
+  // Left group (Campfire, Novels, ... Shop) scrolls on its own inside the bar; the right group (Author Studio, settings, bell, avatar) stays put.
+  const linksScroll = document.getElementById('barLinksScroll');
+  if (linksScroll) {
+    const fade = () => {
+      const max = linksScroll.scrollWidth - linksScroll.clientWidth;
+      linksScroll.classList.toggle('fade-l', linksScroll.scrollLeft > 4);
+      linksScroll.classList.toggle('fade-r', max > 4 && linksScroll.scrollLeft < max - 4);
+    };
+    linksScroll.addEventListener('scroll', fade, { passive: true });
+    addEventListener('resize', fade);
+    // mouse wheel scrolls the menu sideways while it can still move in that direction
+    linksScroll.addEventListener('wheel', (e) => {
+      const max = linksScroll.scrollWidth - linksScroll.clientWidth;
+      if (max <= 4 || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+      if ((e.deltaY > 0 && linksScroll.scrollLeft >= max - 1) || (e.deltaY < 0 && linksScroll.scrollLeft <= 0)) return;
+      linksScroll.scrollLeft += e.deltaY; e.preventDefault();
+    }, { passive: false });
+    // bring the active page into view
+    const activeItem = linksScroll.querySelector('.active');
     requestAnimationFrame(() => {
-      const scroller = document.getElementById('barScroll');
-      if (scroller && scroller.scrollWidth > scroller.clientWidth) {
-        scroller.scrollLeft = activeItem.offsetLeft - (scroller.clientWidth - activeItem.offsetWidth) / 2;
+      if (activeItem && linksScroll.scrollWidth > linksScroll.clientWidth) {
+        linksScroll.scrollLeft = activeItem.offsetLeft - (linksScroll.clientWidth - activeItem.offsetWidth) / 2;
       }
+      fade();
     });
   }
 
