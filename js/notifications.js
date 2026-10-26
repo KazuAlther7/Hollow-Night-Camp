@@ -4,7 +4,7 @@
 
 import { supabase } from '../config/supabase.js';
 import { el } from './dom.js?v=2';
-import { t, getLanguage } from './preferences.js?v=3';
+import { t, getLanguage } from './preferences.js?v=4';
 
 const LIMIT = 30;
 const RING_MS = 650;

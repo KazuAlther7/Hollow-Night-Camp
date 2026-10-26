@@ -1,7 +1,7 @@
 // HOLLOW NIGHT CAMP — shared by every page after login:
 // session guard, role check, Main Bar / ⋮ menu rendering, sign out.
 
-import { initPreferences, t } from './preferences.js?v=3';
+import { initPreferences, t } from './preferences.js?v=4';
 
 import {
   getCurrentSession,
@@ -291,12 +291,13 @@ function mountMainBar({ active, isAuthor, onAuthorToggle, profile, user }) {
 const SETTINGS_MENU = [
   { href: 'settings-profile.html', label: t('Profile'), icon: 'profile' },
   { href: 'settings-display.html', label: t('Display'), icon: 'display' },
+  { href: 'settings-sound.html', label: t('Sound & Music'), icon: 'volume' },
   { href: 'settings-preferences.html', label: t('Preferences'), icon: 'notification' },
   { href: 'settings-history.html', label: t('History & Bookmarks'), icon: 'bookmark' },
   { href: 'settings-clock.html',   label: t('Clock & timezone'), icon: 'clock' },
   { href: 'settings-community.html', label: t('Community'), icon: 'campfire' },
-  { href: 'settings-information.html', label: t('Information'), icon: 'chapters' },
-  { href: 'settings-support.html', label: t('Support'), icon: 'theories' }
+  { href: 'settings-information.html', label: t('Information'), icon: 'information' },
+  { href: 'settings-support.html', label: t('Support'), icon: 'help' }
 ];
 
 function mountSettingsMenu() {
@@ -305,7 +306,7 @@ function mountSettingsMenu() {
 
   const css = document.createElement('link');
   css.rel = 'stylesheet';
-  css.href = new URL('../css/settings-menu.css?v=5', import.meta.url).href;
+  css.href = new URL('../css/settings-menu.css?v=6', import.meta.url).href;
   document.head.append(css);
 
   // lives on <body>: the Main Bar's blur / scroll container would clip or re-anchor a fixed child
