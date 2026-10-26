@@ -172,6 +172,7 @@ body.editor-mode .camp-app { padding-top: 84px; }
 .icon-novels         { --mask: url("../assets/icons/novels.png"); }
 .icon-theories       { --mask: url("../assets/icons/theories.png"); }
 .icon-arcade         { --mask: url("../assets/icons/arcade.png"); }
+.icon-shop           { --mask: url("../assets/icons/shop.png"); }
 .icon-settings       { --mask: url("../assets/icons/settings.png"); }
 .icon-author-studio  { --mask: url("../assets/icons/author-studio.png"); }
 .icon-notification   { --mask: url("../assets/icons/notification.png"); }
@@ -459,3 +460,38 @@ body.bar-sidebar .notification-dot { top: 50%; right: 14px; margin-top: -4px; }
 :root[data-theme-resolved="light"] .bar-brand {
   border-color: rgba(39, 53, 42, .18);
 }
+
+
+/* =====================================
+   TOP BAR: the left menu (Campfire ... Shop) scrolls by itself; the right group (Author Studio, settings, bell, avatar) stays fixed
+===================================== */
+.bar-links-scroll { display: contents; }   /* sidebar mode keeps its vertical list */
+body:not(.bar-sidebar) .bar-links-scroll {
+  display: block;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: min(430px, 100%);
+  padding: 2px 4px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+  touch-action: pan-x;
+  -webkit-overflow-scrolling: touch;
+  --fl: 0px; --fr: 0px;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 var(--fl), #000 calc(100% - var(--fr)), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 var(--fl), #000 calc(100% - var(--fr)), transparent 100%);
+}
+body:not(.bar-sidebar) .bar-links-scroll::-webkit-scrollbar { display: none; }
+body:not(.bar-sidebar) .bar-links-scroll.fade-l { --fl: 22px; }
+body:not(.bar-sidebar) .bar-links-scroll.fade-r { --fr: 22px; }
+body:not(.bar-sidebar) .bar-links-scroll .bar-primary-links { width: max-content; flex-wrap: nowrap; }
+body:not(.bar-sidebar) .bar-links-scroll .camp-nav-item { flex-shrink: 0; }
+@media (max-width: 700px) {
+  /* mobile: only the left group scrolls (the old rule made the whole bar scroll) */
+  body:not(.bar-sidebar) .bar-scroll { display: contents; overflow: visible; padding: 0; -webkit-mask-image: none; mask-image: none; }
+  body:not(.bar-sidebar) .bar-links-scroll { flex: 1 1 auto; max-width: none; }
+  body:not(.bar-sidebar) .bar-utility-links { margin-left: 6px; padding-left: 8px; }
+}
+@media (prefers-reduced-motion: reduce) { .bar-links-scroll { scroll-behavior: auto !important; } }
