@@ -1,13 +1,13 @@
 /* HOLLOW NIGHT CAMP — Shop. Layout is positioned on the 2400x1792 reference canvas (percent of board). */
 body[data-page="shop"] { background: #1a0f08 url("../assets/shop/shop-bg.jpg") center / cover fixed no-repeat; }
 body[data-page="shop"]::before { content:""; position:fixed; inset:0; z-index:0; pointer-events:none; background: radial-gradient(ellipse at 50% 55%, rgba(20,10,4,.12), rgba(10,5,2,.62) 100%); }
-body[data-page="shop"] .camp-app { position:relative; z-index:1; width:min(1240px,96%); padding-top:150px; padding-bottom:24px; }
-.shop-page { overflow-x:auto; overflow-y:visible; padding-top:34px; }
+body[data-page="shop"] .camp-app { position:relative; z-index:1; width:min(1500px,98%); padding-top:92px; padding-bottom:8px; }
+.shop-page { overflow-x:auto; overflow-y:visible; padding-top:0; }
 
 .shop-board {
   --ink:#4a2a14; --ui:url("../assets/shop/ui/");
   position:relative; container-type:inline-size; aspect-ratio:2400/1792; min-width:640px;
-  width:min(100%, calc((100dvh - 170px) * 2400 / 1792)); margin:0 auto;
+  width:min(100%, max(1000px, calc((100dvh - 70px) * 2400 / 1792))); margin:0 auto;
   background:url("../assets/shop/ui/frame.webp") center / 100% 100% no-repeat;
   filter:drop-shadow(0 22px 34px rgba(0,0,0,.55)); animation:revealUp .5s var(--ease) both;
   font-family:var(--heading); color:var(--ink);
@@ -20,10 +20,13 @@ body[data-page="shop"] .camp-app { position:relative; z-index:1; width:min(1240p
 .shop-sign span { font:700 5.000cqw/1 var(--heading); letter-spacing:.06em; color:#ffb62e; -webkit-text-stroke:0.292cqw #5a2a0c; paint-order:stroke fill; text-shadow:0 0.250cqw 0 #7a3b12; transform:translateY(-4%); }
 
 /* balance pills */
-.shop-pill { left:17.417%;top:15.737%;width:14.750%;height:6.027%; display:flex; align-items:center; justify-content:center; gap:1.000cqw; background:url("../assets/shop/ui/paper-strip.webp") center / 100% 100% no-repeat; }
-.shop-pill-r { left:69.000%;top:15.737%;width:14.542%;height:6.027%; }
+.shop-pill { left:16.458%;top:15.737%;width:19.792%;height:6.027%; display:flex; align-items:center; justify-content:center; gap:1.000cqw; background:url("../assets/shop/ui/paper-strip.webp") center / 100% 100% no-repeat; }
+.shop-pill-r { left:63.750%;top:15.737%;width:19.792%;height:6.027%; }
+.shop-pill { overflow:hidden; padding:0 4%; box-sizing:border-box; }
+.shop-pill b { white-space:nowrap; }
+.shop-pill .ico { width:3.250cqw; height:3.250cqw; flex:none; background:#8a5226; -webkit-mask:url("../assets/icons/shop.png") center / contain no-repeat; mask:url("../assets/icons/shop.png") center / contain no-repeat; filter:drop-shadow(0 1px 0 rgba(255,235,190,.6)); }
 .shop-pill img { width:3.250cqw; height:3.250cqw; object-fit:contain; }
-.shop-pill b { font:700 2.750cqw/1 var(--heading); min-width:3ch; text-align:left; }
+.shop-pill b { font:700 2.750cqw/1 var(--heading); text-align:left; }
 
 .shop-close { left:92.000%;top:4.018%;width:6.042%;height:7.812%; padding:0; border:0; cursor:pointer; background:url("../assets/shop/ui/close.webp") center / 100% 100% no-repeat; transition:transform .12s ease, filter .12s ease; }
 .shop-close:hover { transform:scale(1.07) rotate(-3deg); filter:brightness(1.1); } .shop-close:active { transform:scale(.94); }
@@ -97,3 +100,8 @@ body[data-page="shop"] .camp-app { position:relative; z-index:1; width:min(1240p
 
 .shop-info-cat:empty { display:none; }
 .shop-price { font-size:2.250cqw; }
+
+/* scrolling: soft fade at both edges + row snapping instead of a hard cut */
+.shop-items > .shop-grid { -webkit-mask-image:linear-gradient(to bottom, transparent 0, #000 6%, #000 92%, transparent 100%); mask-image:linear-gradient(to bottom, transparent 0, #000 6%, #000 92%, transparent 100%);
+  padding-top:1.250cqw; padding-bottom:2.917cqw; box-sizing:border-box; scroll-snap-type:y proximity; scroll-padding-top:1.250cqw; overscroll-behavior:contain; }
+.shop-card:nth-child(3n+1) { scroll-snap-align:start; }
