@@ -51,8 +51,8 @@
   </main>
 
   <script type="module">
-    import { initPage } from './js/shared.js?v=31';
-    import { CHANNELS, PRESETS, loadPrefs, savePrefs, setPrefs, start, stop, isPlaying } from './js/ambience.js?v=1';
+    import { initPage } from './js/shared.js?v=32';
+    import { CHANNELS, PRESETS, loadPrefs, savePrefs, setPrefs, start, stop, isPlaying } from './js/ambience.js?v=2';
 
     await initPage({ active: 'settings' });
 
@@ -97,14 +97,15 @@
       prefs.channels[el.dataset.ch] = +e.target.value; prefs.preset = 'custom'; commit(); paint();
     });
     $('mixPlay').addEventListener('click', async () => {
-      if (isPlaying()) { stop(); note.textContent = ''; }
+      if (isPlaying()) { stop(prefs); note.textContent = ''; }
       else {
         const ok = await start(prefs);
-        note.textContent = ok ? 'Ambience plays on this page only. Leaving the page stops it.' : 'This browser cannot play Web Audio.';
+        note.textContent = ok ? 'Ambience keeps playing on every page until you stop it.' : 'This browser cannot play Web Audio.';
         if (ok && prefs.muted) note.textContent = 'Ambience is muted. Press Unmute all to hear it.';
       }
       paint();
     });
+    window.addEventListener('ambience:state', paint);
     paint();
   </script>
 </body>
