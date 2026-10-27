@@ -636,7 +636,7 @@ The Arcade page should contain playable games rather than a "Coming soon" placeh
 - Bug / error report
 - Feature suggestion
 - FAQ / Help Center
-- Contact email: `juliandoniel07@gmail.com`
+- Contact email: `hollownightcamp.support@gmail.com`
 - Clear subject and message workflow.
 - If opens email client, label that clearly.
 
