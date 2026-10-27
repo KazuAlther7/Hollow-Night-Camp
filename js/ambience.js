@@ -1,6 +1,7 @@
 // HOLLOW NIGHT CAMP — Ambience Mixer engine.
-// Sounds are synthesised with the Web Audio API (no audio files needed).
-// Preferences persist in localStorage; playback starts only after a click (browser autoplay rules).
+// Campfire / Thunder / Forest use mp3 layers from assets/sound/ambience/ (looped with crossfade).
+// Rain uses assets/sound/ambience/rain.mp3 if present, otherwise a synthesised fallback.
+// Preferences + play state persist in localStorage; initAmbience() runs on every page (shared.js).
 
 export const CHANNELS = [
   { id: 'campfire', label: 'Campfire',     hint: 'Warm crackle and low embers' },
@@ -17,7 +18,7 @@ export const PRESETS = [
 ];
 
 const KEY = 'hn.ambience.v1';
-const DEFAULTS = { master: 70, muted: false, preset: 'cozy', channels: { ...PRESETS[0].mix } };
+const DEFAULTS = { master: 70, muted: false, playing: false, preset: 'cozy', channels: { ...PRESETS[0].mix } };
 
 const clamp = (n) => Math.max(0, Math.min(100, Math.round(Number(n) || 0)));
 
@@ -28,6 +29,7 @@ export function loadPrefs() {
     if (saved && typeof saved === 'object') {
       prefs.master = clamp(saved.master ?? prefs.master);
       prefs.muted = !!saved.muted;
+      prefs.playing = !!saved.playing;
       prefs.preset = typeof saved.preset === 'string' ? saved.preset : 'custom';
       CHANNELS.forEach(({ id }) => { prefs.channels[id] = clamp(saved.channels?.[id] ?? prefs.channels[id]); });
     }
@@ -40,171 +42,197 @@ export function savePrefs(prefs) {
 }
 
 // ---------- engine ----------
+const BASE = new URL('../assets/sound/ambience/', import.meta.url).href;
+// gain = dB trim so every layer sits at a similar loudness (measured from the files)
+const LAYERS = {
+  campfire: [{ file: 'campfire.mp3', db: 4 }],
+  rain:     [{ file: 'rain.mp3', db: 0, optional: true }],
+  thunder:  [{ file: 'thunder-1.mp3', db: -6 }, { file: 'thunder-2.mp3', db: -3 }],
+  forest:   [{ file: 'forest-wind-owl.mp3', db: 0 }, { file: 'forest-birds-1.mp3', db: 16 }, { file: 'forest-birds-2.mp3', db: 14 }]
+};
+
+const OWNER_KEY = 'hn.ambience.owner';
+const myId = Math.random().toString(36).slice(2);
 let ctx = null, master = null, running = false;
-const chans = {};   // id -> { gain, timers:[], stopFns:[] }
+const chans = {};              // id -> { gain, built, layers:[{srcs,timer,stop}] }
+const bufCache = new Map();    // file -> Promise<AudioBuffer|null>
 let prefsRef = loadPrefs();
-let noiseWhite = null, noiseBrown = null;
+let noiseWhite = null, toastEl = null, gestureBound = false;
 
 const curve = (pct) => Math.pow(pct / 100, 2);
 const rand = (a, b) => a + Math.random() * (b - a);
+const dbToGain = (db) => Math.pow(10, db / 20);
+const emit = () => window.dispatchEvent(new Event('ambience:state'));
 
-function makeNoise(type) {
-  const len = ctx.sampleRate * 3;
-  const buf = ctx.createBuffer(1, len, ctx.sampleRate);
-  const d = buf.getChannelData(0);
-  let last = 0;
-  for (let i = 0; i < len; i++) {
-    const w = Math.random() * 2 - 1;
-    if (type === 'brown') { last = (last + 0.02 * w) / 1.02; d[i] = last * 3.5; } else d[i] = w;
+function loadBuffer(file) {
+  if (!bufCache.has(file)) {
+    bufCache.set(file, fetch(BASE + file)
+      .then((r) => { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
+      .then((ab) => ctx.decodeAudioData(ab))
+      .catch(() => null));
   }
-  return buf;
+  return bufCache.get(file);
 }
 
-function loopSrc(buf) {
-  const s = ctx.createBufferSource();
-  s.buffer = buf; s.loop = true; s.loopStart = 0; s.loopEnd = buf.duration;
-  s.start(0, rand(0, buf.duration - 0.1));
-  return s;
-}
-
-function schedule(id, fn, min, max) {
-  const c = chans[id];
-  const tick = () => {
+// One looping layer: overlapping instances with equal-ish crossfades, scheduled ahead on the audio clock.
+function runLayer(buf, db, out) {
+  const lg = ctx.createGain(); lg.gain.value = dbToGain(db); lg.connect(out);
+  const X = Math.min(2.5, buf.duration / 4);
+  const L = { srcs: [], timer: 0, next: ctx.currentTime + 0.05, off: rand(0, buf.duration * 0.9), lg };
+  const pump = () => {
     if (!running) return;
-    if (prefsRef.channels[id] > 0 && !prefsRef.muted) fn();
-    c.timers.push(setTimeout(tick, rand(min, max) * 1000));
-  };
-  c.timers.push(setTimeout(tick, rand(min, max) * 1000));
-}
-
-function buildCampfire(out) {
-  const rumble = loopSrc(noiseBrown);
-  const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 380;
-  const g = ctx.createGain(); g.gain.value = 0.5;
-  rumble.connect(lp).connect(g).connect(out);
-  chans.campfire.stopFns.push(() => rumble.stop());
-  // crackles: tiny filtered noise bursts at random intervals
-  const crackle = () => {
-    const t = ctx.currentTime, dur = rand(0.012, 0.05);
-    const s = ctx.createBufferSource(); s.buffer = noiseWhite;
-    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = rand(1200, 5200); bp.Q.value = rand(1, 4);
-    const eg = ctx.createGain(); eg.gain.setValueAtTime(rand(0.25, 1), t); eg.gain.exponentialRampToValueAtTime(0.001, t + dur);
-    s.connect(bp).connect(eg).connect(out); s.start(t, rand(0, 2.5), dur + 0.02);
-  };
-  schedule('campfire', () => { crackle(); if (Math.random() < 0.4) setTimeout(crackle, rand(15, 70)); }, 0.05, 0.4);
-}
-
-function buildRain(out) {
-  const s = loopSrc(noiseWhite);
-  const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 700;
-  const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 9000;
-  const g = ctx.createGain(); g.gain.value = 0.38;
-  s.connect(hp).connect(lp).connect(g).connect(out);
-  const s2 = loopSrc(noiseWhite);                       // brighter layer = drops on leaves
-  const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 3200; bp.Q.value = 0.8;
-  const g2 = ctx.createGain(); g2.gain.value = 0.16;
-  s2.connect(bp).connect(g2).connect(out);
-  chans.rain.stopFns.push(() => { s.stop(); s2.stop(); });
-}
-
-function buildThunder(out) {
-  const wind = loopSrc(noiseBrown);                      // low storm bed
-  const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 160;
-  const g = ctx.createGain(); g.gain.value = 0.22;
-  wind.connect(lp).connect(g).connect(out);
-  chans.thunder.stopFns.push(() => wind.stop());
-  const roll = () => {
-    const t = ctx.currentTime, len = rand(3, 6.5);
-    const crack = Math.random() < 0.45;
-    if (crack) {                                         // close strike: sharp crack first
-      const c = ctx.createBufferSource(); c.buffer = noiseWhite;
-      const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 900;
-      const cg = ctx.createGain(); cg.gain.setValueAtTime(0.9, t); cg.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
-      c.connect(hp).connect(cg).connect(out); c.start(t, rand(0, 2), 0.3);
+    while (L.next < ctx.currentTime + 90) {
+      const t = L.next, off = L.off, dur = buf.duration - off;
+      const s = ctx.createBufferSource(); s.buffer = buf;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.linearRampToValueAtTime(1, t + Math.min(X, dur / 2));
+      g.gain.setValueAtTime(1, Math.max(t + Math.min(X, dur / 2), t + dur - X));
+      g.gain.linearRampToValueAtTime(0.0001, t + dur);
+      s.connect(g).connect(lg); s.start(t, off); s.stop(t + dur + 0.05);
+      s.onended = () => { L.srcs = L.srcs.filter((x) => x !== s); };
+      L.srcs.push(s);
+      L.next = t + dur - X; L.off = 0;
     }
-    const r = ctx.createBufferSource(); r.buffer = noiseBrown;
-    const f = ctx.createBiquadFilter(); f.type = 'lowpass';
-    f.frequency.setValueAtTime(rand(260, 420), t + 0.05); f.frequency.exponentialRampToValueAtTime(70, t + len);
-    const rg = ctx.createGain();
-    rg.gain.setValueAtTime(0.0001, t); rg.gain.linearRampToValueAtTime(rand(1.1, 1.8), t + (crack ? 0.18 : 0.9));
-    rg.gain.exponentialRampToValueAtTime(0.001, t + len);
-    r.connect(f).connect(rg).connect(out); r.start(t, rand(0, 2), len + 0.1);
   };
-  schedule('thunder', roll, 5, 15);
+  pump(); L.timer = setInterval(pump, 20000);
+  L.stop = () => { clearInterval(L.timer); L.srcs.forEach((s) => { try { s.stop(); } catch {} }); lg.disconnect(); };
+  return L;
 }
 
-function buildForest(out) {
-  const w = loopSrc(noiseWhite);                         // wind through trees
-  const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 500; bp.Q.value = 0.7;
-  const lfo = ctx.createOscillator(); lfo.frequency.value = 0.11;
-  const depth = ctx.createGain(); depth.gain.value = 260;
-  lfo.connect(depth).connect(bp.frequency);
-  const wg = ctx.createGain(); wg.gain.value = 0.3;
-  w.connect(bp).connect(wg).connect(out); lfo.start();
-  // crickets: 4.4 kHz tone, pulsed fast, grouped slowly
-  const osc = ctx.createOscillator(); osc.type = 'sine'; osc.frequency.value = 4400;
-  const pulse = ctx.createGain(); pulse.gain.value = 0.5;
-  const pl = ctx.createOscillator(); pl.frequency.value = 32;
-  const pd = ctx.createGain(); pd.gain.value = 0.5; pl.connect(pd).connect(pulse.gain);
-  const group = ctx.createGain(); group.gain.value = 0.5;
-  const gl = ctx.createOscillator(); gl.frequency.value = 0.45;
-  const gd = ctx.createGain(); gd.gain.value = 0.5; gl.connect(gd).connect(group.gain);
-  const cg = ctx.createGain(); cg.gain.value = 0.045;
-  osc.connect(pulse).connect(group).connect(cg).connect(out);
-  osc.start(); pl.start(); gl.start();
-  chans.forest.stopFns.push(() => { w.stop(); lfo.stop(); osc.stop(); pl.stop(); gl.stop(); });
-  const hoot = (delay, hz) => {
-    const t = ctx.currentTime + delay;
-    const o = ctx.createOscillator(); o.type = 'sine';
-    o.frequency.setValueAtTime(hz, t); o.frequency.exponentialRampToValueAtTime(hz * 0.88, t + 0.5);
-    const e = ctx.createGain(); e.gain.setValueAtTime(0.0001, t);
-    e.gain.linearRampToValueAtTime(0.28, t + 0.08); e.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
-    o.connect(e).connect(out); o.start(t); o.stop(t + 0.65);
+function rainSynth(out) {   // fallback when rain.mp3 is missing
+  noiseWhite = noiseWhite || (() => {
+    const b = ctx.createBuffer(1, ctx.sampleRate * 3, ctx.sampleRate), d = b.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    return b;
+  })();
+  const nodes = [];
+  const mk = (type, f, q, gv) => {
+    const s = ctx.createBufferSource(); s.buffer = noiseWhite; s.loop = true; s.start(0, rand(0, 2));
+    const a = ctx.createBiquadFilter(); a.type = type; a.frequency.value = f; a.Q.value = q;
+    const g = ctx.createGain(); g.gain.value = gv;
+    s.connect(a); if (type === 'highpass') { const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 9000; a.connect(lp).connect(g); } else a.connect(g);
+    g.connect(out); nodes.push(s);
   };
-  schedule('forest', () => { const hz = rand(360, 440); hoot(0, hz); hoot(0.8, hz * 0.92); }, 14, 32);
+  mk('highpass', 700, 0.7, 0.12); mk('bandpass', 3200, 0.8, 0.05);
+  return { stop: () => nodes.forEach((s) => { try { s.stop(); } catch {} }) };
 }
 
-const BUILDERS = { campfire: buildCampfire, rain: buildRain, thunder: buildThunder, forest: buildForest };
+async function buildChannel(id) {
+  const c = chans[id]; if (!c || c.built) return; c.built = true;
+  for (const def of LAYERS[id]) {
+    const buf = await loadBuffer(def.file);
+    if (!running || !chans[id]) return;          // stopped while loading
+    if (buf) c.layers.push(runLayer(buf, def.db, c.gain));
+    else if (id === 'rain') { c.layers.push(rainSynth(c.gain)); break; }
+  }
+}
 
 function applyGains() {
-  if (!ctx) return;
+  if (!ctx || !running) return;
   const now = ctx.currentTime;
   master.gain.setTargetAtTime(prefsRef.muted ? 0 : curve(prefsRef.master), now, 0.08);
-  CHANNELS.forEach(({ id }) => chans[id]?.gain.gain.setTargetAtTime(curve(prefsRef.channels[id]), now, 0.12));
+  CHANNELS.forEach(({ id }) => {
+    const pct = prefsRef.channels[id];
+    chans[id].gain.gain.setTargetAtTime(curve(pct), now, 0.12);
+    if (pct > 0) buildChannel(id);               // lazy: only fetch/decode channels in use
+  });
+}
+
+// ---- resume-on-gesture (browsers block autoplay after a page load) ----
+function showToast(on) {
+  if (!on) { toastEl?.remove(); toastEl = null; return; }
+  if (toastEl) return;
+  if (!document.getElementById('hn-amb-style')) {
+    const st = document.createElement('style'); st.id = 'hn-amb-style';
+    st.textContent = '.hn-amb-toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:9999;padding:10px 16px;border-radius:999px;background:rgba(10,15,25,.94);border:1px solid rgba(243,231,201,.3);color:#f3e7c9;font:600 13px system-ui,sans-serif;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.4)}';
+    document.head.appendChild(st);
+  }
+  toastEl = document.createElement('div'); toastEl.className = 'hn-amb-toast'; toastEl.setAttribute('role', 'status');
+  toastEl.textContent = 'Ambience ready. Tap anywhere to resume.';
+  document.body.appendChild(toastEl);
+}
+function tryResume() {
+  if (!ctx || !running) return;
+  ctx.resume().catch(() => {});
+}
+function bindGesture() {
+  if (gestureBound) return; gestureBound = true;
+  const go = () => {
+    tryResume();
+    if (ctx?.state === 'running') { showToast(false); ['pointerdown', 'keydown', 'touchstart'].forEach((e) => document.removeEventListener(e, go, true)); gestureBound = false; }
+  };
+  ['pointerdown', 'keydown', 'touchstart'].forEach((e) => document.addEventListener(e, go, true));
+}
+
+function claim() { try { localStorage.setItem(OWNER_KEY, myId); } catch {} }
+
+function startEngine() {
+  if (running) return true;
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC) return false;
+  ctx = ctx || new AC();
+  master = ctx.createGain(); master.gain.value = 0; master.connect(ctx.destination);
+  running = true;
+  CHANNELS.forEach(({ id }) => {
+    const gain = ctx.createGain(); gain.gain.value = 0; gain.connect(master);
+    chans[id] = { gain, built: false, layers: [] };
+  });
+  applyGains();
+  ctx.onstatechange = () => { if (ctx.state === 'running') showToast(false); emit(); };
+  tryResume();
+  setTimeout(() => { if (running && ctx.state !== 'running') { showToast(true); bindGesture(); } }, 400);
+  emit();
+  return true;
+}
+
+function stopLocal() {
+  if (!running) return;
+  running = false;
+  showToast(false);
+  const m = master, ch = { ...chans };
+  m.gain.setTargetAtTime(0, ctx.currentTime, 0.06);
+  Object.keys(chans).forEach((k) => delete chans[k]);
+  setTimeout(() => {
+    Object.values(ch).forEach((c) => c.layers.forEach((l) => { try { l.stop(); } catch {} }));
+    Object.values(ch).forEach((c) => c.gain.disconnect());
+    m.disconnect();
+  }, 300);
+  emit();
 }
 
 // ---------- public API ----------
 export function setPrefs(prefs) { prefsRef = prefs; applyGains(); }
 export function isPlaying() { return running; }
 
+/** Called from a user click (Sound & Music page). Persists play state so every page resumes it. */
 export async function start(prefs) {
-  prefsRef = prefs;
-  if (running) return true;
-  const AC = window.AudioContext || window.webkitAudioContext;
-  if (!AC) return false;
-  ctx = ctx || new AC();
-  if (ctx.state === 'suspended') await ctx.resume();
-  noiseWhite = noiseWhite || makeNoise('white');
-  noiseBrown = noiseBrown || makeNoise('brown');
-  master = ctx.createGain(); master.gain.value = 0; master.connect(ctx.destination);
-  running = true;
-  CHANNELS.forEach(({ id }) => {
-    const gain = ctx.createGain(); gain.gain.value = 0; gain.connect(master);
-    chans[id] = { gain, timers: [], stopFns: [] };
-    BUILDERS[id](gain);
-  });
-  applyGains();
-  return true;
+  prefsRef = prefs; prefs.playing = true; savePrefs(prefs);
+  claim();
+  const ok = startEngine();
+  if (ok) await ctx.resume().catch(() => {});
+  return ok;
+}
+export function stop(prefs) {
+  if (prefs) { prefsRef = prefs; prefs.playing = false; savePrefs(prefs); }
+  stopLocal();
 }
 
-export function stop() {
-  if (!running) return;
-  running = false;
-  const m = master, c = ctx;
-  m.gain.setTargetAtTime(0, c.currentTime, 0.06);
-  setTimeout(() => {
-    Object.values(chans).forEach((ch) => { ch.timers.forEach(clearTimeout); ch.stopFns.forEach((f) => { try { f(); } catch {} }); ch.gain.disconnect(); });
-    Object.keys(chans).forEach((k) => delete chans[k]);
-    m.disconnect();
-  }, 300);
+/** Run once per page (shared.js): resume ambience if it was playing on the previous page. */
+export function initAmbience() {
+  prefsRef = loadPrefs();
+  if (prefsRef.playing) { claim(); startEngine(); }
+  window.addEventListener('storage', (e) => {
+    if (e.key === OWNER_KEY && e.newValue !== myId && running) stopLocal();   // another tab took over: avoid double audio
+    if (e.key === KEY) {
+      prefsRef = loadPrefs();
+      if (!prefsRef.playing && running) stopLocal(); else applyGains();
+      emit();
+    }
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState !== 'visible') return;
+    prefsRef = loadPrefs();
+    if (prefsRef.playing && !running) { claim(); startEngine(); }               // switched back to a camp tab: take over
+  });
 }

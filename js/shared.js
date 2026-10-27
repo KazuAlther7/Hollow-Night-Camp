@@ -2,6 +2,7 @@
 // session guard, role check, Main Bar / ⋮ menu rendering, sign out.
 
 import { initPreferences, t } from './preferences.js?v=4';
+import { initAmbience } from './ambience.js?v=2';
 
 import {
   getCurrentSession,
@@ -416,6 +417,8 @@ export async function initPage(options = {}) {
     requireAuthor = false,
     onAuthorToggle = null
   } = options;
+
+  initAmbience();   // resume campsite ambience on every page
 
   let session = null;
 
