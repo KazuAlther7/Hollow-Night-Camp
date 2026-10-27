@@ -16,7 +16,7 @@
   <script src="js/loader.js?v=2"></script>
   <link rel="stylesheet" href="css/base.css?v=4">
   <link rel="stylesheet" href="css/mainbar.css?v=13">
-  <link rel="stylesheet" href="css/shop.css?v=3">
+  <link rel="stylesheet" href="css/shop.css?v=5">
 </head>
 
 <body class="camp-body" data-page="shop">
@@ -26,7 +26,7 @@
       <div class="shop-board" id="shopBoard">
         <h1 class="shop-sign"><span>SHOP</span></h1>
 
-        <div class="shop-pill shop-pill-l" title="Items owned"><img src="assets/arcade/amber.png" alt=""><b id="ownedCount">0</b></div>
+        <div class="shop-pill shop-pill-l" title="Owned / items for sale"><i class="ico" aria-hidden="true"></i><b id="ownedCount">0/0</b></div>
         <div class="shop-pill shop-pill-r" title="Amber Coin"><img src="assets/arcade/amber-coin.png" alt=""><b id="walletBal">—</b></div>
         <button class="shop-close" id="shopClose" type="button" aria-label="Close shop"></button>
 
@@ -119,7 +119,11 @@
       b.disabled = busy || (balance !== null && balance < i.price);
       t.textContent = 'BUY';
     }
-    function renderHud() { $('ownedCount').textContent = owned.size; $('walletBal').textContent = balance === null ? '—' : formatAmber(balance); }
+    function renderHud() {
+      $('ownedCount').textContent = ITEMS.filter((i) => owned.has(i.key)).length + '/' + ITEMS.length;
+      $('walletBal').textContent = balance === null ? '—' : formatAmber(balance);
+      document.querySelectorAll('.shop-pill').forEach((p) => { const b = p.querySelector('b'); b.style.fontSize = ''; let px = parseFloat(getComputedStyle(b).fontSize); const min = px * 0.5; while (p.scrollWidth > p.clientWidth + 1 && px > min) { px *= 0.93; b.style.fontSize = px + 'px'; } });
+    }
     function syncThumb() {
       const el = $('shopGrid'), tr = $('shopTrack'), th = $('shopThumb');
       const r = el.clientHeight / el.scrollHeight; tr.classList.toggle('is-off', r >= 0.999);
