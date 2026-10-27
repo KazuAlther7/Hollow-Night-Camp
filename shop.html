@@ -16,33 +16,38 @@
   <script src="js/loader.js?v=2"></script>
   <link rel="stylesheet" href="css/base.css?v=4">
   <link rel="stylesheet" href="css/mainbar.css?v=13">
-  <link rel="stylesheet" href="css/shop.css?v=2">
+  <link rel="stylesheet" href="css/shop.css?v=3">
 </head>
 
 <body class="camp-body" data-page="shop">
 
   <main class="camp-app">
     <section class="camp-page shop-page">
-      <div class="shop-board">
-        <h1 class="shop-sign">SHOP</h1>
+      <div class="shop-board" id="shopBoard">
+        <h1 class="shop-sign"><span>SHOP</span></h1>
 
-        <div class="shop-panel shop-items" id="shopItems" tabindex="0" aria-label="Items for sale">
+        <div class="shop-pill shop-pill-l" title="Items owned"><img src="assets/arcade/amber.png" alt=""><b id="ownedCount">0</b></div>
+        <div class="shop-pill shop-pill-r" title="Amber Coin"><img src="assets/arcade/amber-coin.png" alt=""><b id="walletBal">—</b></div>
+        <button class="shop-close" id="shopClose" type="button" aria-label="Close shop"></button>
+
+        <div class="shop-tabs" id="shopTabs" role="tablist" aria-label="Categories"></div>
+
+        <div class="shop-items" id="shopItems" tabindex="0" aria-label="Items for sale">
           <div class="shop-grid" id="shopGrid"></div>
         </div>
+        <div class="shop-track" id="shopTrack" aria-hidden="true"><i id="shopThumb"></i></div>
 
-        <aside class="shop-side">
-          <div class="shop-tabs" id="shopTabs" role="tablist" aria-label="Categories"></div>
-          <div class="shop-panel shop-info" id="shopInfo" aria-live="polite">
-            <div class="shop-info-art"><img id="infoArt" alt=""></div>
-            <h2 class="shop-info-name" id="infoName">Pick an item</h2>
-            <div class="shop-info-body">
-              <span class="shop-info-cat" id="infoCat">—</span>
-              <p class="shop-info-desc" id="infoDesc"></p>
-              <button class="shop-buy" id="buyBtn" type="button" disabled>BUY</button>
-              <p class="shop-msg" id="shopMsg"></p>
-            </div>
+        <div class="shop-info" id="shopInfo" aria-live="polite">
+          <div class="shop-info-art"><img id="infoArt" alt=""></div>
+          <h2 class="shop-info-name" id="infoName">Pick an item</h2>
+          <div class="shop-info-body">
+            <span class="shop-info-cat" id="infoCat">—</span>
+            <p class="shop-info-desc" id="infoDesc"></p>
+            <p class="shop-msg" id="shopMsg"></p>
+            <div class="shop-info-price" id="infoPrice"></div>
           </div>
-        </aside>
+        </div>
+        <button class="shop-buy" id="buyBtn" type="button" disabled><span>BUY</span></button>
       </div>
     </section>
   </main>
@@ -75,7 +80,8 @@
       { key: 'frame-mystic-hollowgrove', cat: 'Outfit', rarity: 'epic', name: 'Mystic Hollowgrove', price: 850, art: 'assets/frames/mystic-hollowgrove.webp', desc: 'A hollow tree ring lit by glowing mushrooms.' },
     ];
     let ITEMS = FALLBACK;
-    const CATS = ['All', 'Outfit', 'Toys', 'Keepsakes'];
+    const CATS = ['All', 'Toys', 'Outfit', 'Keepsakes'];
+    const TAB = { All: 'all', Toys: 'sword', Outfit: 'bag', Keepsakes: 'lantern' };
     const $ = (id) => document.getElementById(id);
     let cat = 'All', sel = null, balance = null, owned = new Set(), busy = false;
 
@@ -83,31 +89,49 @@
     const msg = (t, ok) => { $('shopMsg').textContent = t || ''; $('shopMsg').classList.toggle('is-ok', !!ok); };
 
     function renderTabs() {
-      $('shopTabs').innerHTML = CATS.map((c) => `<button class="shop-tab${c === cat ? ' is-on' : ''}" role="tab" aria-selected="${c === cat}" data-cat="${c}" type="button">${c}</button>`).join('');
+      $('shopTabs').innerHTML = CATS.map((c) => `<button class="shop-tab t-${TAB[c]}${c === cat ? ' is-on' : ''}" role="tab" aria-selected="${c === cat}" aria-label="${c}" title="${c}" data-cat="${c}" type="button">${c === 'All' ? 'ALL' : ''}</button>`).join('');
     }
     function renderGrid() {
       const list = ITEMS.filter((i) => cat === 'All' || i.cat === cat);
       $('shopGrid').innerHTML = list.length ? list.map((i, n) => `
         <button class="shop-card${i.key === sel?.key ? ' is-sel' : ''}${owned.has(i.key) ? ' is-owned' : ''}" style="--n:${n}" data-r="${i.rarity || ''}" data-key="${i.key}" type="button" aria-label="${i.name}">
           <span class="shop-art"><img src="${i.art}" alt="" loading="lazy" draggable="false"></span>
-          <span class="shop-price">${owned.has(i.key) ? '✓ Owned' : price(i.price)}</span>
+          <span class="shop-price">${owned.has(i.key) ? 'BOUGHT' : price(i.price)}</span>
         </button>`).join('') : '<p class="shop-empty">Shelf is empty.</p>';
+    }
+    // shrink text until it fits its box (fonts differ per device)
+    function fit(el, axis) {
+      el.style.fontSize = ''; let px = parseFloat(getComputedStyle(el).fontSize); const min = px * 0.55;
+      const over = () => axis === 'w' ? el.scrollWidth > el.clientWidth + 1 : el.scrollHeight > el.clientHeight + 1;
+      while (over() && px > min) { px *= 0.94; el.style.fontSize = px + 'px'; }
     }
     function renderInfo() {
       const i = sel;
       $('infoArt').src = i ? i.art : ''; $('infoArt').style.visibility = i ? 'visible' : 'hidden';
       $('infoName').textContent = i ? i.name : 'Pick an item';
-      $('infoCat').textContent = i ? (i.cat === 'Outfit' ? 'Frame Skin' : i.cat) + (i.rarity ? ' · ' + i.rarity : '') : '—'; $('infoCat').dataset.r = i?.rarity || '';
+      $('infoCat').textContent = i ? (i.cat === 'Outfit' ? 'Frame Skin' : i.cat) + (i.rarity ? ' · ' + i.rarity : '') : ''; $('infoCat').dataset.r = i?.rarity || '';
       $('infoDesc').textContent = i ? i.desc : 'Tap something on the shelf to see what it does.';
-      const b = $('buyBtn');
-      if (!i) { b.disabled = true; b.textContent = 'BUY'; return; }
-      if (owned.has(i.key)) { b.disabled = true; b.textContent = '✓ OWNED'; return; }
+      $('infoPrice').innerHTML = i ? price(i.price) : '';
+      fit($('infoName'), 'w'); fit($('infoDesc'), 'h');
+      const b = $('buyBtn'), t = b.firstElementChild;
+      if (!i) { b.disabled = true; t.textContent = 'BUY'; return; }
+      if (owned.has(i.key)) { b.disabled = true; t.textContent = 'OWNED'; return; }
       b.disabled = busy || (balance !== null && balance < i.price);
-      b.innerHTML = `BUY <img src="${COIN}" alt="">${formatAmber(i.price)}`;
+      t.textContent = 'BUY';
     }
-    const renderAll = () => { renderTabs(); renderGrid(); renderInfo(); };
+    function renderHud() { $('ownedCount').textContent = owned.size; $('walletBal').textContent = balance === null ? '—' : formatAmber(balance); }
+    function syncThumb() {
+      const el = $('shopGrid'), tr = $('shopTrack'), th = $('shopThumb');
+      const r = el.clientHeight / el.scrollHeight; tr.classList.toggle('is-off', r >= 0.999);
+      th.style.height = Math.max(r * 100, 10) + '%';
+      th.style.top = (el.scrollHeight - el.clientHeight ? el.scrollTop / (el.scrollHeight - el.clientHeight) * (100 - Math.max(r * 100, 10)) : 0) + '%';
+    }
+    $('shopGrid').addEventListener('scroll', syncThumb, { passive: true }); window.addEventListener('resize', syncThumb);
+    $('shopTrack').addEventListener('click', (e) => { const r = $('shopTrack').getBoundingClientRect(), el = $('shopGrid'); el.scrollTo({ top: (e.clientY - r.top) / r.height * el.scrollHeight - el.clientHeight / 2, behavior: 'smooth' }); });
+    $('shopClose').addEventListener('click', () => { if (history.length > 1) history.back(); else location.href = 'home.html'; });
+    const renderAll = () => { renderTabs(); renderGrid(); renderInfo(); renderHud(); requestAnimationFrame(syncThumb); };
 
-    $('shopTabs').addEventListener('click', (e) => { const t = e.target.closest('[data-cat]'); if (!t) return; cat = t.dataset.cat; msg(''); renderTabs(); renderGrid(); $('shopItems').scrollTo({ top: 0, behavior: 'smooth' }); });
+    $('shopTabs').addEventListener('click', (e) => { const t = e.target.closest('[data-cat]'); if (!t) return; cat = t.dataset.cat; msg(''); renderTabs(); renderGrid(); $('shopGrid').scrollTo({ top: 0, behavior: 'smooth' }); });
     $('shopGrid').addEventListener('click', (e) => { const c = e.target.closest('[data-key]'); if (!c) return; sel = ITEMS.find((i) => i.key === c.dataset.key); msg(''); renderGrid(); renderInfo(); });
     const ERR = { insufficient_balance: 'Not enough Amber.', already_owned: 'You already own this.', item_unavailable: 'Item is no longer sold.', not_signed_in: 'Sign in first.' };
     let confirming = null;
@@ -115,7 +139,7 @@
     $('buyBtn').addEventListener('click', async () => {
       if (!sel || busy || owned.has(sel.key)) return;
       if (confirming !== sel.key) {            // 1st click: ask to confirm
-        confirming = sel.key; $('buyBtn').innerHTML = `CONFIRM? <img src="${COIN}" alt="">${formatAmber(sel.price)}`;
+        confirming = sel.key; $('buyBtn').firstElementChild.textContent = 'SURE?';
         msg('Tap again to buy.'); setTimeout(() => { if (confirming === sel?.key && !busy) { resetConfirm(); msg(''); renderInfo(); } }, 4000); return;
       }
       resetConfirm(); busy = true; renderInfo(); msg('');
@@ -132,13 +156,13 @@
     $('shopTabs').addEventListener('click', resetConfirm);
 
     await initPage({ active: 'shop' });
-    renderAll();
+    renderAll(); document.fonts?.ready.then(renderInfo);
     try {
       const { data } = await supabase.from('shop_items').select('key,title,description,category,asset_path,price,sort,rarity').order('sort');
       if (data?.length) { ITEMS = data.map((r) => ({ key: r.key, cat: r.category, name: r.title, price: r.price, art: r.asset_path, desc: r.description, rarity: r.category === 'Outfit' ? r.rarity : '' })); sel = null; renderAll(); }
     } catch (_) {}
     try { const w = await refreshWallet(); if (w) { balance = w.balance; startLive(); } } catch (_) {}
-    document.addEventListener('amber:balance', (e) => { balance = e.detail.balance; renderInfo(); });
+    document.addEventListener('amber:balance', (e) => { balance = e.detail.balance; renderInfo(); renderHud(); });
     try { (await getCollectibles()).forEach((c) => owned.add(c.key));
       const { data: pu } = await supabase.from('shop_purchases').select('item_key'); (pu || []).forEach((r) => owned.add(r.item_key)); } catch (_) {}
     renderAll();
