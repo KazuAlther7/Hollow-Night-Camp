@@ -48,12 +48,14 @@ function createUI() {
       </div>
       <button class="daily-login-open" id="dailyLoginOpen" type="button"><span><img src="${COIN}" alt="" draggable="false"></span><span><strong>Daily Login</strong><small>Claim your 7-day camp rewards</small></span><b class="daily-login-open-arrow" aria-hidden="true"></b></button>
       <p class="amber-currency-note">Days 1–6: 25 Amber · Day 7: 50 Amber.</p>
+      <button class="daily-login-open daily-spin-open" id="dailySpinOpen" type="button" style="margin-top:10px"><span><img src="assets/arcade/d20.png" alt="" draggable="false"></span><span><strong>Daily Spin</strong><small id="dailySpinHint">Spin the camp wheel</small></span><b class="daily-login-open-arrow" aria-hidden="true"></b></button>
       <p class="amber-currency-note amber-timezone-note">Resets at midnight in <b id="amberTimezoneName">—</b> · <a href="settings-clock.html">Clock &amp; timezone</a></p>
     </div>`;
   document.body.append(widget);
   const trigger = widget.querySelector('#amberCurrencyTrigger'); const card = widget.querySelector('#amberCurrencyCard');
   trigger.addEventListener('click', () => { const open = card.hidden; card.hidden = !open; trigger.setAttribute('aria-expanded', String(open)); });
   widget.querySelector('#dailyLoginOpen').addEventListener('click', openDailyLogin);
+  widget.querySelector('#dailySpinOpen').addEventListener('click', () => import('./daily-spin.js?v=1').then((m) => m.openDailySpin()).catch((err) => console.warn('Daily Spin unavailable:', err)));
   widget.querySelector('#amberNewReaderClaim').addEventListener('click', claimNewReader);
   widget.querySelector('#amberAuthorAdd').addEventListener('click', authorAddAmber);
   document.addEventListener('click', e => { if (!widget.contains(e.target)) { card.hidden = true; trigger.setAttribute('aria-expanded', 'false'); } });
@@ -210,6 +212,7 @@ async function boot() {
   new MutationObserver(queuePlace).observe(document.body, { attributes: true, attributeFilter: ['class'] });
   const finder = new MutationObserver(queuePlace); finder.observe(document.body, { childList: true, subtree: true }); setTimeout(() => finder.disconnect(), 10000);
   showAuthorTools();
+  import('./daily-spin.js?v=1').then((m) => m.watchHint()).catch(() => {});
   try { await refreshWallet(); await syncTimezoneFromSettings(); startLive(); } catch (err) { console.warn('Amber wallet unavailable:', err); }
 }
 // this module is also loaded late by shared.js, after DOMContentLoaded has already fired
