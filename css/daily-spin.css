@@ -1,0 +1,57 @@
+/* HOLLOW NIGHT CAMP — Daily Spin (art: assets/daily-spin/). Everything is positioned in % / cqw of the 1792x2400 board art. */
+.ds-overlay{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:12px;background:rgba(8,9,13,.8);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);animation:dailyOverlayIn .22s ease both}
+.ds-board{position:relative;width:min(760px,calc(100vw - 16px),calc((100dvh - 24px) * 1792 / 2400));animation:dailyBoardIn .3s ease both}
+.ds-art{position:relative;width:100%;aspect-ratio:1792/2400;container-type:inline-size;filter:drop-shadow(0 14px 28px rgba(0,0,0,.55));user-select:none;-webkit-user-select:none}
+.ds-art>*{position:absolute}
+.ds-art img{display:block;-webkit-user-drag:none;user-drag:none}
+.ds-bg{inset:0;width:100%;height:100%}
+.ds-title{left:0;right:0;top:8.1%;margin:0;text-align:center;font:700 8.4cqw/1 var(--heading,'Fredoka',sans-serif);letter-spacing:.02em;color:#e3ad68;-webkit-text-stroke:.55cqw #5e3418;paint-order:stroke fill;text-shadow:0 .7cqw 0 #3d200e;pointer-events:none}
+/* wheel: .ds-wheel-pos is only centring, .ds-wheel is what turns */
+.ds-wheel-pos{left:50.67%;top:50%;width:68.3cqw;height:68.3cqw;transform:translate(-50%,-50%)}
+.ds-wheel{position:absolute;inset:0;will-change:transform}
+.ds-wheel>img{width:100%;height:100%}
+.ds-slot{position:absolute;left:50%;top:50%;width:0;height:0;transform:rotate(var(--a)) translateY(-22.8cqw)}
+.ds-item{position:absolute;left:0;top:0;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:.4cqw;width:12cqw}
+.ds-item img{width:7.4cqw;height:7.4cqw;object-fit:contain;filter:drop-shadow(0 .4cqw .3cqw #0008)}
+.ds-item b{padding:.25cqw 1.1cqw;border:max(1.5px,.3cqw) solid #3d1f0f;border-radius:99px;background:#f8dfaa;color:#51251a;font:700 2.8cqw/1.15 var(--heading,'Fredoka',sans-serif);white-space:nowrap}
+.ds-item.is-legend b{background:#c9b3ff;color:#2c1a5a;font-size:2.3cqw}
+.ds-hub{left:50.67%;top:50%;width:17.6%;transform:translate(-50%,-50%);pointer-events:none}
+.ds-pointer{left:50.5%;top:15.3%;width:8.1%;transform:translateX(-50%);transform-origin:50% 12%;pointer-events:none;filter:drop-shadow(0 .6cqw .5cqw #0008)}
+.ds-pointer.is-tick{animation:dsTick .11s ease-out}
+@keyframes dsTick{40%{transform:translateX(-50%) rotate(-10deg)}}
+.ds-spin{left:49.8%;top:91.2%;width:32.2%;transform:translate(-50%,-50%);padding:0;border:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.ds-spin img{width:100%;transition:filter .2s,transform .1s}
+.ds-spin:not(:disabled):hover img{filter:brightness(1.1)}
+.ds-spin:not(:disabled):active img{transform:translateY(.5cqw)}
+.ds-spin:not(:disabled) img{animation:dsReady 1.6s ease-in-out infinite}
+.ds-spin:disabled{cursor:default}.ds-spin:disabled img{filter:grayscale(.75) brightness(.72)}
+.ds-spin:focus-visible{outline:3px solid rgba(255,206,114,.8);outline-offset:4px;border-radius:12px}
+@keyframes dsReady{50%{filter:brightness(1.12) drop-shadow(0 0 1.2cqw #9be25a99)}}
+.ds-paper{left:65%;top:86.5%;width:15.1%;height:9.7%;box-sizing:border-box;display:grid;align-content:center;justify-items:center;gap:.4cqw;padding:.6cqw;text-align:center;color:#5a2f1b;background:linear-gradient(160deg,#f1e2bb,#e2cd9b);border:max(1.5px,.3cqw) solid #7a5632;border-radius:.6cqw;box-shadow:0 .6cqw 1cqw #0006;transform:rotate(-1.5deg);font-family:var(--heading,'Fredoka',sans-serif)}
+.ds-paper::before{content:"";position:absolute;left:50%;top:-1.1cqw;width:1.7cqw;height:1.7cqw;margin-left:-.85cqw;border-radius:50%;background:radial-gradient(circle at 35% 30%,#d9dde3,#6b717b);box-shadow:0 .3cqw .4cqw #0007}
+.ds-paper b{font-weight:700;font-size:2.7cqw;line-height:1.1;letter-spacing:.01em}
+.ds-paper small{font:700 2.2cqw/1 var(--body,'DM Sans',sans-serif);font-variant-numeric:tabular-nums;color:#8a4a22}
+.ds-rates-btn{left:3%;top:3%;padding:.8cqw 2cqw;border:max(2px,.3cqw) solid #4b2419;border-radius:99px;background:#f4dfb5;color:#4b2419;font:700 2.4cqw/1 var(--heading,'Fredoka',sans-serif);cursor:pointer;box-shadow:0 .4cqw 0 #4b2419}
+.ds-rates{left:50%;top:50%;width:62cqw;transform:translate(-50%,-50%);box-sizing:border-box;padding:3cqw;border:max(2px,.4cqw) solid #4b2419;border-radius:2cqw;background:#f4dfb5;color:#4b2419;box-shadow:0 2cqw 5cqw #000a;z-index:5;font-family:var(--body,'DM Sans',sans-serif)}
+.ds-rates[hidden],.ds-result[hidden]{display:none}
+.ds-rates h3{margin:0 0 1.2cqw;font:700 3.6cqw/1 var(--heading,'Fredoka',sans-serif)}
+.ds-rates ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:.8cqw 3cqw}
+.ds-rates li{display:flex;justify-content:space-between;gap:1cqw;font-size:max(11px,2.5cqw);font-weight:700}
+.ds-rates li b{font-variant-numeric:tabular-nums}
+.ds-rates p{margin:1.4cqw 0 0;font-size:max(10px,2cqw);opacity:.8}
+.ds-result{left:50%;top:50%;width:56cqw;transform:translate(-50%,-50%);box-sizing:border-box;padding:4cqw 3cqw 3cqw;text-align:center;border:max(2px,.5cqw) solid #4b2419;border-radius:2.4cqw;background:linear-gradient(160deg,#f6e6bf,#e6cf9c);color:#4b2419;box-shadow:0 2cqw 6cqw #000b;z-index:6;animation:dsPop .45s cubic-bezier(.3,1.5,.5,1) both;font-family:var(--heading,'Fredoka',sans-serif)}
+.ds-result.is-legend{background:linear-gradient(160deg,#efe4ff,#c9b3ff);box-shadow:0 0 6cqw #b894ffcc,0 2cqw 6cqw #000b}
+.ds-result img{width:19cqw;height:19cqw;margin:0 auto 1cqw;object-fit:contain;position:static;filter:drop-shadow(0 .8cqw .6cqw #0007);animation:dsFloat 1.8s ease-in-out infinite}
+.ds-result small{display:block;font:700 2.4cqw/1 var(--body,'DM Sans',sans-serif);letter-spacing:.14em;color:#8a4a22}
+.ds-result strong{display:block;margin:1cqw 0;font-size:5.6cqw;line-height:1.1}
+.ds-result p{margin:0 0 2cqw;font:600 2.4cqw/1.3 var(--body,'DM Sans',sans-serif)}
+.ds-result button{padding:1.2cqw 5cqw;border:max(2px,.35cqw) solid #60341f;border-radius:1.2cqw;background:#e99a43;color:#482418;font:700 3cqw/1 var(--heading,'Fredoka',sans-serif);cursor:pointer}
+.ds-result button:hover{filter:brightness(1.08)}
+@keyframes dsPop{from{opacity:0;transform:translate(-50%,-50%) scale(.6)}}
+@keyframes dsFloat{50%{transform:translateY(-1cqw) rotate(2deg)}}
+.ds-msg{left:5%;right:5%;bottom:.2%;margin:0;text-align:center;font:800 max(11px,2.1cqw)/1.25 var(--body,'DM Sans',sans-serif);color:#fff2d0;text-shadow:0 2px 0 #3a1a10,0 0 6px #3a1a10;pointer-events:none}
+.ds-msg:empty{display:none}
+/* Amber menu button + pulsing dot on the closed Amber Coin pill while a spin is ready */
+.amber-currency-trigger.has-spin::before{content:"";position:absolute;top:-2px;right:-2px;width:11px;height:11px;border-radius:50%;background:#7ed957;border:2px solid #0e1424;animation:amberGift 1.6s ease-in-out infinite}
+.daily-spin-open.is-ready small{color:#b7ee8f}
+@media(prefers-reduced-motion:reduce){.ds-overlay,.ds-board,.ds-result,.ds-result img,.ds-spin img,.ds-pointer.is-tick,.amber-currency-trigger.has-spin::before{animation:none!important}}
