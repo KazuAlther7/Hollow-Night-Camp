@@ -5,7 +5,9 @@
 .ds-art>*{position:absolute}
 .ds-art img{display:block;-webkit-user-drag:none;user-drag:none}
 .ds-bg{inset:0;width:100%;height:100%}
-.ds-title{left:0;right:0;top:8.1%;margin:0;text-align:center;font:700 8.4cqw/1 var(--heading,'Fredoka',sans-serif);letter-spacing:.02em;color:#e3ad68;-webkit-text-stroke:.55cqw #5e3418;paint-order:stroke fill;text-shadow:0 .7cqw 0 #3d200e;pointer-events:none}
+.ds-title{left:22%;width:56%;top:7%;margin:0;pointer-events:none}
+.ds-title svg{display:block;width:100%;overflow:visible}
+.ds-title text{font:700 150px/1 var(--heading,'Fredoka',sans-serif);letter-spacing:6px;fill:#e3ad68;stroke:#5e3418;stroke-width:14px;stroke-linejoin:round;paint-order:stroke fill}
 /* wheel: .ds-wheel-pos is only centring, .ds-wheel is what turns */
 .ds-wheel-pos{left:50.67%;top:50%;width:68.3cqw;height:68.3cqw;transform:translate(-50%,-50%)}
 .ds-wheel{position:absolute;inset:0;will-change:transform}
@@ -14,8 +16,9 @@
 .ds-item{position:absolute;left:0;top:0;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:.4cqw;width:12cqw}
 .ds-item img{width:7.4cqw;height:7.4cqw;object-fit:contain;filter:drop-shadow(0 .4cqw .3cqw #0008)}
 .ds-item b{padding:.25cqw 1.1cqw;border:max(1.5px,.3cqw) solid #3d1f0f;border-radius:99px;background:#f8dfaa;color:#51251a;font:700 2.8cqw/1.15 var(--heading,'Fredoka',sans-serif);white-space:nowrap}
+.ds-item.is-exp b{font-size:2.2cqw;padding:.25cqw .8cqw}
 .ds-item.is-legend b{background:#c9b3ff;color:#2c1a5a;font-size:2.3cqw}
-.ds-hub{left:50.67%;top:50%;width:17.6%;transform:translate(-50%,-50%);pointer-events:none}
+.ds-hub{left:50.67%;top:50%;width:18.4%;transform:translate(-50%,-50%);pointer-events:none}
 .ds-pointer{left:50.5%;top:15.3%;width:8.1%;transform:translateX(-50%);transform-origin:50% 12%;pointer-events:none;filter:drop-shadow(0 .6cqw .5cqw #0008)}
 .ds-pointer.is-tick{animation:dsTick .11s ease-out}
 @keyframes dsTick{40%{transform:translateX(-50%) rotate(-10deg)}}
