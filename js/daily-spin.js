@@ -5,7 +5,7 @@ import { supabase } from '../config/supabase.js';
 import { refreshWallet, holdBalance } from './wallet.js?v=3';
 import { activeTimezone } from './status-widget.js?v=3';
 
-const A = 'assets/daily-spin/', COIN = 'assets/arcade/amber-coin.png', FIRE = 'assets/icons/campfire.png', FRAME = 'assets/frames/sacred-of-hollow.webp';
+const A = 'assets/daily-spin/', COIN = 'assets/arcade/amber-coin.png', FIRE = A + 'exp-fire.webp', FRAME = 'assets/frames/sacred-of-hollow.webp';
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const money = (n) => Number(n || 0).toLocaleString();
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -22,8 +22,8 @@ const ITEMS = [
 // Display only — mirrors the odds in sql/daily_spin.sql (percent).
 const RATES = { amber_20: 22, amber_50: 17, amber_100: 8.05, amber_200: 5, amber_500: 0.5, amber_1000: 0.25, exp_50: 20, exp_100: 13, exp_200: 8, exp_300: 4, exp_500: 2, frame_sacred_of_hollow: 0.2 };
 const iconOf = (i) => (i.kind === 'amber' ? COIN : i.kind === 'exp' ? FIRE : FRAME);
-const chipOf = (i) => (i.kind === 'amber' ? String(i.amount) : i.kind === 'exp' ? '+' + i.amount : 'LEGEND');
-const nameOf = (i) => (i.kind === 'amber' ? `${money(i.amount)} Amber` : i.kind === 'exp' ? `${money(i.amount)} EXP` : 'Sacred of Hollow');
+const chipOf = (i) => (i.kind === 'amber' ? String(i.amount) : i.kind === 'exp' ? '+Exp ' + i.amount : 'LEGEND');
+const nameOf = (i) => (i.kind === 'amber' ? `${money(i.amount)} Amber` : i.kind === 'exp' ? `Exp ${money(i.amount)}` : 'Sacred of Hollow');
 
 let st = null, offset = 0, spinning = false, angle = 0, refetching = false;
 
@@ -83,14 +83,14 @@ const sfxWin = (big) => (big ? [523, 659, 784, 1047, 1319] : [523, 659, 784]).fo
 export function openDailySpin() {
   if (document.getElementById('dailySpinOverlay')) return;
   injectStyles();
-  const slots = ITEMS.map((it, i) => `<div class="ds-slot" style="--a:${i * 30}deg"><div class="ds-item${it.kind === 'frame' ? ' is-legend' : ''}"><b>${chipOf(it)}</b><img src="${iconOf(it)}" alt="" draggable="false"></div></div>`).join('');
+  const slots = ITEMS.map((it, i) => `<div class="ds-slot" style="--a:${i * 30}deg"><div class="ds-item${it.kind === 'frame' ? ' is-legend' : it.kind === 'exp' ? ' is-exp' : ''}"><b>${chipOf(it)}</b><img src="${iconOf(it)}" alt="" draggable="false"></div></div>`).join('');
   const rates = ITEMS.map((it) => `<li><span>${nameOf(it)}</span><b>${RATES[it.key]}%</b></li>`).join('');
   const overlay = document.createElement('div'); overlay.id = 'dailySpinOverlay'; overlay.className = 'ds-overlay';
   overlay.innerHTML = `<section class="ds-board" role="dialog" aria-modal="true" aria-label="Daily Spin">
     <button class="daily-login-close" type="button" aria-label="Close daily spin">×</button>
     <div class="ds-art">
       <img class="ds-bg" src="${A}board.webp" alt="" draggable="false">
-      <h2 class="ds-title">DAILY SPIN</h2>
+      <h2 class="ds-title" aria-label="Daily Spin"><svg viewBox="0 0 1000 260" aria-hidden="true"><path id="dsArc" d="M40 200 Q500 80 960 200" fill="none"/><text><textPath href="#dsArc" startOffset="50%" text-anchor="middle">DAILY SPIN</textPath></text></svg></h2>
       <div class="ds-wheel-pos"><div class="ds-wheel" id="dsWheel"><img src="${A}wheel.webp" alt="" draggable="false">${slots}</div></div>
       <img class="ds-hub" src="${A}hub.webp" alt="" draggable="false">
       <img class="ds-pointer" id="dsPointer" src="${A}pointer.webp" alt="" draggable="false">
