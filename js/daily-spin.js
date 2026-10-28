@@ -56,6 +56,7 @@ function paintHint() {
   document.getElementById('amberCurrencyTrigger')?.classList.toggle('has-spin', ready);
   const hint = document.getElementById('dailySpinHint');
   if (hint) hint.textContent = ready ? '1 free spin ready!' : `Next spin in ${hms(leftMs())}`;
+  if (ready && st.unlimited) hint.textContent = 'Author: unlimited spins';
   refetchWhenDue();
 }
 export function watchHint() {
@@ -169,7 +170,7 @@ async function doSpin() {
   setRot(final, dur, 'cubic-bezier(.12,.62,.08,1)'); trackTicks();
   await wait(dur + 80);
   angle = final % 360; setRot(angle, 0);   // same look, small numbers
-  st = { ...st, available: false, next_at: res.next_at, server_now: res.server_now }; offset = Date.parse(res.server_now) - Date.now();
+  st = { ...st, available: !!res.unlimited, next_at: res.next_at, server_now: res.server_now }; offset = Date.parse(res.server_now) - Date.now();
   spinning = false; sfxWin(res.key === 'frame_sacred_of_hollow' || res.key === 'amber_1000');
   showResult(res); release(); refreshWallet().catch(() => {}); paintAll();
 }
