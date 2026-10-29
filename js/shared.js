@@ -470,6 +470,9 @@ export async function initPage(options = {}) {
   // Amber Coin widget (under the clock/online widget) + Daily Login board, on every camp page except the editor
   if (!editor) import('./daily-login.js?v=8').catch((error) => console.warn('Amber Coin widget unavailable:', error));
 
+  // Camp Staff (Stacy) chat bubble, signed-in readers only; never allowed to break the page
+  if (!editor) import('./camp-staff.js?v=1').then((module) => module.mountCampStaff()).catch((error) => console.warn('Camp Staff unavailable:', error));
+
   observeAuthState((event) => {
     if (event === 'SIGNED_OUT' && !signingOut) {
       window.location.replace('index.html');
